@@ -1,0 +1,113 @@
+/* Header */
+
+#SignInArea {
+  float: right; 
+  margin: 10px;
+  text-align: center; 
+}
+
+#SignIn {
+  border: 3px solid lightgrey; 
+  border-radius: 5px;
+  font-size: 14pt; 
+  margin: 50px 10px;
+  padding: 3px; 
+  text-decoration: none; 
+}
+
+#LearnMore {
+  margin-top: 10px;
+}
+
+#Banner {
+  vertical-align: middle;
+}
+
+#lols-icon {
+  height: 97px;
+  width: 128px;
+}
+
+#lols-name {
+  height: 92px;
+  width: 580px;
+}
+
+#LangRibbon {
+  background-color: black; 
+  width: 100%;
+}
+
+/* Language Ribbon */
+
+#LangRibbon button {
+  background-color: black;
+  border-color: white;
+  border-style: none solid none none;
+  border-width: 1px;
+  color: white;
+  font-family: monaco;
+  font-size: 10pt;
+}
+
+/* Project Area */
+
+.ProjectTitle scan {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.LoLsViewTitle scan {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.ProjectTitle button img,
+.LoLsViewTitle button img {
+  height: 16px;
+  width: 16px;
+}
+
+.ProjectTitle button,
+.LoLsViewTitle button {
+  background-color: white;
+  border: 1px solid lightgrey;
+  border-radius: 4px;
+}
+
+#ReadMeFirst,
+#MathProblem,
+#Answer,
+#LETExplorer, 
+#MathGrammar {
+  border: 1px solid #DDD;
+  border-radius: 4px;
+  border-bottom-right-radius: 0;
+  display: block;
+  height: 100px;
+  margin-top: 5px;
+  position: relative;	
+  visibility: visible; 
+  width: 100%;
+}
+
+#MathProblem,
+#Answer {
+  height: 20px;
+}
+
+#MathGrammar {
+  height: 250px;
+}
+
+/* footer */
+
+#acknowledgement p {
+  text-align: right;
+}
+
+#acknowledgement img {
+  vertical-align: middle;
+  height: 80px;
+  width: 198px;
+}

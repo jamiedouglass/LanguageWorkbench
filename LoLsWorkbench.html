@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<title>Language of Languages Workbench</title>
+<meta name="description" content="Free Language Workbench">
+<meta name="author" content="Jamie Douglass, Nicholas Chen">
+<meta charset="utf-8">
+<!-- TODO: set base
+<base href="//www.languageoflanguages.com/">
+-->
+
+<link rel="stylesheet" href="LoLsWorkbench.css">
+
+<script src="prototype.js"></script>
+<script src="prototype-fix.js"></script>
+<script src="lib.js"></script>
+<script src="ometa-base.js"></script>
+<script src="parser.js"></script>
+<script src="bs-js-compiler.js"></script>
+<script src="bs-ometa-compiler.js"></script>
+<script src="bs-ometa-optimizer.js"></script>
+<script src="bs-ometa-js-compiler.js"></script>
+<!-- TODO: remove protocol -->
+<script src="http://d1n0x3qji82z53.cloudfront.net/src-min-noconflict/ace.js" ></script>
+<script src="LoLsWorkbenchUI.js"></script>
+<!-- TODO: temporary -->
+<script src="getting-started-project.js"></script>
+
+<body onLoad="setupPage();">
+<div id="SignInArea">
+  <a id="SignIn" href="SignIn.html">Sign in</a>
+  <div id="LearnMore">
+<!-- TODO: remove protocol -->
+    <a href="http://www.LanguageOfLanguages.com/">learn more</a>
+  </div>
+</div>
+<div id="Banner">
+  <a href="http://www.LanguageOfLanguages.com/">
+    <img id="lols-icon" src="tower-of-babel.png" alt="Tower of Babel">
+    <img id="lols-name" src="LoLsW logo.png" alt="Language of Languages (LoLs) Workbench">
+  </a>
+</div>
+<div id="LangRibbon">
+  <scan>
+    <button type="button">+Language</button>
+    <button type="button">calculate</button>
+    <button type="button">CAT</button>
+    <button type="button">documentation</button>
+    <button type="button">LET</button>
+    <button type="button">math</button>
+    <button type="button">stack_machine</button>
+  </scan>
+</div>
+<hr>
+<div id="ProjectArea">
+<div class="ProjectTitle">
+  <scan>Getting Started </scan><i>project</i>
+  <button type="button" onClick="doMenuItem('OpenProject',this)">
+    <img src="open-project.png" alt="Open Project">
+  </button>
+  <button type="button" onClick="doMenuItem('SaveProject',this)">
+    <img src="save-project.png" alt="Save Project">
+  </button>
+  <button type="button" onClick="doMenuItem('CloseProject',this)">
+    <img src="close.gif" alt="Close Project">
+  </button>
+  <button type="button" onClick="doMenuItem('OpenView',this)">
+    <img src="open-view.png" alt="Open View">
+  </button>
+  <button type="button" onClick="doMenuItem('RefreshAll',this)">
+    <img src="refresh.png" alt="Refresh All">
+  </button>
+</div>
+
+<div class="LoLsViewTitle">
+  <input id ="ReadMeFirstButton" type="button" value="-" onClick="showOrHide('ReadMeFirst')">
+  <scan>Read Me First </scan><i>view</i>
+  <button type="button" onClick="doMenuItem('OpenView',this)">
+    <img src="open-view.png" alt="Open View">
+  </button>
+  <button type="button" onClick="doMenuItem('CloseView',this)">
+    <img src="close.gif" alt="Close View">
+  </button>
+  <button type="button" onClick="doMenuItem('RefreshView',this)">
+    <img src="refresh.png" alt="Refresh View">
+  </button>
+</div>
+<div id="ReadMeFirst" class="LoLsView">
+</div>
+
+<div class="LoLsViewTitle">
+  <input id="MathProblemButton" type="button" value="-" onClick="showOrHide('MathProblem')">
+  <scan>Math Problem </scan><i>view</i>
+  <button type="button" onClick="doMenuItem('OpenView',this)">
+    <img src="open-view.png" alt="Open View">
+  </button>
+  <button type="button" onClick="doMenuItem('CloseView',this)">
+    <img src="close.gif" alt="Close View">
+  </button>
+<!-- TODO: generalize with onClick="doMenuItem('RefreshView',this)" -->
+  <button type="button" onClick="updateMathProblemView()">
+    <img src="refresh.png" alt="Refresh View">
+  </button>
+</div>
+<div id="MathProblem" class="LoLsView">
+</div>
+
+<div class="LoLsViewTitle">
+  <input id="AnswerButton" type="button" value="-" onClick="showOrHide('Answer')">
+  <scan>Answer </scan><i>view</i>
+  <button type="button" onClick="doMenuItem('OpenView',this)">
+    <img src="open-view.png" alt="Open View">
+  </button>
+  <button type="button" onClick="doMenuItem('CloseView',this)">
+    <img src="close.gif" alt="Close View">
+  </button>
+<!-- TODO: generalize with onClick="doMenuItem('RefreshView',this)" -->
+  <button type="button" onClick="updateAnswerView()">
+    <img src="refresh.png" alt="Refresh View">
+  </button>
+</div>
+<div id="Answer" class="LoLsView">
+</div>
+
+<div class="LoLsViewTitle">
+  <input id="LETExplorerButton" type="button" value="-" onClick="showOrHide('LETExplorer')">
+  <scan>LET Explorer </scan><i>view</i>
+  <button type="button" onClick="doMenuItem('OpenView',this)">
+    <img src="open-view.png" alt="Open View">
+  </button>
+  <button type="button" onClick="doMenuItem('CloseView',this)">
+    <img src="close.gif" alt="Close View">
+  </button>
+<!-- TODO: generalize with onClick="doMenuItem('RefreshView',this)" -->
+  <button type="button" onClick="updateLETExplorerView()">
+    <img src="refresh.png" alt="Refresh View">
+  </button>
+</div>
+<div id="LETExplorer" class="LoLsView">
+</div>
+
+<div class="LoLsViewTitle">
+  <input id ="MathGrammarButton" type="button" value="-" onClick="showOrHide('MathGrammar')">
+  <scan>Math Grammar </scan><i>view</i>
+  <button type="button" onClick="doMenuItem('OpenView',this)">
+    <img src="open-view.png" alt="Open View">
+  </button>
+  <button type="button" onClick="doMenuItem('CloseView',this)">
+    <img src="close.gif" alt="Close View">
+  </button>
+<!-- TODO: generalize with onClick="doMenuItem('RefreshView',this)" -->
+  <button type="button" onClick="updateMathGrammarView()">
+    <img src="refresh.png" alt="Refresh View">
+  </button>
+</div>
+<div id="MathGrammar" class="LoLsView">
+</div>
+
+<div id="acknowledgement">
+<!-- TODO: remove protocol -->
+  <p>Brought to you by <a href="http://www.ResearchOnKnowing.com/">
+	<img src="ROK.png" alt="Research On Knowing, LLC"></a>
+</div>
+</div>
