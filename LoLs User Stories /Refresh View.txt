@@ -1,0 +1,10 @@
+Refresh View
+====
+
+On the LoLs Workbench, Joe sees a refresh icon which looks like two green arrows
+in a circle located on the title line for each view and also on the title line
+for the project. When Joe hovers over the icon for a view, a tips pops up saying
+"refresh". By clicking the icon (which is a button) the content of the current
+view is redisplayed. However when Joe hovers over the icon for the project a tip 
+pops up saying "refresh all". Clicking the project refresh button refreshes all 
+the views in the project. 

@@ -1,0 +1,8 @@
+Remove View from Project
+====
+
+On the LoLs Workbench, Joe sees an icon which is a red ball with a white X
+located on the title line for each view and also on the title line for the
+project. When Joe hovers over the icon, an tips pops up saying "remove view". By
+clicking the icon (which is a button) the current view is removed from the
+project.  

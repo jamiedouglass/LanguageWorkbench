@@ -1,0 +1,7 @@
+Add View to Project
+====
+
+On the LoLs Workbench, Joe sees an icon which looks like an eye located on the
+title line for each view. When Joe hovers over the icon, an tips pops up saying
+"add view". By clicking the icon (which is a button) a duplicate of the current
+view is created and added to the project. Joe can now alter the new view. 
