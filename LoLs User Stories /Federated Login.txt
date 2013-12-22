@@ -13,6 +13,7 @@ user ID and password. The Google Service handles the authentication including us
 and password recovery and other authentication issues. Once Nell's identity is verified,
 the LoLs Workbench page is redisplayed. The sign in link in the upper right hand corner
 is replaced with "Welcome Nell (nell@youremail.com)" followed by a sign out link. 
+Clicking on the sign out link returns the workbench to the initial state.
 
 Signing on allows Nell to save projects she creates and open other users projects who
 have granted her access. 

@@ -1,0 +1,11 @@
+Changing the Language in a View Selection
+====
+
+Neil see HTML listed in the language ribbon is red. This indicates the root language
+for current selection is HTML. The selection highlights a subtree of language elements.
+Smaller subtrees within the selection maybe other languages than HTML, but the overall
+language is indicated as HTML by being red in the language ribbon.
+
+By clicking XML in the language ribbon, Neil changes the language for the whole subtree
+in the selection to XML. If Neil instead held the shift or command key while clicking
+XML only the root language of the selection would be altered.

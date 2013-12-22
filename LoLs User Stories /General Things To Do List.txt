@@ -1,0 +1,17 @@
+General Things To Do List
+====
+
+Use Coding Style Guidelines from Google https://code.google.com/p/google-styleguide/
+  HTML/CSS   http://google-styleguide.googlecode.com/svn/trunk/htmlcssguide.xml
+  Javascript http://google-styleguide.googlecode.com/svn/trunk/javascriptguide.xml
+Ask user whether to save or abandon project changes before leaving project:
+  closing browser window, signing out, opening a different project.
+Add tips for "expand" '+' and "collapse" '-' to view buttons.
+Adjust a views height by dragging the bottom edge of the view frame.
+Create "Getting Started" as loadable project with User Documentation.
+Collect licenses and write contribution history.
+Set/Change view attributes: edit/read-only, line numbers, etc.
+Replace Packrat with Shortcut Parser.
+Bootstrap CAT (CFG+ support) from OMeta (PEG support) grammar.
+Support LET generation: A:c = 'aa':a 'bb':b -> <c,a,b> 
+  c=concept for A and a,b are the first and second children.

@@ -1,0 +1,13 @@
+Add or Remove Language
+====
+
+Bob wants to use a new language, XML, in one of his project views. The language
+needs to be added to the language ribbon located at the top of the LoLs
+Workbench. Bob clicks the "+Language" button at the start(left top) of the
+language ribbon. A window pops up which lists the available languages. Bob
+selects the XML as the language to add. Languages which are on the ribbon but
+are not being used in the project can be deselected. The reselected languages
+are removed from the language ribbon. Several languages can be added or removed
+at once. When the pop up is closed by clicking the submit button the language
+ribbon is updated accordingly. Closing the pop up window or clicking the cancel 
+button leaves the language ribbon unchanged.
