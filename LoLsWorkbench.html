@@ -18,6 +18,7 @@
 <script src="bs-ometa-compiler.js"></script>
 <script src="bs-ometa-optimizer.js"></script>
 <script src="bs-ometa-js-compiler.js"></script>
+<script src="language-elements.js"></script>
 <!-- TODO: remove protocol -->
 <script src="http://d1n0x3qji82z53.cloudfront.net/src-min-noconflict/ace.js" ></script>
 <script src="LoLsWorkbenchUI.js"></script>
@@ -35,12 +36,12 @@
 <div id="Banner">
   <a href="http://www.LanguageOfLanguages.com/">
     <img id="lols-icon" src="tower-of-babel.png" alt="Tower of Babel">
-    <img id="lols-name" src="LoLsW logo.png" alt="Language of Languages (LoLs) Workbench">
+    <img id="lols-name" src="LoLsW-logo.png" alt="Language of Languages (LoLs) Workbench">
   </a>
 </div>
 <div id="LangRibbon">
   <scan>
-    <button type="button">+Language</button>
+    <button type="button" title="add/remove language">+Language</button>
     <button type="button">calculate</button>
     <button type="button">CAT</button>
     <button type="button">documentation</button>
@@ -53,27 +54,28 @@
 <div id="ProjectArea">
 <div class="ProjectTitle">
   <scan>Getting Started </scan><i>project</i>
-  <button type="button" onClick="doMenuItem('OpenProject',this)">
+  <button type="button" title="open project" onClick="doMenuItem('OpenProject',this)">
     <img src="open-project.png" alt="Open Project">
   </button>
-  <button type="button" onClick="doMenuItem('SaveProject',this)">
+  <button type="button" title="save project" onClick="doMenuItem('SaveProject',this)">
     <img src="save-project.png" alt="Save Project">
   </button>
-  <button type="button" onClick="doMenuItem('RefreshAll',this)">
+  <button type="button" title="refresh all" onClick="doMenuItem('RefreshAll',this)">
     <img src="refresh.png" alt="Refresh All">
   </button>
 </div>
 
 <div class="LoLsViewTitle">
-  <input id ="ReadMeFirstButton" type="button" value="-" onClick="showOrHide('ReadMeFirst')">
+  <input id ="ReadMeFirstButton" type="button" title="collapse" value="-" 
+    onClick="showOrHide('ReadMeFirst')">
   <scan>Read Me First </scan><i>view</i>
-  <button type="button" onClick="doMenuItem('OpenView',this)">
+  <button type="button" title="open view" onClick="doMenuItem('OpenView',this)">
     <img src="open-view.png" alt="Open View">
   </button>
-  <button type="button" onClick="doMenuItem('CloseView',this)">
+  <button type="button" title="close view" onClick="doMenuItem('CloseView',this)">
     <img src="close.gif" alt="Close View">
   </button>
-  <button type="button" onClick="doMenuItem('RefreshView',this)">
+  <button type="button" title="refresh" onClick="doMenuItem('RefreshView',this)">
     <img src="refresh.png" alt="Refresh View">
   </button>
 </div>
@@ -81,16 +83,17 @@
 </div>
 
 <div class="LoLsViewTitle">
-  <input id="MathProblemButton" type="button" value="-" onClick="showOrHide('MathProblem')">
+  <input id="MathProblemButton" type="button" title="collapse" value="-" 
+    onClick="showOrHide('MathProblem')">
   <scan>Math Problem </scan><i>view</i>
-  <button type="button" onClick="doMenuItem('OpenView',this)">
+  <button type="button" title="open view" onClick="doMenuItem('OpenView',this)">
     <img src="open-view.png" alt="Open View">
   </button>
-  <button type="button" onClick="doMenuItem('CloseView',this)">
+  <button type="button" title="close view" onClick="doMenuItem('CloseView',this)">
     <img src="close.gif" alt="Close View">
   </button>
 <!-- TODO: generalize with onClick="doMenuItem('RefreshView',this)" -->
-  <button type="button" onClick="updateMathProblemView()">
+  <button type="button" title="refresh" onClick="updateMathProblemView()">
     <img src="refresh.png" alt="Refresh View">
   </button>
 </div>
@@ -98,16 +101,17 @@
 </div>
 
 <div class="LoLsViewTitle">
-  <input id="AnswerButton" type="button" value="-" onClick="showOrHide('Answer')">
+  <input id="AnswerButton" type="button" title="collapse" value="-" 
+    onClick="showOrHide('Answer')">
   <scan>Answer </scan><i>view</i>
-  <button type="button" onClick="doMenuItem('OpenView',this)">
+  <button type="button" title="open view" onClick="doMenuItem('OpenView',this)">
     <img src="open-view.png" alt="Open View">
   </button>
-  <button type="button" onClick="doMenuItem('CloseView',this)">
+  <button type="button" title="close view" onClick="doMenuItem('CloseView',this)">
     <img src="close.gif" alt="Close View">
   </button>
 <!-- TODO: generalize with onClick="doMenuItem('RefreshView',this)" -->
-  <button type="button" onClick="updateAnswerView()">
+  <button type="button" title="refresh" onClick="updateAnswerView()">
     <img src="refresh.png" alt="Refresh View">
   </button>
 </div>
@@ -115,16 +119,17 @@
 </div>
 
 <div class="LoLsViewTitle">
-  <input id="LETExplorerButton" type="button" value="-" onClick="showOrHide('LETExplorer')">
+  <input id="LETExplorerButton" type="button" title="collapse" value="-" 
+    onClick="showOrHide('LETExplorer')">
   <scan>LET Explorer </scan><i>view</i>
-  <button type="button" onClick="doMenuItem('OpenView',this)">
+  <button type="button" title="open view" onClick="doMenuItem('OpenView',this)">
     <img src="open-view.png" alt="Open View">
   </button>
-  <button type="button" onClick="doMenuItem('CloseView',this)">
+  <button type="button" title="close view" onClick="doMenuItem('CloseView',this)">
     <img src="close.gif" alt="Close View">
   </button>
 <!-- TODO: generalize with onClick="doMenuItem('RefreshView',this)" -->
-  <button type="button" onClick="updateLETExplorerView()">
+  <button type="button" title="refresh" onClick="updateLETExplorerView()">
     <img src="refresh.png" alt="Refresh View">
   </button>
 </div>
@@ -132,16 +137,17 @@
 </div>
 
 <div class="LoLsViewTitle">
-  <input id ="MathGrammarButton" type="button" value="-" onClick="showOrHide('MathGrammar')">
+  <input id ="MathGrammarButton" type="button" title="collapse" value="-" 
+    onClick="showOrHide('MathGrammar')">
   <scan>Math Grammar </scan><i>view</i>
-  <button type="button" onClick="doMenuItem('OpenView',this)">
+  <button type="button" title="open view" onClick="doMenuItem('OpenView',this)">
     <img src="open-view.png" alt="Open View">
   </button>
-  <button type="button" onClick="doMenuItem('CloseView',this)">
+  <button type="button" title="close view" onClick="doMenuItem('CloseView',this)">
     <img src="close.gif" alt="Close View">
   </button>
 <!-- TODO: generalize with onClick="doMenuItem('RefreshView',this)" -->
-  <button type="button" onClick="updateMathGrammarView()">
+  <button type="button" title="refresh" onClick="updateMathGrammarView()">
     <img src="refresh.png" alt="Refresh View">
   </button>
 </div>

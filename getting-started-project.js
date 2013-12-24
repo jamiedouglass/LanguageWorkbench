@@ -29,16 +29,16 @@ function loadGettingStarted() {
   grammar.getSession().setMode('ace/mode/textmate');
   grammar.setValue('ometa math {\n' +
   '  expression = term:t space* end           -> t,\n' +
-  '  term       = term:t "+" factor:f         -> [\'Add\', t, f]\n' +
-  '             | term:t "-" factor:f         -> [\'Subtract\', t, f]\n' +
+  '  term       = term:t "+" factor:f         -> Le(\'Add\', t, f)\n' +
+  '             | term:t "-" factor:f         -> Le(\'Subtract\', t, f)\n' +
   '             | factor,\n' +
-  '  factor     = factor:f "*" primary:p      -> [\'Multiply\', f, p]\n' +
-  '             | factor:f "/" primary:p      -> [\'Divide\', f, p]\n' +
+  '  factor     = factor:f "*" primary:p      -> Le(\'Multiply\', f, p)\n' +
+  '             | factor:f "/" primary:p      -> Le(\'Divide\', f, p)\n' +
   '             | primary,\n' + 
   '  primary    = Group\n' +
   '             | Number,\n' +
-  '  Group      = "(" term:t ")"              -> [\'Group\', t],\n' +
-  '  Number     = space* digits:n             -> [\'Number\', n],\n' + 
+  '  Group      = "(" term:t ")"              -> Le(\'Group\', t),\n' +
+  '  Number     = space* digits:n             -> Le(\'Number\', n),\n' + 
   '  digits     = digits:n digit:d            -> (n * 10 + d)\n' +
   '             | digit,\n' + 
   '  digit      = ^digit:d                    -> d.digitValue(),\n' +

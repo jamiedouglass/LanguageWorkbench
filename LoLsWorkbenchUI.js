@@ -37,10 +37,12 @@ function showOrHide(id) {
   	style.display = "block";
   	style.visibility = "visible";
   	button.value = "-";
+  	button.title = "collapse";
   } else {
   	style.display = "none";
   	style.visibility = "hidden";
   	button.value = "+";
+  	button.title = "expand";
   }
 }
 
