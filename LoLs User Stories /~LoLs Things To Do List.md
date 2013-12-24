@@ -40,7 +40,7 @@ Completed Tasks
 Note
 ----
 * Use Coding Style Guidelines from Google `https://code.google.com/p/google-styleguide/`
-** HTML/CSS   `http://google-styleguide.googlecode.com/svn/trunk/htmlcssguide.xml`
-** Javascript `http://google-styleguide.googlecode.com/svn/trunk/javascriptguide.xml`
+* HTML/CSS   `http://google-styleguide.googlecode.com/svn/trunk/htmlcssguide.xml`
+* Javascript `http://google-styleguide.googlecode.com/svn/trunk/javascriptguide.xml`
 * Place initials of who is working on each started task in parenthesis at end of item.
 * Place initials and completion date in parenthesis on end of each completed task.
