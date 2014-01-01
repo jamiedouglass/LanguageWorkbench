@@ -3,6 +3,21 @@ function setupPage() {
   loadGettingStarted();
 }
 
+function openProject(id) {
+  // TODO: open existing or create new project
+  alert("Open Existing Project or Create New Project");
+}
+
+function saveProject(id) {
+  // TODO: save current project
+  alert("Save Current Project");
+}
+
+function refreshAll(id) {
+  // TODO: refresh all the views in the current project
+  alert("Refresh All Views in Project");
+}
+
 function translateCode(s) {
   var translationError = function(m, i) {
     alert('Translation error - please report this!');
@@ -30,76 +45,32 @@ function insertMessage(editor, index, message) {
   editor.focus();
 }
   
-function showOrHide(id) {
-  var	button = document.getElementById(id + "Button"),
-    style = document.getElementById(id).style;
+function showOrHide(id, button) {
+  var style = document.getElementById(id).style;
   if (style.visibility === "hidden") {
   	style.display = "block";
   	style.visibility = "visible";
-  	button.value = "-";
   	button.title = "collapse";
+  	button.value = "-";
   } else {
   	style.display = "none";
   	style.visibility = "hidden";
-  	button.value = "+";
   	button.title = "expand";
+  	button.value = "+";
   }
 }
 
-function updateMathProblemView() {
-  var result, doc, pos;
-  updateMathGrammarView();
-  if (math == undefined) 
-    return undefined;
-  try {
-	result=math.matchAll(mathProblem.getValue(), 'expression', undefined, 
-	  function(m, i) {throw objectThatDelegatesTo(fail, {errorPos: i}) });
-	return result;
-  } catch (e) {
-    if (e.errorPos != undefined) {
-	  insertMessage(mathProblem, e.errorPos, " Unknown-->");
-	} else {
-	  alert("Math Problem Error\n\n" + e);
-	}
-  }
+function openView(id) {
+  // TODO: open a copy of this view
+  alert("Open a Copy of This View");
 }
 
-function updateAnswerView() {
-  var result = updateMathProblemView();
-  try {
-    if (result == undefined) 
-      return;
-    if (math != undefined) 
-      result = math.match(result,'le');
-    answer.setValue("" + result);
-  } catch (e) {
-    alert("Answer Error\n\n" + e);
-  }
+function closeView(id) {
+  // TODO: close this view in current project
+  alert("Close This View");
 }
 
-function updateMathGrammarView() {
-  var code;
-  try {
-    code=translateCode(grammar.getValue());
-    eval(code);
-  } catch (e) {
-    if (e.errorPos != undefined) {
-      insertMessage(grammar, e.errorPos, " Unknown-->");
-    } else {
-      alert("Math Grammar Error\n\n" + e);
-    }
-  }
-}
-
-function updateLETExplorerView() {
-  var result = updateMathProblemView();
-  try {
-    if (result == undefined) 
-      return;
-    if (math != undefined) 
-      result = math.match(result,'let');
-    letExplorer.setValue("" + l(result));
-  } catch (e) {
-    alert("LET Explorer Error\n\n" + e);
-  }
+function refreshView(id) {
+  // TODO: refresh this view in current project
+  alert("Refresh View");
 }

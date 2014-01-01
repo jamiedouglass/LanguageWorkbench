@@ -76,28 +76,39 @@
 }
 
 #ReadMeFirst,
-#MathProblem,
-#Answer,
-#LETExplorer, 
-#MathGrammar {
+#LETExplorer {
+  position: relative;	
+}
+
+.LoLsViewEditor {
   border: 1px solid #DDD;
   border-radius: 4px;
   border-bottom-right-radius: 0;
   display: block;
   height: 100px;
   margin-top: 5px;
-  position: relative;	
   visibility: visible; 
   width: 100%;
 }
 
+
 #MathProblem,
 #Answer {
   height: 20px;
+  position: relative;	
+
 }
+
+/*
+#ReadMeFirst,
+#LETExplorer {
+  position: relative;	
+}
+*/
 
 #MathGrammar {
   height: 250px;
+  position: relative;	
 }
 
 /* footer */

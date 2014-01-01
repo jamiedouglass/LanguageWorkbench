@@ -28,3 +28,12 @@ Array.prototype.concept = function() {
 Array.prototype.children = function() {
   return this.slice(1);
 }
+
+Array.prototype.depth = function() {
+  var d=0, n=this;
+  while (n !== undefined) {
+    n=n.parent();
+    d++;
+  }
+  return d;
+}

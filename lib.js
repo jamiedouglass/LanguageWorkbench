@@ -1,3 +1,21 @@
+// generate locally unique id from string argument
+
+function genLocalId(s) {
+  var c, sid="";
+  for (var i=0; i<s.length; i++) {
+    c=s[i];
+    if (c>="A" && c<="Z" || c>="a" && c<="z" ) {
+      sid=sid+c;
+	}
+  }
+  c=document.getElementById(sid);
+  while (c!=null) {
+    sid= sid+"0";
+  	c=document.getElementById(sid);
+  } 
+  return sid;
+}
+
 // try to use StringBuffer instead of string concatenation to improve performance
 
 function StringBuffer() {
