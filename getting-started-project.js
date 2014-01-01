@@ -1,5 +1,5 @@
 function createView(name,gutter,readOnly,value,height) {
-  var e, id=genLocalId(name);
+  var e, view, id=genLocalId(name);
   document.getElementById("ProjectArea").insertAdjacentHTML("beforeend",
 	'<div class="LoLsView">' +
 	'	<div class="LoLsViewTitle">' +
@@ -29,24 +29,26 @@ function createView(name,gutter,readOnly,value,height) {
   view.setValue(value);
   view.setReadOnly(readOnly);
   view.clearSelection();
+  e.editor=view;
   return view;  
 }
 
 function loadGettingStarted() { 
   // TODO: load Getting Started as general project
+  var startView;
   document.getElementById("ProjectName").textContent='Getting Started'+' ';
-  view = createView('Read Me First',false,true,
+  createView('Read Me First',false,true,
 	'Welcome to the Language Workbench for Language of Languages (LoLs).\n' +
 	'Select a project and interact with it using the language areas below.\n' +
 	'Each area displays the project according to a selected language.\n' +
 	'Changes in one area update all other areas and the Language Element\n' +
 	'Tree (LET) which defines the LoLs project.',"100px");
-  mathProblem = createView('Math Problem',false,false,'2+3*4',"20px");  
-  answer = createView('Answer',false,true,'',"20px");  
-  letExplorer = createView('LET Explorer',false,true,
+  startView=createView('Math Problem',false,false,'2+3*4',"20px");  
+  createView('Answer',false,true,'',"20px");  
+  createView('LET Explorer',false,true,
 	 '.+. Add\n  2 Natural Number\n  .*. Multiply\n' +
 	 '    3 Natural Number\n    4 Natural Number',"100px");	 
-  grammar = createView('Math Grammar',true,false,
+  createView('Math Grammar',true,false,
 	'ometa math {\n' +
 	'  expression = term:t space* end           -> t,\n' +
 	'  term       = term:t "+" factor:f         -> Le(\'Add\', t, f)\n' +
@@ -77,7 +79,7 @@ function loadGettingStarted() {
 	'}',"250px");
   
   updateAnswerView();
-  mathProblem.focus(); 
+  startView.focus(); 
 }
 
 function p(x) { 
@@ -97,9 +99,13 @@ function l(x) {
   return s;
 }
 
+function updateReadMeFirstView() {
+}
+
 function updateMathGrammarView() {
-  var code;
+  var grammar, code;
   try {
+    grammar=document.getElementById("MathGrammar").editor;
     code=translateCode(grammar.getValue());
     eval(code);
   } catch (e) {
@@ -112,11 +118,12 @@ function updateMathGrammarView() {
 }
 
 function updateMathProblemView() {
-  var result, doc, pos;
+  var mathProblem, result;
   updateMathGrammarView();
   if (math == undefined) 
     return undefined;
   try {
+  mathProblem=document.getElementById("MathProblem").editor;
 	result=math.matchAll(mathProblem.getValue(), 'expression', undefined, 
 	  function(m, i) {throw objectThatDelegatesTo(fail, {errorPos: i}) });
 	return result;
@@ -130,12 +137,13 @@ function updateMathProblemView() {
 }
 
 function updateAnswerView() {
-  var result = updateMathProblemView();
+  var answer, result = updateMathProblemView();
   try {
     if (result == undefined) 
       return;
     if (math != undefined) 
       result = math.match(result,'le');
+    answer=document.getElementById("Answer").editor;
     answer.setValue("" + result);
   } catch (e) {
     alert("Answer error at unknown position\n\n" + e);
@@ -143,12 +151,13 @@ function updateAnswerView() {
 }
 
 function updateLETExplorerView() {
-  var result = updateMathProblemView();
+  var letExplorer, result = updateMathProblemView();
   try {
     if (result == undefined) 
       return;
     if (math != undefined) 
       result = math.match(result,'let');
+    letExplorer=document.getElementById("LETExplorer").editor;
     letExplorer.setValue("" + l(result));
   } catch (e) {
     alert("LET Explorer error at unknown position\n\n" + e);
