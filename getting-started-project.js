@@ -45,9 +45,7 @@ function loadGettingStarted() {
 	'Tree (LET) which defines the LoLs project.',"100px");
   startView=createView('Math Problem',false,false,'2+3*4',"20px");  
   createView('Answer',false,true,'',"20px");  
-  createView('LET Explorer',false,true,
-	 '.+. Add\n  2 Natural Number\n  .*. Multiply\n' +
-	 '    3 Natural Number\n    4 Natural Number',"100px");	 
+  createView('LET Explorer',false,true,'',"100px");	 
   createView('Math Grammar',true,false,
 	'ometa math {\n' +
 	'  expression = term:t space* end           -> t,\n' +
@@ -70,33 +68,25 @@ function loadGettingStarted() {
 	'         | [\'Subtract\' le:l le:r] -> (l - r)\n' +
 	'         | [\'Multiply\' le:l le:r] -> (l * r)\n' +
 	'         | [\'Divide\' le:l le:r]   -> (l / r),\n\n' + 
-	'  let = [\'Number\' anything:n]  -> [\'\'+n+\' Natural Number\']\n' +
-	'      | [\'Group\' let:x]           -> [\'(.) Group\'].concat(p(x))\n' +
-	'      | [\'Add\' let:l let:r]       -> [\'.+. Add\'].concat(p(l),p(r))\n' +
-	'      | [\'Subtract\' let:l let:r]  -> [\'.-. Subtract\'].concat(p(l),p(r))\n' +
-	'      | [\'Multiply\' let:l let:r]  -> [\'.*. Multiply\'].concat(p(l),p(r))\n' +
-	'      | [\'Divide\' let:l let:r]    -> [\'./. Divide\'].concat(p(l),p(r))\n' +
+	'  let = [\'Number\' anything:n]:x    -> (sp(x)+n+\' Number\\n\')\n' +
+	'      | [\'Group\' let:e]:x          -> (sp(x)+\'(.) Group\\n\'+e)\n' +
+	'      | [\'Add\' let:l let:r]:x      -> (sp(x)+\'.+. Add\\n\'+l+r)\n' +
+	'      | [\'Subtract\' let:l let:r]:x -> (sp(x)+\'.-. Subtract\\n\'+l+r)\n' +
+	'      | [\'Multiply\' let:l let:r]:x -> (sp(x)+\'.*. Multiply\\n\'+l+r)\n' +
+	'      | [\'Divide\' let:l let:r]:x   -> (sp(x)+\'./. Divide\\n\'+l+r)\n' +
 	'}',"250px");
   
   updateAnswerView();
+  updateLETExplorerView();
   startView.focus(); 
 }
 
-function p(x) { 
-  var a = [], j = 0; 
-  for (var i = 0; i < x.length; i++) {
-    a[j++] = '  ' + x[i];  
+function sp(node) {
+  var s='', i=node.depth();
+  while (i-- > 1) {
+    s=s+'  ';
   }
-  return a;
-}
-
-
-function l(x) {  
-  var s = '';
-  for (var i = 0; i < x.length; i++) {
-    s = s + x[i] + '\n';  
-  }
-  return s;
+  return s; 
 }
 
 function updateReadMeFirstView() {
@@ -158,7 +148,7 @@ function updateLETExplorerView() {
     if (math != undefined) 
       result = math.match(result,'let');
     letExplorer=document.getElementById("LETExplorer").editor;
-    letExplorer.setValue("" + l(result));
+    letExplorer.setValue("" + result);
   } catch (e) {
     alert("LET Explorer error at unknown position\n\n" + e);
   }
