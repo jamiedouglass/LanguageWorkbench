@@ -75,11 +75,6 @@
   border-radius: 4px;
 }
 
-#ReadMeFirst,
-#LETExplorer {
-  position: relative;	
-}
-
 .LoLsViewEditor {
   border: 1px solid #DDD;
   border-radius: 4px;
@@ -89,26 +84,6 @@
   margin-top: 5px;
   visibility: visible; 
   width: 100%;
-}
-
-
-#MathProblem,
-#Answer {
-  height: 20px;
-  position: relative;	
-
-}
-
-/*
-#ReadMeFirst,
-#LETExplorer {
-  position: relative;	
-}
-*/
-
-#MathGrammar {
-  height: 250px;
-  position: relative;	
 }
 
 /* footer */

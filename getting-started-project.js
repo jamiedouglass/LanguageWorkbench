@@ -1,5 +1,5 @@
-function createView(name,gutter,readOnly,value) {
-  var id=genLocalId(name);
+function createView(name,gutter,readOnly,value,height) {
+  var e, id=genLocalId(name);
   document.getElementById("ProjectArea").insertAdjacentHTML("beforeend",
 	'<div class="LoLsView">' +
 	'	<div class="LoLsViewTitle">' +
@@ -19,7 +19,10 @@ function createView(name,gutter,readOnly,value) {
 	'	</div>' +
 	'	<div id="'+ id +'" class="LoLsViewEditor">' +
 	'	</div>' +
-	'</div>');  
+	'</div>'); 
+	e=document.getElementById(id);
+	e.style.position="relative"; 
+	e.style.height=height;
   view=ace.edit(id);
   view.getSession().setMode('ace/mode/textmate');
   view.renderer.setShowGutter(gutter);
@@ -37,12 +40,12 @@ function loadGettingStarted() {
 	'Select a project and interact with it using the language areas below.\n' +
 	'Each area displays the project according to a selected language.\n' +
 	'Changes in one area update all other areas and the Language Element\n' +
-	'Tree (LET) which defines the LoLs project.');
-  mathProblem = createView('Math Problem',false,false,'2+3*4');  
-  answer = createView('Answer',false,true,'');  
+	'Tree (LET) which defines the LoLs project.',"100px");
+  mathProblem = createView('Math Problem',false,false,'2+3*4',"20px");  
+  answer = createView('Answer',false,true,'',"20px");  
   letExplorer = createView('LET Explorer',false,true,
 	 '.+. Add\n  2 Natural Number\n  .*. Multiply\n' +
-	 '    3 Natural Number\n    4 Natural Number');	 
+	 '    3 Natural Number\n    4 Natural Number',"100px");	 
   grammar = createView('Math Grammar',true,false,
 	'ometa math {\n' +
 	'  expression = term:t space* end           -> t,\n' +
@@ -71,7 +74,7 @@ function loadGettingStarted() {
 	'      | [\'Subtract\' let:l let:r]  -> [\'.-. Subtract\'].concat(p(l),p(r))\n' +
 	'      | [\'Multiply\' let:l let:r]  -> [\'.*. Multiply\'].concat(p(l),p(r))\n' +
 	'      | [\'Divide\' let:l let:r]    -> [\'./. Divide\'].concat(p(l),p(r))\n' +
-	'}');
+	'}',"250px");
   
   updateAnswerView();
   mathProblem.focus(); 
