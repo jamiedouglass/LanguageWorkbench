@@ -46,7 +46,7 @@ function loadGettingStarted() {
   startView=createView('Math Problem',false,false,'2+3*4',"20px");  
   createView('Answer',false,true,'',"20px");  
   createView('LET Explorer',false,true,'',"100px");	 
-  createView('Math Grammar',true,false,
+  createView('Grammar',true,false,
 	'ometa math {\n' +
 	'  expression = term:t space* end           -> t,\n' +
 	'  term       = term:t "+" factor:f         -> Le(\'Add\', t, f)\n' +
@@ -61,21 +61,29 @@ function loadGettingStarted() {
 	'  Number     = space* digits:n             -> Le(\'Number\', n),\n' + 
 	'  digits     = digits:n digit:d            -> (n * 10 + d)\n' +
 	'             | digit,\n' + 
-	'  digit      = ^digit:d                    -> d.digitValue(),\n\n' +
+	'  digit      = ^digit:d                    -> d.digitValue()\n' +
+	'}\n\n' + 
+	'ometa calculate {\n' +
 	'  le     = [\'Number\' anything:n]  -> n\n' +
 	'         | [\'Group\' le:x]         -> x\n' +
 	'         | [\'Add\' le:l le:r]      -> (l + r)\n' +
 	'         | [\'Subtract\' le:l le:r] -> (l - r)\n' +
 	'         | [\'Multiply\' le:l le:r] -> (l * r)\n' +
-	'         | [\'Divide\' le:l le:r]   -> (l / r),\n\n' + 
+	'         | [\'Divide\' le:l le:r]   -> (l / r)\n' +
+	'}\n\n' + 
+	'ometa LET {\n' +
 	'  let = [\'Number\' anything:n]:x    -> (sp(x)+n+\' Number\\n\')\n' +
 	'      | [\'Group\' let:e]:x          -> (sp(x)+\'(.) Group\\n\'+e)\n' +
 	'      | [\'Add\' let:l let:r]:x      -> (sp(x)+\'.+. Add\\n\'+l+r)\n' +
 	'      | [\'Subtract\' let:l let:r]:x -> (sp(x)+\'.-. Subtract\\n\'+l+r)\n' +
 	'      | [\'Multiply\' let:l let:r]:x -> (sp(x)+\'.*. Multiply\\n\'+l+r)\n' +
 	'      | [\'Divide\' let:l let:r]:x   -> (sp(x)+\'./. Divide\\n\'+l+r)\n' +
+	'}\n\n' +
+	'ometa text {\n' +
+	'  doc = anything*\n' +
 	'}',"250px");
   
+  updateGrammarView();
   updateAnswerView();
   updateLETExplorerView();
   startView.focus(); 
@@ -90,26 +98,40 @@ function sp(node) {
 }
 
 function updateReadMeFirstView() {
+  var readMeFirst, result;
+  if (text == undefined) 
+    return undefined;
+  try {
+  readMeFirst=document.getElementById("ReadMeFirst").editor;
+	result=text.matchAll(readMeFirst.getValue(), 'doc', undefined, 
+	  function(m, i) {throw objectThatDelegatesTo(fail, {errorPos: i}) });
+	return result;
+  } catch (e) {
+    if (e.errorPos != undefined) {
+	    insertMessage(readMeFirst, e.errorPos, " Unknown-->");
+	  } else {
+	    alert("Read Me First error at unknown position\n\n" + e);
+	  }
+  }
 }
 
-function updateMathGrammarView() {
+function updateGrammarView() {
   var grammar, code;
   try {
-    grammar=document.getElementById("MathGrammar").editor;
+    grammar=document.getElementById("Grammar").editor;
     code=translateCode(grammar.getValue());
     eval(code);
   } catch (e) {
     if (e.errorPos != undefined) {
       insertMessage(grammar, e.errorPos, " Unknown-->");
     } else {
-      alert("Math Grammar error at unknown position\n\n" + e);
+      alert("Grammar error at unknown position\n\n" + e);
     }
   }
 }
 
 function updateMathProblemView() {
   var mathProblem, result;
-  updateMathGrammarView();
   if (math == undefined) 
     return undefined;
   try {
@@ -132,7 +154,7 @@ function updateAnswerView() {
     if (result == undefined) 
       return;
     if (math != undefined) 
-      result = math.match(result,'le');
+      result = calculate.match(result,'le');
     answer=document.getElementById("Answer").editor;
     answer.setValue("" + result);
   } catch (e) {
@@ -146,7 +168,7 @@ function updateLETExplorerView() {
     if (result == undefined) 
       return;
     if (math != undefined) 
-      result = math.match(result,'let');
+      result = LET.match(result,'let');
     letExplorer=document.getElementById("LETExplorer").editor;
     letExplorer.setValue("" + result);
   } catch (e) {
