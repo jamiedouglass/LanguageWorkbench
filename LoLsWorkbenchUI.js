@@ -21,7 +21,8 @@ function refreshAll(id) {
 function translateCode(s) {
   var translationError = function(m, i) {
     alert('Translation error - please report this!');
-    throw fail};
+    throw fail;
+    };
   var tree = BSOMetaJSParser.matchAll(s, 'topLevel', undefined, function(m, i) {
     throw objectThatDelegatesTo(fail, {errorPos: i})});
   return BSOMetaJSTranslator.match(tree, 'trans', undefined, translationError)
