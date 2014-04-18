@@ -45,7 +45,7 @@ function loadGettingStarted() {
 	'Tree (LET) which defines the LoLs project.',"100px");
   startView=createView('Math Problem',false,false,'2+3*4',"60px");  
   createView('Answer',false,true,'',"60px");  
-  createView('LET Explorer',false,true,'',"100px");	 
+  createView('LET Explorer',false,true,'',"200px");	 
   createView('Grammar',true,false,
 	'ometa math {\n' +
 	'  expression = term:t space* end           -> t,\n' +
