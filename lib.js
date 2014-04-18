@@ -158,7 +158,7 @@ function unescape(s) {
       case 'v':  return '\v'
       case 'x':  return String.fromCharCode(parseInt(s.substring(2, 4), 16))
       case 'u':  return String.fromCharCode(parseInt(s.substring(2, 6), 16))
-      default:   return s.charAt(1)
+      default:   return s.slice(0,1)
     }
   else
     return s
