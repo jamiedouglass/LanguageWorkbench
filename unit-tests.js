@@ -1,26 +1,3 @@
-<!DOCTYPE html>
-<title>Language of Languages Workbench Test</title>
-
-<head>
-<script src="lib.js"></script>
-<script src="ometa-base.js"></script>
-<script src="parser.js"></script>
-<script src="bs-js-compiler.js"></script>
-<script src="bs-ometa-compiler.js"></script>
-<script src="bs-ometa-optimizer.js"></script>
-<script src="bs-ometa-js-compiler.js"></script>
-<script src="language-elements.js"></script>
-<script src="LoLsWorkbenchUI.js"></script>
-
-<!-- TODO: temporary -->
-<script src="getting-started-project.js"></script>
-
-<!-- Unit testing -->
-<script src="http://yui.yahooapis.com/3.14.1/build/yui/yui-min.js"></script>
-
-</head>
-
-<script>
 // Create a new YUI instance and populate it with the required modules.
 
 YUI({useBrowserconsole: true}).use('test', function (Y) {
@@ -73,7 +50,3 @@ YUI({useBrowserconsole: true}).use('test', function (Y) {
 	Y.Test.Runner.run();
 
 	});
-</script>
-
-</html>
-
