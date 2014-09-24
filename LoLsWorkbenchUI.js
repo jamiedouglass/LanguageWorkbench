@@ -1,3 +1,14 @@
+// events
+window.onbeforeunload = function() {
+  /* TODO: track changes and determine if a message needs to popup
+  if (dirty === false) {
+    return;
+  }
+  */
+  return "By leaving this page, any unsaved changes will be lost.";
+}
+
+//functions
 function setupPage() { 
   // TODO: load Getting Started as general project
   loadGettingStarted();
