@@ -87,6 +87,13 @@ function loadGettingStarted() {
   updateAnswerView();
   updateLETExplorerView();
   startView.focus(); 
+  // TODO: Implement language ribbon support
+  document.getElementById("LangRibbon").insertAdjacentHTML("beforeend",
+    '<button type="button">calculate</button>' +
+    '<button type="button">LET</button>' +
+    '<button type="button">math</button>' +
+    '<button type="button">ometa</button>' +
+    '<button type="button">text</button>');
 }
 
 function sp(node) {

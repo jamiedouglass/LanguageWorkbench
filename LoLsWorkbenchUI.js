@@ -14,6 +14,11 @@ function setupPage() {
   loadGettingStarted();
 }
 
+function addRemoveLanguage(id) {
+  // TODO: add and/or remove languages to/from language ribbon
+  alert("add and/or remove languages to/from language ribbon");  
+}
+
 function openProject(id) {
   // TODO: open existing or create new project
   alert("Open Existing Project or Create New Project");

@@ -29,6 +29,7 @@
  !-- end unit testing-->
 
 <body onLoad="setupPage();">
+// TODO: remove wip div when bootstrap LoLs in built
 <div id="wip">
   <h4>Under Construction</h4>
   <hr>
@@ -36,7 +37,6 @@
 <div id="SignInArea">
   <a id="SignIn" href="sign-in.html">Sign in</a>
   <div id="LearnMore">
-<!-- TODO: remove protocol -->
     <a href="http://www.LanguageOfLanguages.com/">learn more</a>
   </div>
 </div>
@@ -46,15 +46,10 @@
     <img id="lols-name" src="LoLsW-logo.png" alt="Language of Languages (LoLs) Workbench">
   </a>
 </div>
-<!-- TODO: generate language ribbon contents and implement language selection -->  
 <div id="LangRibbon">
   <scan>
-    <button type="button" title="add/remove language">+Language</button>
-    <button type="button">calculate</button>
-    <button type="button">LET</button>
-    <button type="button">math</button>
-    <button type="button">ometa</button>
-    <button type="button">text</button>
+    <button type="button" title="add/remove language" onClick="addRemoveLanguage(this)">
+    +Language</button>
   </scan>
 </div>
 <hr>
@@ -74,7 +69,6 @@
 </div>
 
 <div id="acknowledgement">
-<!-- TODO: remove protocol -->
   <p>Brought to you by <a href="http://www.ResearchOnKnowing.com/">
 	<img src="ROK.png" alt="Research On Knowing, LLC"></a>
 </div>
