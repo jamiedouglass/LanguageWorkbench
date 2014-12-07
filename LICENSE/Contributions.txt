@@ -16,4 +16,5 @@ The following provided contributions to Language of Languages (LoLs):
 Nicholas (Nick) Chen
 Andronetta (Andi) Douglass
 James (Jamie) Douglass
+Alyssa Pavao
 Alessandro (Alex) Warth (see "ometa-js LICENSE" file)

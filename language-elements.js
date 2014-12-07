@@ -1,3 +1,23 @@
+var LoLs= {
+	languages:[],
+	views: []};
+LoLs.languages["ometa"]=[
+   {name: "BSOMetaJSParser",
+    startRule: "topLevel",
+    sourceIsLET: false},
+   {name: "BSOMetaJSTranslator",
+    startRule: "trans",
+    sourceIsLET: true,
+    evaluate: true}];
+
+function createLanguage(name, startRule, sourceIsLET, langView) {
+  LoLs.languages[name]=[
+   {name: name,
+    startRule: startRule,
+    sourceIsLET: sourceIsLET,
+    langView: langView}];
+}
+
 function Le(concept) {
   var a, args = new Array(arguments.length); 
   args[0] = concept;
@@ -36,4 +56,25 @@ Array.prototype.depth = function() {
     d++;
   }
   return d;
+}
+
+function applyLanguage(lang, source) {
+  var rules, result=source;
+  for (var i=0; i < lang.length; i++) {
+// TODO: update when language loaded or regenerated
+    rules=eval(lang[i].name);
+    if (lang[i].sourceIsLET) {
+      result=rules.match(result, lang[i].startRule, undefined, 
+         function(m, i) {
+           alert('' + lang[i].name + ' translation error');
+           throw fail;
+         });
+	  } else {
+      result=rules.matchAll(result, lang[i].startRule, undefined, 
+	       function(m, i) {throw objectThatDelegatesTo(fail, {errorPos: i}) });
+	  };
+    if (lang[i].evaluate) 
+      eval(result);
+	};
+	return result;
 }
