@@ -72,7 +72,7 @@ function openView(id) {
   alert("Open a Copy of This View");
 }
 function createView(name,lang,gutter,readOnly,value,height,source) {
-  var e, view, id=genLocalId(name);
+  var e, view, id=genLocalId(name), changeFn;
   document.getElementById("ProjectArea").insertAdjacentHTML("beforeend",
 	'<div class="LoLsView">' +
 	'	<div class="LoLsViewTitle">' +
@@ -102,13 +102,22 @@ function createView(name,lang,gutter,readOnly,value,height,source) {
   view.setReadOnly(readOnly);
   view.clearSelection();
   e.editor=view;
+  changeFn=function(e) {
+    var view=this[0].myView;
+    if (view.updating)
+      return;
+    view.changed = true;
+  };
   LoLs.views[name]={
     id: id,
     lang: lang,
     updating: false,
     changed: true,
+    changeFn: changeFn,
     result: undefined,
     source: source};
+  changeFn.myView=LoLs.views[name];
+  view.on('change', LoLs.views[name].changeFn);
   return view;  
 }
 
@@ -135,11 +144,11 @@ function refreshView(viewName) {
       source=refreshView(lolsView.source);
     };
     lolsView.result=applyLanguage(LoLs.languages[lolsView.lang],source);
-    lolsView.updating=false;
-    lolsView.changed=false;
     if (lolsView.source !== undefined) {
       editor.setValue("" + lolsView.result);
     }
+    lolsView.updating=false;
+    lolsView.changed=false;
 	  return lolsView.result;
   } catch (e) {
     if (e.errorPos != undefined) {
