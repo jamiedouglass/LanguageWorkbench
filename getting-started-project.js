@@ -2,6 +2,17 @@ function loadGettingStarted() {
   // TODO: load Getting Started as general project
   var startView;
   document.getElementById('ProjectName').textContent='Getting Started'+' ';
+  createLanguage("text","doc",false,"Grammar");
+	createLanguage("math","expression",false,"Grammar");
+	createLanguage("calculate","le",true,"Grammar");
+	createLanguage("LET","let",true,"Grammar");  
+  // TODO: Implement language ribbon support
+  document.getElementById("LangRibbon").insertAdjacentHTML("beforeend",
+    '<button type="button">calculate</button>' +
+    '<button type="button">LET</button>' +
+    '<button type="button">math</button>' +
+    '<button type="button">ometa</button>' +
+    '<button type="button">text</button>');
   createView('Read Me First',"text",false,true,
 	'Welcome to the Language Workbench for Language of Languages (LoLs).\n' +
 	'Select a project and interact with it using the language areas below.\n' +
@@ -52,19 +63,8 @@ function loadGettingStarted() {
 	'ometa text {\n' +
 	'  doc = anything*\n' +
 	'}',"250px");
-	createLanguage("text","doc",false,"Grammar");
-	createLanguage("math","expression",false,"Grammar");
-	createLanguage("calculate","le",true,"Grammar");
-	createLanguage("LET","let",true,"Grammar");  
   refreshView("Grammar");
   refreshView("Answer");
   refreshView("LET Explorer");
   startView.focus(); 
-  // TODO: Implement language ribbon support
-  document.getElementById("LangRibbon").insertAdjacentHTML("beforeend",
-    '<button type="button">calculate</button>' +
-    '<button type="button">LET</button>' +
-    '<button type="button">math</button>' +
-    '<button type="button">ometa</button>' +
-    '<button type="button">text</button>');
 }

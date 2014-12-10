@@ -109,6 +109,7 @@ function createView(name,lang,gutter,readOnly,value,height,source) {
     view.changed = true;
   };
   LoLs.views[name]={
+  	name: name,
     id: id,
     lang: lang,
     updating: false,
@@ -127,28 +128,31 @@ function closeView(id) {
 }
 
 function refreshView(viewName) {
-  var lolsView, editor, source;
+  var lolsView, editor, source, lang;
   try {
     lolsView=LoLs.views[viewName];
-// TODO: mark changed views and avoid unneeded refresh, check is source or language changed
-/*  if (not lolsView.changed)
-  	  return lolsView.result; */
-// TODO: detect dependence and order refreshes
+// TODO: eliminate duplicate refreshing of views
+// TODO: bidirectional view dependency support A updates B & B updates A
     if (lolsView.updating)
   	  return lolsView.result;
     lolsView.updating=true;
+    lang=LoLs.languages[lolsView.lang];
+    for (var i in lang) {
+    	if (lang[i].langView !== undefined)
+    		refreshView(lang[i].langView);
+    };
     editor=document.getElementById(lolsView.id).editor;
-    if (lolsView.source == undefined) {
+    if (lolsView.source == undefined || lolsView.source == lolsView.name) {
       source=editor.getValue();
     } else {
       source=refreshView(lolsView.source);
     };
-    lolsView.result=applyLanguage(LoLs.languages[lolsView.lang],source);
-    if (lolsView.source !== undefined) {
+    lolsView.result=applyLanguage(lang,source);
+    if (lolsView.source !== undefined || lolsView.source == lolsView.name) {
       editor.setValue("" + lolsView.result);
     }
-    lolsView.updating=false;
     lolsView.changed=false;
+    lolsView.updating=false;
 	  return lolsView.result;
   } catch (e) {
     if (e.errorPos != undefined) {
