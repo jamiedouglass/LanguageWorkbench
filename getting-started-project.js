@@ -8,11 +8,16 @@ function loadGettingStarted() {
 	createLanguage("LET","let",true,"Grammar");  
   // TODO: Implement language ribbon support
   document.getElementById("LangRibbon").insertAdjacentHTML("beforeend",
-    '<button type="button">calculate</button>' +
-    '<button type="button">LET</button>' +
-    '<button type="button">math</button>' +
-    '<button type="button">ometa</button>' +
-    '<button type="button">text</button>');
+    '<button id="calculateLang" type="button"' +
+    ' onClick="setLanguage(\'calculate\')">calculate</button>' +
+    '<button id="LETLang" type="button"' +
+    ' onClick="setLanguage(\'LET\')">LET</button>' +
+    '<button id="mathLang" type="button"' +
+    ' onClick="setLanguage(\'math\')">math</button>' +
+    '<button id="ometaLang" type="button"' +
+    ' onClick="setLanguage(\'ometa\')">ometa</button>' +
+    '<button id="textLang" type="button"' +
+    ' onClick="setLanguage(\'text\')">text</button>');
   createView('Read Me First',"text",false,true,
 	'Welcome to the Language Workbench for Language of Languages (LoLs).\n' +
 	'Select a project and interact with it using the language areas below.\n' +

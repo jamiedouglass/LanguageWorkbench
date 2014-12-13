@@ -1,5 +1,6 @@
 var LoLs= {
 	languages:[],
+	viewNames: [],
 	views: []};
 LoLs.languages["ometa"]=[
    {name: "BSOMetaJSParser",

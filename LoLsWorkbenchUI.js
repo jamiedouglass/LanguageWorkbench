@@ -1,3 +1,5 @@
+var LoLsCurrentView, LoLsLastView, LoLsLanguage;
+
 // events
 window.onbeforeunload = function() {
   /* TODO: track changes and determine if a message needs to popup
@@ -30,8 +32,12 @@ function saveProject(id) {
 }
 
 function refreshAll(id) {
-  // TODO: refresh all the views in the current project
-  alert("Refresh All Views in Project");
+  var button;
+  for (var i=0; i < LoLs.viewNames.length; i++) {
+    refreshView(LoLs.viewNames[i]);
+  }
+  button=document.getElementById("refreshAll");
+  button.style.backgroundColor = "white";
 }
 
 function indexToPosition(doc, index) {
@@ -72,7 +78,7 @@ function openView(id) {
   alert("Open a Copy of This View");
 }
 function createView(name,lang,gutter,readOnly,value,height,source) {
-  var e, view, id=genLocalId(name), changeFn;
+  var e, view, id=genLocalId(name);
   document.getElementById("ProjectArea").insertAdjacentHTML("beforeend",
 	'<div class="LoLsView">' +
 	'	<div class="LoLsViewTitle">' +
@@ -85,7 +91,8 @@ function createView(name,lang,gutter,readOnly,value,height,source) {
 	'	  <button type="button" title="close view" onClick="closeView(this)">' +
 	'		<img src="close.gif" alt="Close View">' +
 	'	  </button>' +
-	'	  <button type="button" title="refresh" onClick="refreshView(\''+name+'\')">'+
+	'	  <button id="'+id+'Refresh" type="button" title="refresh"' + 
+	' onClick="refreshView(\''+name+'\')">'+
 	'		<img src="refresh.png" alt="Refresh View">' +
 	'	  </button>' +
 	'	</div>' +
@@ -102,23 +109,47 @@ function createView(name,lang,gutter,readOnly,value,height,source) {
   view.setReadOnly(readOnly);
   view.clearSelection();
   e.editor=view;
-  changeFn=function(e) {
-    var view=this[0].myView;
-    if (view.updating)
-      return;
-    view.changed = true;
-  };
+  LoLs.viewNames[LoLs.viewNames.length] = name;
   LoLs.views[name]={
   	name: name,
     id: id,
     lang: lang,
     updating: false,
     changed: true,
-    changeFn: changeFn,
+    changeFn: function(e) {
+      var button, view=this[0].myView;
+      if (view.updating)
+        return;
+      view.changed=true;
+      button=document.getElementById(view.id+"Refresh");    
+      button.style.backgroundColor = "yellow";
+      button=document.getElementById("refreshAll");
+      button.style.backgroundColor = "yellow";
+    },
+    focusFn:function() {
+      var langButton;
+      if (LoLsLanguage) {
+        langButton=document.getElementById(LoLsLanguage+"Lang");
+        langButton.style.color = "white";
+      }
+      LoLsCurrentView=this[0].myView;
+      LoLsLastView=LoLsCurrentView;
+      LoLsLanguage=LoLsCurrentView.lang;
+      langButton=document.getElementById(LoLsLanguage+"Lang");
+      langButton.style.color = "red";
+    },
+    blurFn:function() {
+    	if (LoLsCurrentView==this[0].myView) 
+    		LoLsCurrentView=undefined;
+    },
     result: undefined,
     source: source};
-  changeFn.myView=LoLs.views[name];
+  LoLs.views[name].changeFn.myView=LoLs.views[name];
   view.on('change', LoLs.views[name].changeFn);
+  LoLs.views[name].focusFn.myView=LoLs.views[name];
+  view.on('focus', LoLs.views[name].focusFn);
+  LoLs.views[name].blurFn.myView=LoLs.views[name];
+  view.on('blur', LoLs.views[name].blurFn);
   return view;  
 }
 
@@ -128,7 +159,7 @@ function closeView(id) {
 }
 
 function refreshView(viewName) {
-  var lolsView, editor, source, lang;
+  var lolsView, editor, source, lang, button;
   try {
     lolsView=LoLs.views[viewName];
 // TODO: eliminate duplicate refreshing of views
@@ -137,7 +168,7 @@ function refreshView(viewName) {
   	  return lolsView.result;
     lolsView.updating=true;
     lang=LoLs.languages[lolsView.lang];
-    for (var i in lang) {
+    for (var i=0; i <lang.length; i++) {
     	if (lang[i].langView !== undefined)
     		refreshView(lang[i].langView);
     };
@@ -153,6 +184,8 @@ function refreshView(viewName) {
     }
     lolsView.changed=false;
     lolsView.updating=false;
+    button=document.getElementById(lolsView.id+"Refresh");    
+    button.style.backgroundColor = "white";
 	  return lolsView.result;
   } catch (e) {
     if (e.errorPos != undefined) {
@@ -163,4 +196,10 @@ function refreshView(viewName) {
     lolsView.updating=false;
     return lolsView.result;
   }
+}
+
+function setLanguage(lang) {
+  LoLsLastView.lang=lang;
+  refreshView(LoLsLastView.name);
+  document.getElementById(LoLsLastView.id).editor.focus();
 }
