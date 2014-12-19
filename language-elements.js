@@ -1,22 +1,68 @@
 var LoLs= {
+/* reserved for saving to file, GitHub, etc.
+	guid: GUID,
+  url: URL,
+*/
+  name: "",
+  changed: false,
 	languages:[],
-	viewNames: [],
+	currentLanguage: undefined,
+	viewOrder: [],
+	currentView: undefined,
 	views: []};
-LoLs.languages["ometa"]=[
-   {name: "BSOMetaJSParser",
+LoLs.languages["ometa"]={
+/* reserved for saving to file, GitHub, etc.
+	guid: GUID,
+  url: URL,
+*/
+	name: "ometa",
+	code:[
+   {
+/* reserved for saving to file, GitHub, etc.
+	  guid: GUID,
+    url: URL,
+*/
+    name: "BSOMetaJSParser",
+    rules: BSOMetaJSParser,
     startRule: "topLevel",
-    sourceIsLET: false},
-   {name: "BSOMetaJSTranslator",
+    sourceIsList: true,
+    references:[LoLs.languages["ometa"]]},
+   {
+/* reserved for saving to file, GitHub, etc.
+	  guid: GUID,
+    url: URL,
+*/
+    name: "BSOMetaJSTranslator",
+    rules: BSOMetaJSTranslator,
     startRule: "trans",
-    sourceIsLET: true,
-    evaluate: true}];
+    sourceIsList: false,
+    evalResults: true,
+    references:[LoLs.languages["ometa"]]}],
+  decode:[],
+  references:[]};
 
-function createLanguage(name, startRule, sourceIsLET, langView) {
-  LoLs.languages[name]=[
-   {name: name,
-    startRule: startRule,
-    sourceIsLET: sourceIsLET,
-    langView: langView}];
+function createLanguage(name, startRule, sourceIsList, langView) {
+  LoLs.languages[name]={
+/* reserved for saving to file, GitHub, etc.
+		guid: GUID,
+  	url: URL,
+*/
+    name: name,
+    code:[
+      {
+/* reserved for saving to file, GitHub, etc.
+	guid: GUID,
+  url: URL,
+*/
+       name: name,
+       rules: eval(name),
+       startRule: startRule,
+       sourceIsList: sourceIsList,
+       references:[LoLs.languages[name]],
+// TODO: eliminate old fields
+       langView: langView}],
+    decode:[],
+    references:[]};
 }
 
 function Le(concept) {
@@ -64,17 +110,17 @@ function applyLanguage(lang, source) {
   for (var i=0; i < lang.length; i++) {
 // TODO: update when language loaded or regenerated
     rules=eval(lang[i].name);
-    if (lang[i].sourceIsLET) {
+    if (lang[i].sourceIsList) {
+      result=rules.matchAll(result, lang[i].startRule, undefined, 
+	       function(m, i) {throw objectThatDelegatesTo(fail, {errorPos: i}) });
+	  } else {
       result=rules.match(result, lang[i].startRule, undefined, 
          function(m, i) {
            alert('' + lang[i].name + ' translation error');
            throw fail;
          });
-	  } else {
-      result=rules.matchAll(result, lang[i].startRule, undefined, 
-	       function(m, i) {throw objectThatDelegatesTo(fail, {errorPos: i}) });
 	  };
-    if (lang[i].evaluate) 
+    if (lang[i].evalResults) 
       eval(result);
 	};
 	return result;

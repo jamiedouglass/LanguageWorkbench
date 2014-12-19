@@ -1,13 +1,8 @@
-var LoLsCurrentView, LoLsLastView, LoLsLanguage;
-
 // events
 window.onbeforeunload = function() {
-  /* TODO: track changes and determine if a message needs to popup
-  if (dirty === false) {
-    return;
-  }
-  */
-  return "By leaving this page, any unsaved changes will be lost.";
+  if (LoLs.changed) {
+    return "By leaving this page, any unsaved changes will be lost.";
+  };
 }
 
 //functions
@@ -33,8 +28,8 @@ function saveProject(id) {
 
 function refreshAll(id) {
   var button;
-  for (var i=0; i < LoLs.viewNames.length; i++) {
-    refreshView(LoLs.viewNames[i]);
+  for (var i=0; i < LoLs.viewOrder.length; i++) {
+    refreshView(LoLs.viewOrder[i]);
   }
   button=document.getElementById("refreshAll");
   button.style.backgroundColor = "white";
@@ -79,6 +74,56 @@ function openView(id) {
 }
 function createView(name,lang,gutter,readOnly,value,height,source) {
   var e, view, id=genLocalId(name);
+  view=createACEeditor(name,id, gutter,readOnly,value,height);
+// TODO: use View object rather than name
+  LoLs.viewOrder[LoLs.viewOrder.length] = name;
+  LoLs.views[name]={
+  	name: name,
+    id: id,
+  	editorProperties: {},   // reserved for other than ACE editor support
+    updating: false,
+    changed: false,
+    changeFn: function(e) {
+      var button, view=this[0].myView;
+      LoLs.changed=true;
+      if (view.updating || view.changed)
+        return;
+      view.changed=true;
+      button=document.getElementById(view.id+"Refresh");    
+      button.style.backgroundColor = "yellow";
+      button=document.getElementById("refreshAll");
+      button.style.backgroundColor = "yellow";
+    },
+    focusFn:function() {
+      var langButton;
+      if (LoLs.currentLanguage) {
+        langButton=document.getElementById(LoLs.currentLanguage+"Lang");
+        langButton.style.color = "white";
+      }
+      LoLs.currentView=this[0].myView;
+      LoLs.currentLanguage=LoLs.currentView.lang;
+      langButton=document.getElementById(LoLs.currentLanguage+"Lang");
+      langButton.style.color = "red";
+    },
+    blurFn:function() {
+    },
+    lang: lang,
+    inputView: undefined,  // source, change to use view rather than view name
+    outputView: undefined,
+    result: undefined,
+    references: [],
+// TODO: eliminate old fields
+    source: source};
+  LoLs.views[name].changeFn.myView=LoLs.views[name];
+  view.on('change', LoLs.views[name].changeFn);
+  LoLs.views[name].focusFn.myView=LoLs.views[name];
+  view.on('focus', LoLs.views[name].focusFn);
+  LoLs.views[name].blurFn.myView=LoLs.views[name];
+  view.on('blur', LoLs.views[name].blurFn);
+  return view;  
+}
+function createACEeditor(name,id, gutter,readOnly,value,height) {
+  var e, frame;
   document.getElementById("ProjectArea").insertAdjacentHTML("beforeend",
 	'<div class="LoLsView">' +
 	'	<div class="LoLsViewTitle">' +
@@ -102,55 +147,14 @@ function createView(name,lang,gutter,readOnly,value,height,source) {
 	e=document.getElementById(id);
 	e.style.position="relative"; 
 	e.style.height=height;
-  view=ace.edit(id);
-  view.getSession().setMode('ace/mode/textmate');
-  view.renderer.setShowGutter(gutter);
-  view.setValue(value);
-  view.setReadOnly(readOnly);
-  view.clearSelection();
-  e.editor=view;
-  LoLs.viewNames[LoLs.viewNames.length] = name;
-  LoLs.views[name]={
-  	name: name,
-    id: id,
-    lang: lang,
-    updating: false,
-    changed: true,
-    changeFn: function(e) {
-      var button, view=this[0].myView;
-      if (view.updating)
-        return;
-      view.changed=true;
-      button=document.getElementById(view.id+"Refresh");    
-      button.style.backgroundColor = "yellow";
-      button=document.getElementById("refreshAll");
-      button.style.backgroundColor = "yellow";
-    },
-    focusFn:function() {
-      var langButton;
-      if (LoLsLanguage) {
-        langButton=document.getElementById(LoLsLanguage+"Lang");
-        langButton.style.color = "white";
-      }
-      LoLsCurrentView=this[0].myView;
-      LoLsLastView=LoLsCurrentView;
-      LoLsLanguage=LoLsCurrentView.lang;
-      langButton=document.getElementById(LoLsLanguage+"Lang");
-      langButton.style.color = "red";
-    },
-    blurFn:function() {
-    	if (LoLsCurrentView==this[0].myView) 
-    		LoLsCurrentView=undefined;
-    },
-    result: undefined,
-    source: source};
-  LoLs.views[name].changeFn.myView=LoLs.views[name];
-  view.on('change', LoLs.views[name].changeFn);
-  LoLs.views[name].focusFn.myView=LoLs.views[name];
-  view.on('focus', LoLs.views[name].focusFn);
-  LoLs.views[name].blurFn.myView=LoLs.views[name];
-  view.on('blur', LoLs.views[name].blurFn);
-  return view;  
+  frame=ace.edit(id);
+  frame.getSession().setMode('ace/mode/textmate');
+  frame.renderer.setShowGutter(gutter);
+  frame.setValue(value);
+  frame.setReadOnly(readOnly);
+  frame.clearSelection();
+  e.editor=frame;
+  return frame;  
 }
 
 function closeView(id) {
@@ -159,7 +163,7 @@ function closeView(id) {
 }
 
 function refreshView(viewName) {
-  var lolsView, editor, source, lang, button;
+  var lolsView, editor, source, lang, button, cleared;
   try {
     lolsView=LoLs.views[viewName];
 // TODO: eliminate duplicate refreshing of views
@@ -167,7 +171,7 @@ function refreshView(viewName) {
     if (lolsView.updating)
   	  return lolsView.result;
     lolsView.updating=true;
-    lang=LoLs.languages[lolsView.lang];
+    lang=LoLs.languages[lolsView.lang].code;
     for (var i=0; i <lang.length; i++) {
     	if (lang[i].langView !== undefined)
     		refreshView(lang[i].langView);
@@ -186,6 +190,15 @@ function refreshView(viewName) {
     lolsView.updating=false;
     button=document.getElementById(lolsView.id+"Refresh");    
     button.style.backgroundColor = "white";
+    cleared=true;
+    for (var i=0; i <LoLs.viewOrder.length; i++) {
+    	if (LoLs.views[LoLs.viewOrder[i]].changed)
+    		cleared=false;
+    };
+    if (cleared) {
+      button=document.getElementById("refreshAll");
+      button.style.backgroundColor = "white";
+    };
 	  return lolsView.result;
   } catch (e) {
     if (e.errorPos != undefined) {
@@ -199,7 +212,7 @@ function refreshView(viewName) {
 }
 
 function setLanguage(lang) {
-  LoLsLastView.lang=lang;
-  refreshView(LoLsLastView.name);
-  document.getElementById(LoLsLastView.id).editor.focus();
+  LoLs.currentView.lang=lang;
+  refreshView(LoLs.currentView.name);
+  document.getElementById(LoLs.currentView.id).editor.focus();
 }

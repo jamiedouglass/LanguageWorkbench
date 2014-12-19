@@ -1,11 +1,8 @@
 function loadGettingStarted() { 
   // TODO: load Getting Started as general project
   var startView;
-  document.getElementById('ProjectName').textContent='Getting Started'+' ';
-  createLanguage("text","doc",false,"Grammar");
-	createLanguage("math","expression",false,"Grammar");
-	createLanguage("calculate","le",true,"Grammar");
-	createLanguage("LET","let",true,"Grammar");  
+  LoLs.name='Getting Started';
+  document.getElementById('ProjectName').textContent=LoLs.name+' ';
   // TODO: Implement language ribbon support
   document.getElementById("LangRibbon").insertAdjacentHTML("beforeend",
     '<button id="calculateLang" type="button"' +
@@ -69,6 +66,10 @@ function loadGettingStarted() {
 	'  doc = anything*\n' +
 	'}',"250px");
   refreshView("Grammar");
+  createLanguage("text","doc",true,"Grammar");
+	createLanguage("math","expression",true,"Grammar");
+	createLanguage("calculate","le",false,"Grammar");
+	createLanguage("LET","let",false,"Grammar");  
   refreshView("Answer");
   refreshView("LET Explorer");
   startView.focus(); 

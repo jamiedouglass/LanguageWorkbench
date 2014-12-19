@@ -30,7 +30,7 @@ YUI({useBrowserconsole: true}).use('test', function (Y) {
 			name : "LoLs Test Case",
 			
 			testParse : function() {
-			    var genCode=applyLanguage(LoLs.languages["ometa"],'ometa text { doc = digit+ end}');
+			    var genCode=applyLanguage(LoLs.languages["ometa"].code,'ometa text { doc = digit+ end}');
     			eval(genCode);
 				
 					// Check top-level grammar constructs
