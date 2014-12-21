@@ -10,6 +10,7 @@ var LoLs={
 	views: [],				// by name
 	currentView: undefined,
 	viewOrder: []};
+// TODO: load meta language such as ometa or CAT from general workspace
 LoLs.languages["ometa"]={
 /* reserved for saving to file, GitHub, etc.
 	guid: GUID,
@@ -39,7 +40,6 @@ LoLs.languages["ometa"]={
     inputIsList: false,
     evalResults: true}],
   decode:[],
-// TODO: use object rather than name
   references:[]};		// Set of Views using language
 LoLs.languages["ometa"].code[0].language=LoLs.languages["ometa"];
 LoLs.languages["ometa"].code[1].language=LoLs.languages["ometa"];
