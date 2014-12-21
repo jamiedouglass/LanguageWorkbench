@@ -1,6 +1,6 @@
 function loadGettingStarted() { 
   // TODO: load Getting Started as general project
-  var startView;
+  var startView, view;
   LoLs.name='Getting Started';
   document.getElementById('ProjectName').textContent=LoLs.name+' ';
   // TODO: Implement language ribbon support
@@ -20,8 +20,8 @@ function loadGettingStarted() {
 	'Select a project and interact with it using the language areas below.\n' +
 	'Each area displays the project according to a selected language.\n' +
 	'Changes in one area update all other areas and the Language Element\n' +
-	'Tree (LET) which defines the LoLs project.','100px');
-  startView=createView('Math Problem',"math",false,false,'2+3*4','60px');  
+	'Tree (LET) which defines the LoLs project.','100px','Read Me First');
+  startView=createView('Math Problem',"math",false,false,'2+3*4','60px','Math Problem');  
   createView('Answer',"calculate",false,true,'',"60px",'Math Problem');  
   createView('LET Explorer',"LET",false,true,'',"200px",'Math Problem');	 
   createView('Grammar',"ometa",true,false,
@@ -64,12 +64,42 @@ function loadGettingStarted() {
   '}\n\n' +
 	'ometa text {\n' +
 	'  doc = anything*\n' +
-	'}',"250px");
+	'}',"250px",'Grammar');
+	view=LoLs.views["Grammar"];
+	view.language=LoLs.languages[view.language];
+	view.language.references[view.language.references.length]=view;
+	view.inputView=LoLs.views[view.inputView];
+	if (view.inputView !== view)
+	  view.inputView.references[view.inputView.references.length]=view;
   refreshView("Grammar");
   createLanguage("text","doc",true,"Grammar");
 	createLanguage("math","expression",true,"Grammar");
 	createLanguage("calculate","le",false,"Grammar");
-	createLanguage("LET","let",false,"Grammar");  
+	createLanguage("LET","let",false,"Grammar");
+	view=LoLs.views["Read Me First"];
+	view.language=LoLs.languages[view.language];
+	view.language.references[view.language.references.length]=view;
+	view.inputView=LoLs.views[view.inputView];
+	if (view.inputView !== view)
+	  view.inputView.references[view.inputView.references.length]=view;
+	view=LoLs.views["Math Problem"];
+	view.language=LoLs.languages[view.language];
+	view.language.references[view.language.references.length]=view;
+	view.inputView=LoLs.views[view.inputView];
+	if (view.inputView !== view)
+	  view.inputView.references[view.inputView.references.length]=view;
+	view=LoLs.views["Answer"];
+	view.language=LoLs.languages[view.language];
+	view.language.references[view.language.references.length]=view;
+	view.inputView=LoLs.views[view.inputView];
+	if (view.inputView !== view)
+	  view.inputView.references[view.inputView.references.length]=view;
+	view=LoLs.views["LET Explorer"];
+	view.language=LoLs.languages[view.language];
+	view.language.references[view.language.references.length]=view;
+	view.inputView=LoLs.views[view.inputView];
+	if (view.inputView !== view)
+	  view.inputView.references[view.inputView.references.length]=view;
   refreshView("Answer");
   refreshView("LET Explorer");
   startView.focus(); 

@@ -27,12 +27,16 @@ function saveProject(id) {
 }
 
 function refreshAll(id) {
-  var button;
+  var button, clear=true;
   for (var i=0; i < LoLs.viewOrder.length; i++) {
-    refreshView(LoLs.viewOrder[i]);
+    refreshView(LoLs.viewOrder[i].name);
+    if (LoLs.viewOrder[i].changed)
+    	clear=false;
   }
-  button=document.getElementById("refreshAll");
-  button.style.backgroundColor = "white";
+  if (clear) {
+    button=document.getElementById("refreshAll");
+    button.style.backgroundColor = "white";
+  }
 }
 
 function indexToPosition(doc, index) {
@@ -74,46 +78,39 @@ function openView(id) {
 }
 function createView(name,lang,gutter,readOnly,value,height,source) {
   var e, view, id=genLocalId(name);
-  view=createACEeditor(name,id, gutter,readOnly,value,height);
-// TODO: use View object rather than name
-  LoLs.viewOrder[LoLs.viewOrder.length] = name;
+  view=createACEeditor(name,id,height,gutter,readOnly,value);
   LoLs.views[name]={
   	name: name,
     id: id,
   	editorProperties: {},   // reserved for other than ACE editor support
-    updating: false,
-    changed: false,
+    changed: false,					// undefined (updating), true, false
     changeFn: function(e) {
-      var button, view=this[0].myView;
-      LoLs.changed=true;
-      if (view.updating || view.changed)
-        return;
-      view.changed=true;
-      button=document.getElementById(view.id+"Refresh");    
-      button.style.backgroundColor = "yellow";
-      button=document.getElementById("refreshAll");
-      button.style.backgroundColor = "yellow";
+      viewChanged(this[0].myView);
     },
     focusFn:function() {
       var langButton;
-      if (LoLs.currentLanguage) {
-        langButton=document.getElementById(LoLs.currentLanguage+"Lang");
+      if (LoLs.currentLanguage != undefined) {
+        langButton=document.getElementById(LoLs.currentLanguage.name+"Lang");
         langButton.style.color = "white";
       }
       LoLs.currentView=this[0].myView;
-      LoLs.currentLanguage=LoLs.currentView.lang;
-      langButton=document.getElementById(LoLs.currentLanguage+"Lang");
+      LoLs.currentLanguage=LoLs.currentView.language;
+      langButton=document.getElementById(LoLs.currentLanguage.name+"Lang");
       langButton.style.color = "red";
     },
     blurFn:function() {
     },
-    lang: lang,
-    inputView: undefined,  // source, change to use view rather than view name
-    outputView: undefined,
-    result: undefined,
-    references: [],
-// TODO: eliminate old fields
-    source: source};
+// TODO: use object rather than name
+    language: lang,
+// TODO: use object rather than name
+    inputView: source,   // point to this views or another view 
+    									   // view displays input or output
+    contents: undefined,
+// TODO: use object rather than name
+    references: [],      // Set of Views which use contents as input 
+    langDefs:[]};        // Set of Languages that View defines  
+// TODO: support inserting view
+  LoLs.viewOrder[LoLs.viewOrder.length] = LoLs.views[name];
   LoLs.views[name].changeFn.myView=LoLs.views[name];
   view.on('change', LoLs.views[name].changeFn);
   LoLs.views[name].focusFn.myView=LoLs.views[name];
@@ -122,7 +119,32 @@ function createView(name,lang,gutter,readOnly,value,height,source) {
   view.on('blur', LoLs.views[name].blurFn);
   return view;  
 }
-function createACEeditor(name,id, gutter,readOnly,value,height) {
+
+function viewChanged(view) {
+  var button;
+	if (view.changed || view.changed==undefined)
+		return;
+	view.changed=true;
+	LoLs.changed=true;
+	button=document.getElementById(view.id+"Refresh");    
+	button.style.backgroundColor = "yellow";
+	for (var i=0;i<view.references.length;i++) {
+		viewChanged(view.references[i]);
+	};
+	for (var i=0;i<view.langDefs.length;i++) {
+		languageChanged(view.langDefs[i]);
+	};
+	button=document.getElementById("refreshAll");
+	button.style.backgroundColor = "yellow";
+}
+
+function languageChanged(lang) {
+  for (var i=0; i<lang.references.length; i++) {
+    viewChanged(lang.references[i]);
+  }
+}
+
+function createACEeditor(name,id,height,gutter,readOnly,value) {
   var e, frame;
   document.getElementById("ProjectArea").insertAdjacentHTML("beforeend",
 	'<div class="LoLsView">' +
@@ -163,56 +185,62 @@ function closeView(id) {
 }
 
 function refreshView(viewName) {
-  var lolsView, editor, source, lang, button, cleared;
+  var lolsView, editor, source, lang, langViews, button, cleared;
   try {
     lolsView=LoLs.views[viewName];
 // TODO: eliminate duplicate refreshing of views
 // TODO: bidirectional view dependency support A updates B & B updates A
-    if (lolsView.updating)
-  	  return lolsView.result;
-    lolsView.updating=true;
-    lang=LoLs.languages[lolsView.lang].code;
-    for (var i=0; i <lang.length; i++) {
-    	if (lang[i].langView !== undefined)
-    		refreshView(lang[i].langView);
+    if (lolsView.changed==undefined)
+  	  return lolsView.contents;
+    lolsView.changed=undefined;
+   lang=lolsView.language.code;
+   for (var i=0; i <lang.length; i++) {
+    	if (lang[i].inputView !== undefined)
+    		refreshView(lang[i].inputView.name);
     };
     editor=document.getElementById(lolsView.id).editor;
-    if (lolsView.source == undefined || lolsView.source == lolsView.name) {
+    if (lolsView.inputView === lolsView) {
       source=editor.getValue();
     } else {
-      source=refreshView(lolsView.source);
+      source=refreshView(lolsView.inputView.name);
     };
-    lolsView.result=applyLanguage(lang,source);
-    if (lolsView.source !== undefined || lolsView.source == lolsView.name) {
-      editor.setValue("" + lolsView.result);
+    lolsView.contents=applyLanguage(lang,source);
+    if (lolsView.inputView !== lolsView) {
+      editor.setValue("" + lolsView.contents);
     }
     lolsView.changed=false;
-    lolsView.updating=false;
     button=document.getElementById(lolsView.id+"Refresh");    
     button.style.backgroundColor = "white";
     cleared=true;
     for (var i=0; i <LoLs.viewOrder.length; i++) {
-    	if (LoLs.views[LoLs.viewOrder[i]].changed)
+    	if (LoLs.viewOrder[i].changed)
     		cleared=false;
     };
     if (cleared) {
       button=document.getElementById("refreshAll");
       button.style.backgroundColor = "white";
     };
-	  return lolsView.result;
+	  return lolsView.contents;
   } catch (e) {
     if (e.errorPos != undefined) {
 	    insertMessage(editor, e.errorPos, " Unknown-->");
 	  } else {
       alert("" + viewName + " error at unknown position\n\n" + e);
 	  }
-    lolsView.updating=false;
-    return lolsView.result;
+	  if (lolsView.changed==undefined)
+	    lolsView.changed=true;
+    return lolsView.contents;
   }
 }
 
 function setLanguage(lang) {
-  LoLs.currentView.lang=lang;
+  var langObj;
+  langObj=LoLs.currentView.language;
+  langObj.references=langObj.references.filter(function(x) {x!==LoLs.currentView});
+  langObj=LoLs.languages[lang];
+  langObj.references=langObj.references.filter(function(x) {x!==LoLs.currentView});
+  langObj.references[langObj.references.length]=LoLs.currentView;    
+  LoLs.currentView.language=langObj;
   refreshView(LoLs.currentView.name);
   document.getElementById(LoLs.currentView.id).editor.focus();
 }

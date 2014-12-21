@@ -1,51 +1,55 @@
-var LoLs= {
+var LoLs={					// TODO: rename project to workspace
 /* reserved for saving to file, GitHub, etc.
 	guid: GUID,
-  url: URL,
+  url: URL,  				// workspace file
 */
-  name: "",
-  changed: false,
+  name: "",  				// workspace name
+  changed: false,		// true => needs to be saved
 	languages:[],
 	currentLanguage: undefined,
-	viewOrder: [],
+	views: [],				// by name
 	currentView: undefined,
-	views: []};
+	viewOrder: []};
 LoLs.languages["ometa"]={
 /* reserved for saving to file, GitHub, etc.
 	guid: GUID,
-  url: URL,
+  url: URL,					// language file with pointers to grammar sources
 */
 	name: "ometa",
 	code:[
    {
 /* reserved for saving to file, GitHub, etc.
 	  guid: GUID,
-    url: URL,
+    url: URL,				// javascript executable file
 */
     name: "BSOMetaJSParser",
     rules: BSOMetaJSParser,
     startRule: "topLevel",
-    sourceIsList: true,
-    references:[LoLs.languages["ometa"]]},
+    language: undefined,
+    inputIsList: true},
    {
 /* reserved for saving to file, GitHub, etc.
 	  guid: GUID,
-    url: URL,
+    url: URL,				// javascript executable file
 */
     name: "BSOMetaJSTranslator",
     rules: BSOMetaJSTranslator,
     startRule: "trans",
-    sourceIsList: false,
-    evalResults: true,
-    references:[LoLs.languages["ometa"]]}],
+    language: undefined,
+    inputIsList: false,
+    evalResults: true}],
   decode:[],
-  references:[]};
+// TODO: use object rather than name
+  references:[]};		// Set of Views using language
+LoLs.languages["ometa"].code[0].language=LoLs.languages["ometa"];
+LoLs.languages["ometa"].code[1].language=LoLs.languages["ometa"];
 
-function createLanguage(name, startRule, sourceIsList, langView) {
+function createLanguage(name, startRule, inputIsList, inputView) {
+  var view;
   LoLs.languages[name]={
 /* reserved for saving to file, GitHub, etc.
 		guid: GUID,
-  	url: URL,
+  	url: URL,				// javascript executable file
 */
     name: name,
     code:[
@@ -57,12 +61,15 @@ function createLanguage(name, startRule, sourceIsList, langView) {
        name: name,
        rules: eval(name),
        startRule: startRule,
-       sourceIsList: sourceIsList,
-       references:[LoLs.languages[name]],
-// TODO: eliminate old fields
-       langView: langView}],
+       language: undefined,
+       inputIsList: inputIsList,
+       inputView: LoLs.views[inputView]}],
     decode:[],
-    references:[]};
+    references:[]};		// Set of Views using language
+  LoLs.languages[name].code[0].language=LoLs.languages[name];
+  view=LoLs.languages[name].code[0].inputView;
+  if (view)
+    view.langDefs[view.langDefs.length]=LoLs.languages[name];
 }
 
 function Le(concept) {
@@ -110,7 +117,8 @@ function applyLanguage(lang, source) {
   for (var i=0; i < lang.length; i++) {
 // TODO: update when language loaded or regenerated
     rules=eval(lang[i].name);
-    if (lang[i].sourceIsList) {
+    lang.rules=rules;
+    if (lang[i].inputIsList) {
       result=rules.matchAll(result, lang[i].startRule, undefined, 
 	       function(m, i) {throw objectThatDelegatesTo(fail, {errorPos: i}) });
 	  } else {
