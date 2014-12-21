@@ -1,8 +1,8 @@
 function loadGettingStarted() { 
-  // TODO: load Getting Started as general project
+  // TODO: load Getting Started as general workspace
   var startView, view;
   LoLs.name='Getting Started';
-  document.getElementById('ProjectName').textContent=LoLs.name+' ';
+  document.getElementById('WorkspaceName').textContent=LoLs.name+' ';
   // TODO: Implement language ribbon support
   document.getElementById("LangRibbon").insertAdjacentHTML("beforeend",
     '<button id="calculateLang" type="button"' +
@@ -17,10 +17,10 @@ function loadGettingStarted() {
     ' onClick="setLanguage(\'text\')">text</button>');
   createView('Read Me First',"text",false,true,
 	'Welcome to the Language Workbench for Language of Languages (LoLs).\n' +
-	'Select a project and interact with it using the language areas below.\n' +
-	'Each area displays the project according to a selected language.\n' +
+	'Select a workspace and interact with it using the language areas below.\n' +
+	'Each area displays the workspace according to a selected language.\n' +
 	'Changes in one area update all other areas and the Language Element\n' +
-	'Tree (LET) which defines the LoLs project.','100px','Read Me First');
+	'Tree (LET) which defines the LoLs workspace.','100px','Read Me First');
   startView=createView('Math Problem',"math",false,false,'2+3*4','60px','Math Problem');  
   createView('Answer',"calculate",false,true,'',"60px",'Math Problem');  
   createView('LET Explorer',"LET",false,true,'',"200px",'Math Problem');	 

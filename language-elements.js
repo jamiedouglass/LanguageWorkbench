@@ -1,4 +1,4 @@
-var LoLs={					// TODO: rename project to workspace
+var LoLs={					
 /* reserved for saving to file, GitHub, etc.
 	guid: GUID,
   url: URL,  				// workspace file

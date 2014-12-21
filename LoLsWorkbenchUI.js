@@ -7,7 +7,7 @@ window.onbeforeunload = function() {
 
 //functions
 function setupPage() { 
-  // TODO: load Getting Started as general project
+  // TODO: load Getting Started as general workspace
   loadGettingStarted();
 }
 
@@ -16,14 +16,14 @@ function addRemoveLanguage(id) {
   alert("add and/or remove languages to/from language ribbon");  
 }
 
-function openProject(id) {
-  // TODO: open existing or create new project
-  alert("Open Existing Project or Create New Project");
+function openWorkspace(id) {
+  // TODO: open existing or create new workspace
+  alert("Open Existing Workspace or Create New Workspace");
 }
 
-function saveProject(id) {
-  // TODO: save current project
-  alert("Save Current Project");
+function saveWorkspace(id) {
+  // TODO: save current workspace
+  alert("Save Current Workspace");
 }
 
 function refreshAll(id) {
@@ -146,7 +146,7 @@ function languageChanged(lang) {
 
 function createACEeditor(name,id,height,gutter,readOnly,value) {
   var e, frame;
-  document.getElementById("ProjectArea").insertAdjacentHTML("beforeend",
+  document.getElementById("WorkspaceArea").insertAdjacentHTML("beforeend",
 	'<div class="LoLsView">' +
 	'	<div class="LoLsViewTitle">' +
 	'	  <input id ="'+ id +'Button" type="button" title="collapse" value="-" ' +
@@ -180,7 +180,7 @@ function createACEeditor(name,id,height,gutter,readOnly,value) {
 }
 
 function closeView(id) {
-  // TODO: close this view in current project
+  // TODO: close this view in current workspace
   alert("Close This View");
 }
 
