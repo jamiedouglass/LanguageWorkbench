@@ -45,7 +45,6 @@ function getWorkspace(fn) {
  		 {name: "math",
 			code: [
 			 {name: "math",
-// TODO: add rules by eval(name) after refreshing defView
     		startRule: "expression",
     		inputIsList: true,
         defView: "Grammar"}],
@@ -53,7 +52,6 @@ function getWorkspace(fn) {
  		 {name: "calculate",
 			code: [
 			 {name: "calculate",
-// TODO: add rules by eval(name) after refreshing defView
     		startRule: "le",
     		inputIsList: false,
         defView: "Grammar"}],
@@ -61,7 +59,6 @@ function getWorkspace(fn) {
  		 {name: "LET",
 			code: [
 			 {name: "LET",
-// TODO: add rules by eval(name) after refreshing defView
     		startRule: "let",
     		inputIsList: false,
         defView: "Grammar"}],
@@ -69,7 +66,6 @@ function getWorkspace(fn) {
  		 {name: "raw",
 			code: [
 			 {name: "raw",
-// TODO: add rules by eval(name) after refreshing defView
     		startRule: "it",
     		inputIsList: true,
         defView: "Grammar"}],
@@ -324,46 +320,6 @@ function showOrHide(id, button) {
 function openView(id) {
   // TODO: open a copy of this view
   alert("Open a Copy of This View");
-}
-function createView(name,lang,gutter,readOnly,value,height,source) {
-  var e, view, id=genLocalId(name);
-  view=createACEeditor(name,id,height,gutter,readOnly,value);
-  LoLs.views[name]={
-  	name: name,
-    id: id,
-  	editorProperties: {},   // reserved for other than ACE editor support
-    changed: false,					// undefined (updating), true, false
-    changeFn: function(e) {
-      viewChanged(this[0].myView);
-    },
-    focusFn:function() {
-      var langButton;
-      if (LoLs.currentLanguage != undefined) {
-        langButton=document.getElementById(LoLs.currentLanguage.name+"Lang");
-        langButton.style.color = "white";
-      }
-      LoLs.currentView=this[0].myView;
-      LoLs.currentLanguage=LoLs.currentView.language;
-      langButton=document.getElementById(LoLs.currentLanguage.name+"Lang");
-      langButton.style.color = "red";
-    },
-    blurFn:function() {
-    },
-    language: lang,
-    inputView: source,   // point to this views or another view 
-    									   // view displays input or output
-    contents: undefined,
-    references: [],      // Set of Views which use contents as input 
-    langDefs:[]};        // Set of Languages that View defines  
-// TODO: support inserting view
-  LoLs.views[LoLs.views.length] = LoLs.views[name];
-  LoLs.views[name].changeFn.myView=LoLs.views[name];
-  view.on('change', LoLs.views[name].changeFn);
-  LoLs.views[name].focusFn.myView=LoLs.views[name];
-  view.on('focus', LoLs.views[name].focusFn);
-  LoLs.views[name].blurFn.myView=LoLs.views[name];
-  view.on('blur', LoLs.views[name].blurFn);
-  return view;  
 }
 
 function viewChanged(view) {

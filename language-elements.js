@@ -1,49 +1,5 @@
-var LoLs={					
-/* reserved for saving to file, GitHub, etc.
-	guid: GUID,
-  url: URL,  				// workspace file
-*/
-  name: "",  				// workspace name
-  changed: false,		// true => needs to be saved
-	languages:[],			// by name and order
-	currentLanguage: undefined,
-	views: [],				// by name and order
-	currentView: undefined};
-// TODO: load meta language such as ometa or CAT from general workspace
-LoLs.languages["ometa"]={
-/* reserved for saving to file, GitHub, etc.
-	guid: GUID,
-  url: URL,					// language file with pointers to grammar sources
-*/
-	name: "ometa",
-	code:[
-   {
-/* reserved for saving to file, GitHub, etc.
-	  guid: GUID,
-    url: URL,				// javascript executable file
-*/
-    name: "BSOMetaJSParser",
-    rules: BSOMetaJSParser,
-    startRule: "topLevel",
-    language: undefined,
-    inputIsList: true},
-   {
-/* reserved for saving to file, GitHub, etc.
-	  guid: GUID,
-    url: URL,				// javascript executable file
-*/
-    name: "BSOMetaJSTranslator",
-    rules: BSOMetaJSTranslator,
-    startRule: "trans",
-    language: undefined,
-    inputIsList: false,
-    evalResults: true}],
-  decode:[],
-  references:[]};		// Set of Views using language
-LoLs.languages["ometa"].code[0].language=LoLs.languages["ometa"];
-LoLs.languages["ometa"].code[1].language=LoLs.languages["ometa"];
-LoLs.languages[LoLs.languages.length]=LoLs.languages["ometa"];
-
+var LoLs;
+				
 function createLanguage(name, startRule, inputIsList, defView) {
   var view;
   LoLs.languages[name]={
