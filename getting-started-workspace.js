@@ -13,9 +13,9 @@ function loadGettingStarted() {
     ' onClick="setLanguage(\'math\')">math</button>' +
     '<button id="ometaLang" type="button"' +
     ' onClick="setLanguage(\'ometa\')">ometa</button>' +
-    '<button id="textLang" type="button"' +
-    ' onClick="setLanguage(\'text\')">text</button>');
-  createView('Read Me First',"text",false,true,
+    '<button id="rawLang" type="button"' +
+    ' onClick="setLanguage(\'raw\')">raw</button>');
+  createView('Read Me First',"raw",false,true,
 	'Welcome to the Language Workbench for Language of Languages (LoLs).\n' +
 	'Select a workspace and interact with it using the language areas below.\n' +
 	'Each area displays the workspace according to a selected language.\n' +
@@ -62,8 +62,8 @@ function loadGettingStarted() {
   '  while (i-- > 1) {s=s+"  "};\n' +
   '  return s;\n' +
   '}\n\n' +
-	'ometa text {\n' +
-	'  doc = anything*\n' +
+	'ometa raw {\n' +
+	'  it = anything*\n' +
 	'}',"250px",'Grammar');
 	view=LoLs.views["Grammar"];
 	view.language=LoLs.languages[view.language];
@@ -72,7 +72,7 @@ function loadGettingStarted() {
 	if (view.inputView !== view)
 	  view.inputView.references[view.inputView.references.length]=view;
   refreshView("Grammar");
-  createLanguage("text","doc",true,"Grammar");
+  createLanguage("raw","it",true,"Grammar");
 	createLanguage("math","expression",true,"Grammar");
 	createLanguage("calculate","le",false,"Grammar");
 	createLanguage("LET","let",false,"Grammar");

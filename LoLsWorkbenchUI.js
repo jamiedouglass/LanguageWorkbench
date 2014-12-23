@@ -8,7 +8,12 @@ window.onbeforeunload = function() {
 //functions
 function setupPage() { 
   // TODO: load Getting Started as general workspace
-  loadGettingStarted();
+// loadGettingStarted();
+
+	LoLs=getWorkspace("Getting Started");
+	linkWorkspace(LoLs);
+	showWorkspace(LoLs);
+	
 }
 
 function addRemoveLanguage(id) {
@@ -21,6 +26,250 @@ function openWorkspace(id) {
   alert("Open Existing Workspace or Create New Workspace");
 }
 
+function getWorkspace(fn) {
+	var work;
+	if (fn == "Getting Started") {
+		work={ 
+			name: "Getting Started",		
+			languages: [
+		 {name: "ometa",
+			code: [
+    	 {name: "BSOMetaJSParser",
+    		startRule: "topLevel",
+    		inputIsList: true},
+   		 {name: "BSOMetaJSTranslator",
+        startRule: "trans",
+        inputIsList: false,
+        evalResults: true}],
+ 			decode: []},
+ 		 {name: "math",
+			code: [
+			 {name: "math",
+// TODO: add rules by eval(name) after refreshing defView
+    		startRule: "expression",
+    		inputIsList: true,
+        defView: "Grammar"}],
+ 			decode: []},
+ 		 {name: "calculate",
+			code: [
+			 {name: "calculate",
+// TODO: add rules by eval(name) after refreshing defView
+    		startRule: "le",
+    		inputIsList: false,
+        defView: "Grammar"}],
+ 			decode: []},
+ 		 {name: "LET",
+			code: [
+			 {name: "LET",
+// TODO: add rules by eval(name) after refreshing defView
+    		startRule: "let",
+    		inputIsList: false,
+        defView: "Grammar"}],
+ 			decode: []},
+ 		 {name: "raw",
+			code: [
+			 {name: "raw",
+// TODO: add rules by eval(name) after refreshing defView
+    		startRule: "it",
+    		inputIsList: true,
+        defView: "Grammar"}],
+ 			decode: []}],			
+			views: [
+			{name: "Read Me First",	
+    	 editorProperties: {
+    	   name: "ACE editor", height: "100px", gutters: false, readOnly: true},   				 
+    	 changed: false,
+    	 language: "raw",
+    	 inputView: "Read Me First", 
+    	 contents: 'Welcome to the Language Workbench for Language of Languages (LoLs).\n' +
+			'Select a workspace and interact with it using the language areas below.\n' +
+			'Each area displays the workspace according to a selected language.\n' +
+			'Changes in one area update all other areas and the Language Element\n' +
+			'Tree (LET) which defines the LoLs workspace.'},
+
+			{name: "Math Problem",	
+    	 editorProperties: {
+    	   name: "ACE editor", height: "60px", gutters: false, readOnly: false},   				 
+    	 changed: false,
+    	 language: "math",
+    	 inputView: "Math Problem", 
+    	 contents: '2+3*4'},
+
+			{name: "Answer",	
+    	 editorProperties: {
+    	   name: "ACE editor", height: "60px", gutters: false, readOnly: true},   				 
+    	 changed: false,
+    	 language: "calculate",
+    	 inputView: "Math Problem", 
+    	 contents: ''},
+
+			{name: "LET Explorer",	
+    	 editorProperties: {
+    	   name: "ACE editor", height: "200px", gutters: false, readOnly: true},   				 
+    	 changed: false,
+    	 language: "LET",
+    	 inputView: "Math Problem", 
+    	 contents: ''},
+
+			{name: "Grammar",	
+    	 editorProperties: {
+    	   name: "ACE editor", height: "250px", gutters: true, readOnly: false},   				 
+    	 changed: false,
+    	 language: "ometa",
+    	 inputView: "Grammar", 
+    	 contents: 	'ometa math {\n' +
+			'  expression = term:t space* end           -> t,\n' +
+			'  term       = term:t "+" factor:f         -> Le(\'Add\', t, f)\n' +
+			'             | term:t "-" factor:f         -> Le(\'Subtract\', t, f)\n' +
+			'             | factor,\n' +
+			'  factor     = factor:f "*" primary:p      -> Le(\'Multiply\', f, p)\n' +
+			'             | factor:f "/" primary:p      -> Le(\'Divide\', f, p)\n' +
+			'             | primary,\n' + 
+			'  primary    = Group\n' +
+			'             | Number,\n' +
+			'  Group      = "(" term:t ")"              -> Le(\'Group\', t),\n' +
+			'  Number     = space* digits:n             -> Le(\'Number\', n),\n' + 
+			'  digits     = digits:n digit:d            -> (n * 10 + d)\n' +
+			'             | digit,\n' + 
+			'  digit      = ^digit:d                    -> d.digitValue()\n' +
+			'}\n\n' + 
+			'ometa calculate {\n' +
+			'  le     = [\'Number\' anything:n]  -> n\n' +
+			'         | [\'Group\' le:x]         -> x\n' +
+			'         | [\'Add\' le:l le:r]      -> (l + r)\n' +
+			'         | [\'Subtract\' le:l le:r] -> (l - r)\n' +
+			'         | [\'Multiply\' le:l le:r] -> (l * r)\n' +
+			'         | [\'Divide\' le:l le:r]   -> (l / r)\n' +
+			'}\n\n' + 
+			'ometa LET {\n' +
+			'  let = [\'Number\' anything:n]:x    -> (sp(x)+n+\' Number\\n\')\n' +
+			'      | [\'Group\' let:e]:x          -> (sp(x)+\'(.) Group\\n\'+e)\n' +
+			'      | [\'Add\' let:l let:r]:x      -> (sp(x)+\'.+. Add\\n\'+l+r)\n' +
+			'      | [\'Subtract\' let:l let:r]:x -> (sp(x)+\'.-. Subtract\\n\'+l+r)\n' +
+			'      | [\'Multiply\' let:l let:r]:x -> (sp(x)+\'.*. Multiply\\n\'+l+r)\n' +
+			'      | [\'Divide\' let:l let:r]:x   -> (sp(x)+\'./. Divide\\n\'+l+r)\n' +
+			'}\n\n' +
+			'function sp(node) {\n' +
+			'  var s="", i=node.depth();\n' +
+			'  while (i-- > 1) {s=s+"  "};\n' +
+			'  return s;\n' +
+			'}\n\n' +
+			'ometa raw {\n' +
+			'  it = anything*\n' +
+			'}'}],
+// TODO: currentView needs to change to currentViewSelection
+			currentView: "Math Problem"};			
+ 			
+	  return work;
+	};
+  // TODO: get existing workspace
+  alert("Can't Get Existing Workspace " + fn);	
+}
+
+function linkWorkspace(w) {
+  var lang, view, refs, defs;
+  w.changed=false;
+  for (var i=0; i<w.languages.length; i++) {
+  	lang=w.languages[i];
+  	w.languages[lang.name]=lang;
+  	lang.references=[];
+  	for (var j=0; j<lang.code.length; j++) {
+  	  lang.code[j].language=lang;
+  	  if (lang.code[j].defView === undefined)
+  	    lang.code[j].rules=eval(lang.code[j].name);
+  	};
+  	for (var j=0; j<lang.decode.length; j++) {
+  	  lang.decode[j].language=lang;
+  	  if (lang.decode[j].defView === undefined)
+  	    lang.decode[j].rules=eval(lang.decode[j].name);
+  	};
+	};
+  for (var i=0; i<w.views.length; i++) {
+  	view=w.views[i];
+    w.views[view.name]=view;
+    view.id=undefined;   																				// create on display
+    view.language=w.languages[view.language];
+    view.language.references[view.language.references.length]=view;
+    view.references=[];
+    view.langDefs=[];
+    view.grammarDefs=[];
+  };
+  for (var i=0; i<w.views.length; i++) {
+  	view=w.views[i];
+    view.inputView=w.views[view.inputView];
+    if (view.inputView !== view) {
+      refs=view.inputView.references;
+      refs[refs.length]=view;
+    };
+  };
+  for (var i=0; i<w.languages.length; i++) {
+  	lang=w.languages[i];
+  	for (var j=0; j<lang.code.length; j++) {
+  	  if (lang.code[j].defView!==undefined) {
+  	  	view=w.views[lang.code[j].defView];
+  	  	lang.code[j].defView=view;
+				defs=view.grammarDefs;
+				defs[defs.length]=lang.code[j];
+				if (view.langDefs.indexOf(lang)<0)
+				  view.langDefs[view.langDefs.length]=lang;
+  	  }
+  	};
+  	for (var j=0; j<lang.decode.length; j++) {
+  	  if (lang.decode[j].defView!==undefined) {
+  	  	view=w.views[lang.decode[j].defView];
+  	  	lang.decode[j].defView=view;
+				defs=view.grammarDefs;
+				defs[defs.length]=lang.decode[j];
+				if (view.langDefs.indexOf(lang)<0)
+				  view.langDefs[view.langDefs.length]=lang;
+  	  }
+  	};
+	};
+  w.currentView=w.views[w.currentView];
+  w.currentLanguage=w.currentView.language;
+  
+  return w;
+};
+
+function showWorkspace(w) { 
+  var ribbon, str, startView, view, thisView;
+  document.getElementById('WorkspaceName').textContent=w.name+' ';
+  ribbon=[];
+  for (var i=0; i<w.languages.length; i++) {
+  	ribbon.push(w.languages[i].name);
+  };
+  ribbon.sort();
+  str='';
+  for (var i=0; i<ribbon.length; i++) {
+		str=str + '<button id="' + ribbon[i] + 'Lang" type="button"' +
+			' onClick="setLanguage(\'' + ribbon[i] + '\')">' + ribbon[i] + '</button> ';
+	};
+  document.getElementById("LangRibbon").insertAdjacentHTML("beforeend", str);
+  for (var i=0; i<w.views.length; i++) {
+  	view=w.views[i];
+  	view.id=genLocalId(view.name);
+    thisView=createACEeditor(view.name,view.id,
+    	view.editorProperties.height,
+    	view.editorProperties.gutters,
+    	view.editorProperties.readOnly,
+    	view.contents);
+    if (view === w.currentView)
+      startView=thisView;
+
+    view.changeFn=function(e) {viewChanged(this[0].myView);};
+    view.changeFn.myView=view;
+    thisView.on('change', view.changeFn);
+    view.focusFn=function() {viewFocus(this[0].myView);};
+  	view.focusFn.myView=view;
+    thisView.on('focus', view.focusFn);
+
+    view.changed=true;
+  };
+  refreshAll();
+  if (startView)
+  	startView.focus(); 
+}
+
 function saveWorkspace(id) {
   // TODO: save current workspace
   alert("Save Current Workspace");
@@ -28,9 +277,9 @@ function saveWorkspace(id) {
 
 function refreshAll(id) {
   var button, clear=true;
-  for (var i=0; i < LoLs.viewOrder.length; i++) {
-    refreshView(LoLs.viewOrder[i].name);
-    if (LoLs.viewOrder[i].changed)
+  for (var i=0; i < LoLs.views.length; i++) {
+    refreshView(LoLs.views[i].name);
+    if (LoLs.views[i].changed)
     	clear=false;
   }
   if (clear) {
@@ -100,17 +349,14 @@ function createView(name,lang,gutter,readOnly,value,height,source) {
     },
     blurFn:function() {
     },
-// TODO: use object rather than name
     language: lang,
-// TODO: use object rather than name
     inputView: source,   // point to this views or another view 
     									   // view displays input or output
     contents: undefined,
-// TODO: use object rather than name
     references: [],      // Set of Views which use contents as input 
     langDefs:[]};        // Set of Languages that View defines  
 // TODO: support inserting view
-  LoLs.viewOrder[LoLs.viewOrder.length] = LoLs.views[name];
+  LoLs.views[LoLs.views.length] = LoLs.views[name];
   LoLs.views[name].changeFn.myView=LoLs.views[name];
   view.on('change', LoLs.views[name].changeFn);
   LoLs.views[name].focusFn.myView=LoLs.views[name];
@@ -136,6 +382,18 @@ function viewChanged(view) {
 	};
 	button=document.getElementById("refreshAll");
 	button.style.backgroundColor = "yellow";
+}
+
+function viewFocus(view) {
+	var langButton;
+	if (LoLs.currentLanguage != undefined) {
+		langButton=document.getElementById(LoLs.currentLanguage.name+"Lang");
+		langButton.style.color = "white";
+	}
+	LoLs.currentView=view;
+	LoLs.currentLanguage=LoLs.currentView.language;
+	langButton=document.getElementById(LoLs.currentLanguage.name+"Lang");
+	langButton.style.color = "red";
 }
 
 function languageChanged(lang) {
@@ -188,15 +446,14 @@ function refreshView(viewName) {
   var lolsView, editor, source, lang, langViews, button, cleared;
   try {
     lolsView=LoLs.views[viewName];
-// TODO: eliminate duplicate refreshing of views
 // TODO: bidirectional view dependency support A updates B & B updates A
     if (lolsView.changed==undefined)
   	  return lolsView.contents;
     lolsView.changed=undefined;
    lang=lolsView.language.code;
    for (var i=0; i <lang.length; i++) {
-    	if (lang[i].inputView !== undefined)
-    		refreshView(lang[i].inputView.name);
+    	if (lang[i].defView !== undefined)
+    		refreshView(lang[i].defView.name);
     };
     editor=document.getElementById(lolsView.id).editor;
     if (lolsView.inputView === lolsView) {
@@ -211,9 +468,12 @@ function refreshView(viewName) {
     lolsView.changed=false;
     button=document.getElementById(lolsView.id+"Refresh");    
     button.style.backgroundColor = "white";
+    for (var i=0; i<lolsView.grammarDefs.length; i++) {
+    	lolsView.grammarDefs[i].rules=eval(lolsView.grammarDefs[i].name);
+    };
     cleared=true;
-    for (var i=0; i <LoLs.viewOrder.length; i++) {
-    	if (LoLs.viewOrder[i].changed)
+    for (var i=0; i <LoLs.views.length; i++) {
+    	if (LoLs.views[i].changed)
     		cleared=false;
     };
     if (cleared) {
@@ -236,9 +496,9 @@ function refreshView(viewName) {
 function setLanguage(lang) {
   var langObj;
   langObj=LoLs.currentView.language;
-  langObj.references=langObj.references.filter(function(x) {x!==LoLs.currentView});
+  langObj.references=langObj.references.filter(function(x) {return x!==LoLs.currentView});
   langObj=LoLs.languages[lang];
-  langObj.references=langObj.references.filter(function(x) {x!==LoLs.currentView});
+  langObj.references=langObj.references.filter(function(x) {return x!==LoLs.currentView});
   langObj.references[langObj.references.length]=LoLs.currentView;    
   LoLs.currentView.language=langObj;
   refreshView(LoLs.currentView.name);

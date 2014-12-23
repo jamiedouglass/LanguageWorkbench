@@ -5,11 +5,10 @@ var LoLs={
 */
   name: "",  				// workspace name
   changed: false,		// true => needs to be saved
-	languages:[],
+	languages:[],			// by name and order
 	currentLanguage: undefined,
-	views: [],				// by name
-	currentView: undefined,
-	viewOrder: []};
+	views: [],				// by name and order
+	currentView: undefined};
 // TODO: load meta language such as ometa or CAT from general workspace
 LoLs.languages["ometa"]={
 /* reserved for saving to file, GitHub, etc.
@@ -43,8 +42,9 @@ LoLs.languages["ometa"]={
   references:[]};		// Set of Views using language
 LoLs.languages["ometa"].code[0].language=LoLs.languages["ometa"];
 LoLs.languages["ometa"].code[1].language=LoLs.languages["ometa"];
+LoLs.languages[LoLs.languages.length]=LoLs.languages["ometa"];
 
-function createLanguage(name, startRule, inputIsList, inputView) {
+function createLanguage(name, startRule, inputIsList, defView) {
   var view;
   LoLs.languages[name]={
 /* reserved for saving to file, GitHub, etc.
@@ -63,11 +63,12 @@ function createLanguage(name, startRule, inputIsList, inputView) {
        startRule: startRule,
        language: undefined,
        inputIsList: inputIsList,
-       inputView: LoLs.views[inputView]}],
+       defView: LoLs.views[defView]}],
     decode:[],
     references:[]};		// Set of Views using language
+  LoLs.languages[LoLs.languages.length]=LoLs.languages[name];
   LoLs.languages[name].code[0].language=LoLs.languages[name];
-  view=LoLs.languages[name].code[0].inputView;
+  view=LoLs.languages[name].code[0].defView;
   if (view)
     view.langDefs[view.langDefs.length]=LoLs.languages[name];
 }
@@ -115,9 +116,7 @@ Array.prototype.depth = function() {
 function applyLanguage(lang, source) {
   var rules, result=source;
   for (var i=0; i < lang.length; i++) {
-// TODO: update when language loaded or regenerated
-    rules=eval(lang[i].name);
-    lang.rules=rules;
+    rules=lang[i].rules;
     if (lang[i].inputIsList) {
       result=rules.matchAll(result, lang[i].startRule, undefined, 
 	       function(m, i) {throw objectThatDelegatesTo(fail, {errorPos: i}) });
