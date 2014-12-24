@@ -1,0 +1,47 @@
+ometa math {
+  expression = term:t space* end           -> t,
+  term       = term:t "+" factor:f         -> Le(\'Add\', t, f)
+             | term:t "-" factor:f         -> Le(\'Subtract\', t, f)
+             | factor,
+  factor     = factor:f "*" primary:p      -> Le(\'Multiply\', f, p)
+             | factor:f "/" primary:p      -> Le(\'Divide\', f, p)
+             | primary,
+  primary    = Group
+             | Number,
+  Group      = "(" term:t ")"              -> Le(\'Group\', t),
+  Number     = space* digits:n             -> Le(\'Number\', n),
+  digits     = digits:n digit:d            -> (n * 10 + d)
+             | digit,
+  digit      = ^digit:d                    -> d.digitValue()
+}
+
+ 
+ometa calculate {
+  le     = [\'Number\' anything:n]  -> n
+         | [\'Group\' le:x]         -> x
+         | [\'Add\' le:l le:r]      -> (l + r)
+         | [\'Subtract\' le:l le:r] -> (l - r)
+         | [\'Multiply\' le:l le:r] -> (l * r)
+         | [\'Divide\' le:l le:r]   -> (l / r)
+}
+
+
+ometa LET {
+  let = [\'Number\' anything:n]:x    -> (sp(x)+n+\' Number\\n\')
+      | [\'Group\' let:e]:x          -> (sp(x)+\'(.) Group\\n\'+e)
+      | [\'Add\' let:l let:r]:x      -> (sp(x)+\'.+. Add\\n\'+l+r)
+      | [\'Subtract\' let:l let:r]:x -> (sp(x)+\'.-. Subtract\\n\'+l+r)
+      | [\'Multiply\' let:l let:r]:x -> (sp(x)+\'.*. Multiply\\n\'+l+r)
+      | [\'Divide\' let:l let:r]:x   -> (sp(x)+\'./. Divide\\n\'+l+r)
+}
+// spacing function for LET display
+function sp(node) {
+  var s="", i=node.depth();
+  while (i-- > 1) {s=s+"  "};
+  return s;
+}
+
+
+ometa raw {
+  it = anything*
+}

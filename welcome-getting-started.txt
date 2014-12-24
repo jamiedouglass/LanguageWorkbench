@@ -1,0 +1,5 @@
+Welcome to the Language Workbench for Language of Languages (LoLs).
+Select a workspace and interact with it using the language areas below.
+Each area displays the workspace according to a selected language.
+Changes in one area update all other areas and the Language Element
+Tree (LET) which defines the LoLs workspace.
