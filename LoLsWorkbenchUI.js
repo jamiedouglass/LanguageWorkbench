@@ -6,6 +6,73 @@ window.onbeforeunload = function() {
 }
 
 //functions
+function popUp(id) {
+	var el = document.getElementById(id);
+	el.style.visibility = (el.style.visibility == "visible") ? "hidden" : "visible";
+}
+
+function addGrammar(form,gid) {
+  var str, t, g = document.getElementById(gid), elem = [], grammarData=[];
+  for (var i = 0; i < g.elements.length ;i++) {
+    if (g.elements[i].name) {
+    	grammarData[g.elements[i].name] = g.elements[i].value;
+    	elem[g.elements[i].name]=g.elements[i];
+    }
+  }
+  if (grammarData["name"]) {
+    try {eval(grammarData["name"])} catch (e) {
+			elem["name"].value += " error";
+			elem["name"].focus();
+			return;
+    };
+  } else {
+  	elem["name"].focus();
+  	return;
+  };
+  if (grammarData["startRule"]) {
+    try {
+    	if(eval(grammarData["name"])[grammarData["startRule"]] === undefined) {
+				elem["startRule"].value += " error";
+				elem["startRule"].focus();
+				return;
+    	}
+    } catch (e) {
+			elem["startRule"].value += " error";
+			elem["startRule"].focus();
+			return;
+    };
+  } else {
+  	elem["startRule"].focus();
+  	return;
+  };
+  if (grammarData["defView"]) {
+    if (LoLs.views[grammarData["defView"]] === undefined) {
+			elem["defView"].value += " error";
+			elem["defView"].focus();
+			return;
+    };
+  } else {
+  	grammarData["defView"]="";
+  };
+  if (grammarData["flow"] == "code") {
+		t = document.getElementById(form+"CodeGrammar");
+  }
+  else {
+		t = document.getElementById(form+"DecodeGrammar");
+  };
+  str ='<tr><td>'+grammarData["name"]+'</td>'+
+					 '<td>'+grammarData["startRule"]+'</td>'+		
+					 '<td>'+grammarData["input"]+'</td>'+		
+					 '<td>'+grammarData["defView"]+'</td>'+		
+					'<td><button type="button" title="delete grammar"'+
+					' onclick="deleteGrammar(this)">X</button></td></tr>';
+	t.insertAdjacentHTML("beforeend", str);
+}
+
+function deleteGrammar(here) {
+	var row=here.parentNode.parentNode;
+	row.parentNode.removeChild(row);
+}
 function setupPage() { 
   LoLs=getWorkspace("Getting Started");
 	linkWorkspace(LoLs);
@@ -107,7 +174,9 @@ function showWorkspace(w) {
   str='';
   for (var i=0; i<ribbon.length; i++) {
 		str=str + '<button id="' + ribbon[i] + 'Lang" type="button"' +
-			' onClick="setLanguage(\'' + ribbon[i] + '\')">' + ribbon[i] + '</button> ';
+			' onClick="setLanguage(\'' + ribbon[i] + 
+			'\')" ondblclick="popUp(\'langChange\')">' +
+			 ribbon[i] + '</button> ';
 	};
   document.getElementById("LangRibbon").insertAdjacentHTML("beforeend", str);
   for (var i=0; i<w.views.length; i++) {

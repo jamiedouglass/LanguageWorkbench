@@ -47,9 +47,125 @@
     <img id="lols-name" src="LoLsW-logo.png" alt="Language of Languages (LoLs) Workbench">
   </a>
 </div>
+<div id="langAdd">
+	<div>
+		<form autocomplete="off">
+			Language Name: 
+			<input type="text" name="languageName" value="Unnamed">
+			<br>
+			<input type="checkbox" name="output" value="executable">Meta Language
+			<table id="addCodeGrammar">
+				<tr>
+					<th>Grammar</th>
+					<th>Start Rule</th>		
+					<th>Input</th>
+					<th>View</th>
+				</tr>
+			</table>
+			<table id="addDecodeGrammar">
+				<tr>
+					<th>Decode<br>Grammar</th>
+					<th>Start Rule</th>		
+					<th>Input</th>
+					<th>View</th>
+				</tr>
+			</table>
+			<fieldset id="grammarToAdd">
+				<legend>Grammar</legend>
+			  <button type="button" title="add grammar" 
+			    onClick="addGrammar('add','grammarToAdd')">+</button>
+			  Name:
+				<input type="text" name="name"">
+				<br>
+				from View: 
+				<input type="text" name="defView">
+				<br>
+				Start Rule: 
+				<input type="text" name="startRule">
+				<br>
+				Flow:
+				<select name="flow">
+					<option value="code">code</option>
+					<option value="decode">decode</option>
+				</select>	
+				Input:
+				<select name="input">
+					<option value="List">List</option>
+					<option value="Object">Object</option>
+				</select>	
+			</fieldset>
+			<br>
+			<button type="button" title="cancel" onClick="popUp('langAdd')">
+				Cancel
+			</button>
+			<button type="button" title="add language" onClick="popUp('langAdd')">
+				Add Language
+			</button>
+		</form>
+	</div>
+</div>
+<div id="langChange"> 
+	<div>
+		<form autocomplete="off">
+			<button type="button" title="delete language">Delete Language</button>
+			<br>
+			Language Name: 
+			<input type="text" name="languageName">
+			<br>
+			<input type="checkbox" name="output" value="executable">Meta Language
+			<table id="changeCodeGrammar">
+				<tr>
+					<th>Grammar</th>
+					<th>Start Rule</th>		
+					<th>Input</th>
+					<th>View</th>
+				</tr>
+			</table>
+			<table id="changeDecodeGrammar">
+				<tr>
+					<th>Decode<br>Grammar</th>
+					<th>Start Rule</th>		
+					<th>Input</th>
+					<th>View</th>
+				</tr>
+			</table>
+			<fieldset id="grammarToChange">
+				<legend>Grammar</legend>
+			  <button type="button" title="add grammar" 
+			    onClick="addGrammar('change','grammarToChange')">+</button>
+				Name:
+				<input type="text" name="name">
+				<br>
+				from View: 
+				<input type="text" name="defView">
+				<br>
+				Start Rule: 
+				<input type="text" name="startRule">
+				<br>
+				Flow:
+				<select name="flow">
+					<option value="code">code</option>
+					<option value="decode">decode</option>
+				</select>	
+				Input:
+				<select name="input">
+					<option value="List">List</option>
+					<option value="Object">Object</option>
+				</select>	
+			</fieldset>
+			<br>
+			<button type="button" title="cancel" onClick="popUp('langChange')">
+				Cancel
+			</button>
+			<button type="button" title="change language" onClick="popUp('langChange')">
+				Change Language
+			</button>
+		</form>
+	</div>
+</div>
 <div id="LangRibbon">
   <scan>
-    <button type="button" title="add/remove language" onClick="addRemoveLanguage(this)">
+    <button type="button" title="add/remove language" onClick="popUp('langAdd')">
     +Language</button>
   </scan>
 </div>
