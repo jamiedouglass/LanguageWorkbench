@@ -80,18 +80,94 @@ function setupPage() {
 }
 
 function addLanguage(id) {
-  // TODO: add language to language ribbon
-  alert("add language to language ribbon");  
+	var i, elem=document.getElementById(id+'Name'), checked, table, rows, lang, g;
+	if (elem.value == '') {
+		elem.value += 'needs value';
+		elem.focus();
+		return;
+	};
+	if (LoLs.languages[elem.value] !== undefined) {
+		elem.value += ' already defined';
+		elem.focus();
+		return;
+	};
+	checked=document.getElementById('langAddOutput').checked;
+	table=document.getElementById('addCodeGrammar');
+	rows=table.getElementsByTagName("tr");
+	lang={name: elem.value,
+		code: [],
+		decode: [],
+		references: []};
+	if (rows.length<2) {
+		elem.value += ' at least one code grammar';
+		elem.focus();
+		return;
+	};
+	for (i=1; i<rows.length; i++) {
+		g=rows[i].getElementsByTagName("td");
+		g={name: g[0].textContent,
+		 rules: eval(g[0].textContent),
+		 startRule: g[1].textContent,
+		 language: lang,
+		 inputIsList: g[2].textContent,
+		 defView: g[3].textContent};
+		if (g.inputIsList == "List") {
+		  g.inputIsList=true;
+		} else {
+		  g.inputIsList=false;
+		};
+		lang.code[lang.code.length]=g;
+		if (g.defView !== "") {
+			g.defView=LoLs.views[g.defView];
+			if (g.defView.langDefs.indexOf(lang)<0)
+				g.defView.langDefs[g.defView.langDefs.length]=lang;
+		} else {
+			g.defView=undefined;
+		};	 
+	};
+	table=document.getElementById('addDecodeGrammar');
+	rows=table.getElementsByTagName("tr");
+	for (i=1; i<rows.length; i++) {
+		g=rows[i].getElementsByTagName("td");
+		g={name: g[0].textContent,
+		 rules: eval(g[0].textContent),
+		 startRule: g[1].textContent,
+		 language: lang,
+		 inputIsList: g[2].textContent,
+		 defView: g[3].textContent};
+		if (g.inputIsList == "List") {
+		  g.inputIsList=true;
+		} else {
+		  g.inputIsList=false;
+		};
+		lang.decode[lang.decode.length]=g;		 
+		if (g.defView !== "") {
+			g.defView=LoLs.views[g.defView];
+			if (g.defView.langDefs.indexOf(lang)<0)
+				g.defView.langDefs[g.defView.langDefs.length]=lang;
+		} else {
+			g.defView=undefined;
+		};	 
+	};
+	if (checked)
+		lang.code[lang.code.length-1].evalResults=true;
+	LoLs.languages[LoLs.languages.length]=lang;
+	LoLs.languages[lang.name]=lang;
+	relaceLangRibbon(); 
   popUp(id);  
+	if (LoLs.currentView)
+		document.getElementById(LoLs.currentView.id).editor.focus(); 
 }
 
 function removeLanguage(id) {
+	var form=document.getElementById(id);
   // TODO: remove language from language ribbon
   alert("remove language from language ribbon");  
   popUp(id);  
 }
 
 function changeLanguage(id) {
+	var form=document.getElementById(id);
   // TODO: change language on language ribbon
   alert("change language on language ribbon");
   popUp(id);  
@@ -176,22 +252,31 @@ function linkWorkspace(w) {
   return w;
 };
 
-function showWorkspace(w) { 
-  var ribbon, str, startView, view, thisView;
-  document.getElementById('WorkspaceName').textContent=w.name+' ';
-  ribbon=[];
-  for (var i=0; i<w.languages.length; i++) {
-  	ribbon.push(w.languages[i].name);
+function relaceLangRibbon() { 
+  var i, ribbon=[], str, doc, node;
+  for (i=0; i<LoLs.languages.length; i++) {
+  	ribbon.push(LoLs.languages[i].name);
   };
   ribbon.sort();
   str='';
-  for (var i=0; i<ribbon.length; i++) {
+  for (i=0; i<ribbon.length; i++) {
 		str=str + '<button id="' + ribbon[i] + 'Lang" type="button"' +
 			' onClick="setLanguage(\'' + ribbon[i] + 
 			'\')" ondblclick="popUp(\'langChange\')">' +
 			 ribbon[i] + '</button> ';
 	};
-  document.getElementById("LangRibbon").insertAdjacentHTML("beforeend", str);
+  doc=document.getElementById("LangRibbon");
+  for (i=doc.childNodes.length-1; i>1; i--) {
+  	node=doc.childNodes[i];
+  	node.parentNode.removeChild(node);
+  };
+  doc.insertAdjacentHTML("beforeend", str);
+};
+
+function showWorkspace(w) { 
+  var startView, view, thisView;
+  document.getElementById('WorkspaceName').textContent=w.name+' ';
+  relaceLangRibbon();
   for (var i=0; i<w.views.length; i++) {
   	view=w.views[i];
   	view.id=genLocalId(view.name);
