@@ -98,7 +98,7 @@
 			<button type="button" title="cancel" onClick="popUp('langAdd')">
 				Cancel
 			</button>
-			<button type="button" title="add language" onClick="popUp('langAdd')">
+			<button type="button" title="add language" onClick="addLanguage('langAdd')">
 				Add Language
 			</button>
 		</form>
@@ -107,7 +107,9 @@
 <div id="langChange"> 
 	<div>
 		<form autocomplete="off">
-			<button type="button" title="delete language">Delete Language</button>
+			<button type="button" title="delete language" onClick="removeLanguage('langChange')">
+			  Delete Language
+			</button>
 			<br>
 			Language Name: 
 			<input type="text" name="languageName">
@@ -157,7 +159,7 @@
 			<button type="button" title="cancel" onClick="popUp('langChange')">
 				Cancel
 			</button>
-			<button type="button" title="change language" onClick="popUp('langChange')">
+			<button type="button" title="change language" onClick="changeLanguage('langChange')">
 				Change Language
 			</button>
 		</form>

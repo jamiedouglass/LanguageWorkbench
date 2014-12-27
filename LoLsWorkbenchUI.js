@@ -79,9 +79,22 @@ function setupPage() {
 	showWorkspace(LoLs);
 }
 
-function addRemoveLanguage(id) {
-  // TODO: add and/or remove languages to/from language ribbon
-  alert("add and/or remove languages to/from language ribbon");  
+function addLanguage(id) {
+  // TODO: add language to language ribbon
+  alert("add language to language ribbon");  
+  popUp(id);  
+}
+
+function removeLanguage(id) {
+  // TODO: remove language from language ribbon
+  alert("remove language from language ribbon");  
+  popUp(id);  
+}
+
+function changeLanguage(id) {
+  // TODO: change language on language ribbon
+  alert("change language on language ribbon");
+  popUp(id);  
 }
 
 function openWorkspace(id) {
