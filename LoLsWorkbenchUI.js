@@ -160,9 +160,31 @@ function addLanguage(id) {
 }
 
 function removeLanguage(id) {
-	var form=document.getElementById(id);
-  // TODO: remove language from language ribbon
-  alert("remove language from language ribbon");  
+	var form=document.getElementById('langChangeName'),langObj, view;
+	langObj=LoLs.languages[form.value];
+	if (langObj === undefined)
+		return;
+	if (langObj.references.length>0)
+		return;
+	for (var i=0; i<langObj.code.length; i++) {
+		if (langObj.code[i].defView !== undefined) {
+			view=langObj.code[i].defView;
+			view.grammarDefs=view.grammarDefs.filter(function(x) {return x !== langObj.code[i]});
+			view.langDefs=view.langDefs.filter(function(x) {return x !== langObj});
+		};
+	};
+	for (var i=0; i<langObj.decode.length; i++) {
+		if (langObj.decode[i].defView !== undefined) {
+			view=langObj.decode[i].defView;
+			view.grammarDefs=view.grammarDefs.filter(function(x) {return x !== langObj.code[i]});
+			view.langDefs=view.langDefs.filter(function(x) {return x !== langObj});
+		};
+	};
+	LoLs.languages=LoLs.languages.filter(function (x) {return x !== langObj});
+	for (var i=0; i<LoLs.languages.length; i++) {
+		LoLs.languages[LoLs.languages[i].name]=LoLs.languages[i];
+	};
+	relaceLangRibbon();
   popUp(id);  
 }
 
@@ -261,8 +283,7 @@ function relaceLangRibbon() {
   str='';
   for (i=0; i<ribbon.length; i++) {
 		str=str + '<button id="' + ribbon[i] + 'Lang" type="button"' +
-			' onClick="setLanguage(\'' + ribbon[i] + 
-			'\')" ondblclick="popUp(\'langChange\')">' +
+			' onClick="setLanguage(\'' + ribbon[i] + '\')">' +
 			 ribbon[i] + '</button> ';
 	};
   doc=document.getElementById("LangRibbon");
@@ -509,7 +530,62 @@ function refreshView(viewName) {
 }
 
 function setLanguage(lang) {
-  var langObj;
+  var i, langObj, elem, rows, str, inputOption, view;
+  if (event.altKey) {
+    langObj=LoLs.languages[lang];
+    elem=document.getElementById('deleteLanguage');
+    elem.disabled=langObj.references.length>0;
+    elem=document.getElementById('langChangeName');
+    elem.value=langObj.name;
+    elem=document.getElementById('langChangeOutput');
+    elem.checked=(langObj.code[langObj.code.length-1].evalResults == true);
+    elem=document.getElementById('changeCodeGrammar');
+		rows=elem.getElementsByTagName("tr");
+    for (i=rows.length-1; i>0; i--) {
+    	rows[i].parentNode.removeChild(rows[i]);
+    };
+    for (i=0; i<langObj.code.length; i++) {
+      if (langObj.code[i].inputIsList) {
+      	inputOption = "List";
+      } else {
+      	inputOption = "Object";
+      };
+      view = '';
+      if (langObj.code[i].defView!==undefined)
+      	view=langObj.code[i].defView.name;
+			str ='<tr><td>'+langObj.code[i].name+'</td>'+
+				 '<td>'+langObj.code[i].startRule+'</td>'+		
+				 '<td>'+inputOption+'</td>'+		
+				 '<td>'+view+'</td>'+		
+				'<td><button type="button" title="delete grammar"'+
+				' onclick="deleteGrammar(this)">X</button></td></tr>';
+			elem.insertAdjacentHTML("beforeend", str);
+    };
+    elem=document.getElementById('changeDecodeGrammar');
+		rows=elem.getElementsByTagName("tr");
+    for (i=rows.length-1; i>0; i--) {
+    	rows[i].parentNode.removeChild(rows[i]);
+    };
+    for (i=0; i<langObj.decode.length; i++) {
+      if (langObj.decode[i].inputIsList) {
+      	inputOption = "List";
+      } else {
+      	inputOption = "Object";
+      };
+      view = '';
+      if (langObj.decode[i].defView!==undefined)
+      	view=langObj.decode[i].defView.name;
+			str ='<tr><td>'+langObj.decode[i].name+'</td>'+
+				 '<td>'+langObj.decode[i].startRule+'</td>'+		
+				 '<td>'+inputOption+'</td>'+		
+				 '<td>'+view+'</td>'+		
+				'<td><button type="button" title="delete grammar"'+
+				' onclick="deleteGrammar(this)">X</button></td></tr>';
+			elem.insertAdjacentHTML("beforeend", str);
+    };   
+  	popUp('langChange');
+  	return;
+  };
   langObj=LoLs.currentView.language;
   langObj.references=langObj.references.filter(function(x) {return x!==LoLs.currentView});
   langObj=LoLs.languages[lang];
