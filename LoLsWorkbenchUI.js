@@ -397,7 +397,7 @@ function languageChanged(lang) {
 function createACEeditor(name,id,height,gutter,readOnly,value) {
   var e, frame;
   document.getElementById("WorkspaceArea").insertAdjacentHTML("beforeend",
-	'<div class="LoLsView">' +
+	'<div class="LoLsView" name="'+name+'">' +
 	'	<div class="LoLsViewTitle">' +
 	'	  <input id ="'+ id +'Button" type="button" title="collapse" value="-" ' +
 	'		onClick="showOrHide(\''+ id +'\',this)">' +
@@ -430,8 +430,31 @@ function createACEeditor(name,id,height,gutter,readOnly,value) {
 }
 
 function closeView(id) {
-  // TODO: close this view in current workspace
-  alert("Close This View");
+	var i, str, view, elem=id.parentNode.parentNode, found;
+	if (document.getElementById("WorkspaceArea").childNodes.length<=4) {
+		alert("Workspace must have at least one view");
+		return;
+	};
+	view=LoLs.views[elem.getAttribute("name")];
+	if (view.references.length>0) {
+	  str="view is input to ";
+	  for (i=0; i<view.references.length; i++) {
+	  	str +=view.references[i].name+' ';
+	  };
+		alert(str);
+		return;
+	};
+	for (i=0; i<view.grammarDefs.length; i++) {
+		view.grammarDefs[i].defView=undefined;
+	};
+	view.language.references=view.language.references.filter(function(x) {return x!==view});
+	if (view.inputView !== view)
+		view.inputView.references=view.inputView.references.filter(function(x) {return x!==view});
+	LoLs.views=LoLs.views.filter(function(x) { return x!==view});
+	for (i=0; i<LoLs.views.length; i++) {
+		LoLs.views[LoLs.views[i].name]=LoLs.views[i];
+	};
+	elem.parentNode.removeChild(elem);	
 }
 
 function refreshView(viewName) {
