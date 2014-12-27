@@ -54,7 +54,7 @@
 			<input type="text" id="langAddName" value="Unnamed">
 			<br>
 			<input type="checkbox" id="langAddOutput" value="executable">Meta Language
-			<table id="addCodeGrammar">
+			<table id="langAddCode">
 				<tr>
 					<th>Grammar</th>
 					<th>Start Rule</th>		
@@ -62,7 +62,7 @@
 					<th>View</th>
 				</tr>
 			</table>
-			<table id="addDecodeGrammar">
+			<table id="langAddDecode">
 				<tr>
 					<th>Decode<br>Grammar</th>
 					<th>Start Rule</th>		
@@ -73,7 +73,7 @@
 			<fieldset id="grammarToAdd">
 				<legend>Grammar</legend>
 			  <button type="button" title="add grammar" 
-			    onClick="addGrammar('add','grammarToAdd')">+</button>
+			    onClick="addGrammar('langAdd','grammarToAdd')">+</button>
 			  Name:
 				<input type="text" name="name"">
 				<br>
@@ -116,7 +116,7 @@
 			<input type="text" id="langChangeName">
 			<br>
 			<input type="checkbox" id="langChangeOutput" value="executable">Meta Language
-			<table id="changeCodeGrammar">
+			<table id="langChangeCode">
 				<tr>
 					<th>Grammar</th>
 					<th>Start Rule</th>		
@@ -124,7 +124,7 @@
 					<th>View</th>
 				</tr>
 			</table>
-			<table id="changeDecodeGrammar">
+			<table id="langChangeDecode">
 				<tr>
 					<th>Decode<br>Grammar</th>
 					<th>Start Rule</th>		
@@ -135,7 +135,7 @@
 			<fieldset id="grammarToChange">
 				<legend>Grammar</legend>
 			  <button type="button" title="add grammar" 
-			    onClick="addGrammar('change','grammarToChange')">+</button>
+			    onClick="addGrammar('langChange','grammarToChange')">+</button>
 				Name:
 				<input type="text" name="name">
 				<br>

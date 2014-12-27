@@ -55,10 +55,10 @@ function addGrammar(form,gid) {
   	grammarData["defView"]="";
   };
   if (grammarData["flow"] == "code") {
-		t = document.getElementById(form+"CodeGrammar");
+		t = document.getElementById(form+"Code");
   }
   else {
-		t = document.getElementById(form+"DecodeGrammar");
+		t = document.getElementById(form+"Decode");
   };
   str ='<tr><td>'+grammarData["name"]+'</td>'+
 					 '<td>'+grammarData["startRule"]+'</td>'+		
@@ -80,29 +80,50 @@ function setupPage() {
 }
 
 function addLanguage(id) {
-	var i, elem=document.getElementById(id+'Name'), checked, table, rows, lang, g;
-	if (elem.value == '') {
+	var i, elem=document.getElementById(id+'Name'), lang, view;	
+	lang=pullLangInfo('langAdd');
+	if (lang.name == '') {
 		elem.value += 'needs value';
 		elem.focus();
 		return;
 	};
-	if (LoLs.languages[elem.value] !== undefined) {
+	if (LoLs.languages[lang.name] !== undefined) {
 		elem.value += ' already defined';
 		elem.focus();
 		return;
 	};
-	checked=document.getElementById('langAddOutput').checked;
-	table=document.getElementById('addCodeGrammar');
-	rows=table.getElementsByTagName("tr");
-	lang={name: elem.value,
-		code: [],
-		decode: [],
-		references: []};
-	if (rows.length<2) {
+	if (lang.code.length<1) {
 		elem.value += ' at least one code grammar';
 		elem.focus();
 		return;
 	};
+	for (i=0; i<lang.code.length; i++) {
+		view=lang.code[i].defView;
+		if (view.langDefs.indexOf(lang)<0)
+			view.langDefs[view.langDefs.length]=lang;
+	}
+	for (i=0; i<lang.decode.length; i++) {
+		view=lang.decode[i].defView;
+		if (view.langDefs.indexOf(lang)<0)
+			view.langDefs[view.langDefs.length]=lang;
+	}
+	LoLs.languages[LoLs.languages.length]=lang;
+	LoLs.languages[lang.name]=lang;
+	relaceLangRibbon(); 
+  popUp(id);  
+	if (LoLs.currentView)
+		document.getElementById(LoLs.currentView.id).editor.focus(); 
+}
+
+function pullLangInfo(pre) {
+	var i, elem=document.getElementById(pre+'Name'), checked, table, rows, g;
+	var lang={name: elem.value,
+		code: [],
+		decode: [],
+		references: []};
+	checked=document.getElementById(pre+'Output').checked;
+	table=document.getElementById(pre+'Code');
+	rows=table.getElementsByTagName("tr");
 	for (i=1; i<rows.length; i++) {
 		g=rows[i].getElementsByTagName("td");
 		g={name: g[0].textContent,
@@ -117,15 +138,13 @@ function addLanguage(id) {
 		  g.inputIsList=false;
 		};
 		lang.code[lang.code.length]=g;
-		if (g.defView !== "") {
-			g.defView=LoLs.views[g.defView];
-			if (g.defView.langDefs.indexOf(lang)<0)
-				g.defView.langDefs[g.defView.langDefs.length]=lang;
-		} else {
+		if (g.defView == "") {
 			g.defView=undefined;
+		} else {
+			g.defView=LoLs.views[g.defView];
 		};	 
 	};
-	table=document.getElementById('addDecodeGrammar');
+	table=document.getElementById(pre+'Decode');
 	rows=table.getElementsByTagName("tr");
 	for (i=1; i<rows.length; i++) {
 		g=rows[i].getElementsByTagName("td");
@@ -141,27 +160,28 @@ function addLanguage(id) {
 		  g.inputIsList=false;
 		};
 		lang.decode[lang.decode.length]=g;		 
-		if (g.defView !== "") {
-			g.defView=LoLs.views[g.defView];
-			if (g.defView.langDefs.indexOf(lang)<0)
-				g.defView.langDefs[g.defView.langDefs.length]=lang;
-		} else {
+		if (g.defView == "") {
 			g.defView=undefined;
+		} else {
+			g.defView=LoLs.views[g.defView];
 		};	 
 	};
-	if (checked)
+	if (checked && lang.code.length>=1)
 		lang.code[lang.code.length-1].evalResults=true;
-	LoLs.languages[LoLs.languages.length]=lang;
-	LoLs.languages[lang.name]=lang;
-	relaceLangRibbon(); 
+	return lang;
+}
+
+function removeLanguage(id) {
+	var form=document.getElementById('langChangeName');
+	removeLanguageObj(LoLs.languages[form.value]);
+	relaceLangRibbon();
   popUp(id);  
 	if (LoLs.currentView)
 		document.getElementById(LoLs.currentView.id).editor.focus(); 
 }
 
-function removeLanguage(id) {
-	var form=document.getElementById('langChangeName'),langObj, view;
-	langObj=LoLs.languages[form.value];
+function removeLanguageObj(langObj) {
+	var view;
 	if (langObj === undefined)
 		return;
 	if (langObj.references.length>0)
@@ -184,15 +204,46 @@ function removeLanguage(id) {
 	for (var i=0; i<LoLs.languages.length; i++) {
 		LoLs.languages[LoLs.languages[i].name]=LoLs.languages[i];
 	};
-	relaceLangRibbon();
-  popUp(id);  
 }
 
 function changeLanguage(id) {
-	var form=document.getElementById(id);
+	var elem=document.getElementById('langChangeName'), lang, refs=OLDLang.references, view;
+	var i;
   // TODO: change language on language ribbon
-  alert("change language on language ribbon");
+  lang=pullLangInfo('langChange');
+	if (lang.name == '') {
+		elem.value += 'needs value';
+		elem.focus();
+		return;
+	};
+	if (lang.code.length<1) {
+		elem.value += ' at least one code grammar';
+		elem.focus();
+		return;
+	};
+  OLDLang.references=[];
+  removeLanguageObj(OLDLang);
+	for (i=0; i<lang.code.length; i++) {
+		view=lang.code[i].defView;
+		if (view.langDefs.indexOf(lang)<0)
+			view.langDefs[view.langDefs.length]=lang;
+	};
+	for (i=0; i<lang.decode.length; i++) {
+		view=lang.decode[i].defView;
+		if (view.langDefs.indexOf(lang)<0)
+			view.langDefs[view.langDefs.length]=lang;
+	};
+	for (i=0; i<refs.length; i++) {
+		view=refs[i];
+		view.language=lang;
+		view.references[view.references.length]=view;
+	};
+	LoLs.languages[LoLs.languages.length]=lang;
+	LoLs.languages[lang.name]=lang;
+	relaceLangRibbon(); 
   popUp(id);  
+	if (LoLs.currentView)
+		document.getElementById(LoLs.currentView.id).editor.focus();   
 }
 
 function openWorkspace(id) {
@@ -528,18 +579,20 @@ function refreshView(viewName) {
     return lolsView.contents;
   }
 }
-
+// TODO: eliminate global for language change
+var OLDLang;
 function setLanguage(lang) {
   var i, langObj, elem, rows, str, inputOption, view;
   if (event.altKey) {
     langObj=LoLs.languages[lang];
+    OLDLang=langObj;
     elem=document.getElementById('deleteLanguage');
     elem.disabled=langObj.references.length>0;
     elem=document.getElementById('langChangeName');
     elem.value=langObj.name;
     elem=document.getElementById('langChangeOutput');
     elem.checked=(langObj.code[langObj.code.length-1].evalResults == true);
-    elem=document.getElementById('changeCodeGrammar');
+    elem=document.getElementById('langChangeCode');
 		rows=elem.getElementsByTagName("tr");
     for (i=rows.length-1; i>0; i--) {
     	rows[i].parentNode.removeChild(rows[i]);
@@ -561,7 +614,7 @@ function setLanguage(lang) {
 				' onclick="deleteGrammar(this)">X</button></td></tr>';
 			elem.insertAdjacentHTML("beforeend", str);
     };
-    elem=document.getElementById('changeDecodeGrammar');
+    elem=document.getElementById('langChangeDecode');
 		rows=elem.getElementsByTagName("tr");
     for (i=rows.length-1; i>0; i--) {
     	rows[i].parentNode.removeChild(rows[i]);
