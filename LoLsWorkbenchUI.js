@@ -425,9 +425,40 @@ function showOrHide(id, button) {
   }
 }
 
-function openView(id) {
+function addView() {
   // TODO: open a copy of this view
-  alert("Open a Copy of This View");
+  alert("add a View");
+  popUp('openView');
+}
+
+function updateView() {
+	var e;
+  LoLs.views[OLDView.name]=undefined;
+  OLDView.name=document.getElementById('openViewName').value;
+  LoLs.views[OLDView.name]=OLDView;
+  OLDView.editorProperties.height=document.getElementById('openViewHeight').value+"px";
+  OLDView.editorProperties.readOnly=document.getElementById('openViewReadonly').checked;
+  OLDView.editorProperties.gutters=document.getElementById('openViewGutters').checked;
+  e=document.getElementById(OLDView.id);
+	e.style.height=OLDView.editorProperties.height;
+	e=e.editor;
+  e.renderer.setShowGutter(OLDView.editorProperties.gutters);
+  e.setReadOnly(OLDView.editorProperties.readOnly);
+	document.getElementById(OLDView.id+"ViewName").textContent=OLDView.name+" ";
+  popUp('openView');
+}
+// TODO: eliminate global
+var OLDView;
+function openView(here) {
+	var view, name=here.parentNode.childNodes[3].textContent;
+	view=LoLs.views[name.substring(0,name.length-1)];
+	OLDView=view;
+	document.getElementById('openViewName').value=view.name;
+	document.getElementById('openViewHeight').value=
+		view.editorProperties.height.substring(0,view.editorProperties.height.length-2);
+	document.getElementById('openViewReadonly').checked=view.editorProperties.readOnly;
+	document.getElementById('openViewGutters').checked=view.editorProperties.gutters;
+  popUp('openView');
 }
 
 function viewChanged(view) {
@@ -473,7 +504,7 @@ function createACEeditor(name,id,height,gutter,readOnly,value) {
 	'	<div class="LoLsViewTitle">' +
 	'	  <input id ="'+ id +'Button" type="button" title="collapse" value="-" ' +
 	'		onClick="showOrHide(\''+ id +'\',this)">' +
-	'	  <scan>'+ name +' </scan><i>view</i>' +
+	'	  <scan id="'+id+'ViewName">'+ name +' </scan><i>view</i>' +
 	'	  <button type="button" title="open view" onClick="openView(this)">' +
 	'		<img src="open-view.png" alt="Open View">' +
 	'	  </button>' +

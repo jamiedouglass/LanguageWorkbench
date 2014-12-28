@@ -187,6 +187,31 @@
 	  </button>
 	</div>
 </div>
+<div id="openView">
+	<div>
+		<form>
+			Name: 
+			<input type="text" id="openViewName" value="Unnamed">
+			<br>
+			Height(in pixels):
+			<input type="number" id="openViewHeight" value="100">
+			<br>
+			<input type="checkbox" id="openViewReadonly">Readonly
+			<br>
+			<input type="checkbox" id="openViewGutters">Gutters
+			<br>
+			<button type="button" title="cancel" onClick="popUp('openView')">
+				Cancel
+			</button>
+			<button type="button" title="update view" onClick="updateView()">
+				Update View
+			</button>
+			<button type="button" title="add view" onClick="addView()">
+				New View
+			</button>
+		</form>
+	</div>
+</div>
 
 <div id="acknowledgement">
   <p>Brought to you by <a href="http://www.ResearchOnKnowing.com/">
