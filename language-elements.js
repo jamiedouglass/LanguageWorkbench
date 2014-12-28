@@ -1,5 +1,30 @@
 var LoLs;
-				
+
+var EmptyWorkspace={name: "My Work",	
+ languages: [
+// workbench meta language
+		{name: "ometa",
+		 code: [
+			 {name: "BSOMetaJSParser",
+				startRule: "topLevel",
+				inputIsList: true},
+			 {name: "BSOMetaJSTranslator",
+				startRule: "trans",
+				inputIsList: false,
+				evalResults: true}],
+		 decode: []}], 
+ views: [
+		{name: "My View",	
+		 editorProperties: 
+			 {name: "ACE editor", height: "300px", gutters: true, readOnly: false},   				 
+		 changed: false,
+		 language: "ometa",
+		 inputView: "My View", 
+		 contents: 	''}],
+	
+// current selected view		
+ currentView: "My View"};			
+		
 function createLanguage(name, startRule, inputIsList, defView) {
   var view;
   LoLs.languages[name]={

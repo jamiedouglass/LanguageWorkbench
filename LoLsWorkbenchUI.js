@@ -209,7 +209,6 @@ function removeLanguageObj(langObj) {
 function changeLanguage(id) {
 	var elem=document.getElementById('langChangeName'), lang, refs=OLDLang.references, view;
 	var i;
-  // TODO: change language on language ribbon
   lang=pullLangInfo('langChange');
 	if (lang.name == '') {
 		elem.value += 'needs value';
@@ -248,7 +247,10 @@ function changeLanguage(id) {
 
 function openWorkspace(id) {
   // TODO: open existing or create new workspace
-  alert("Open Existing Workspace or Create New Workspace");
+	LoLs=EmptyWorkspace; // copy???
+	linkWorkspace(LoLs);
+	showWorkspace(LoLs);
+
 }
 
 function getWorkspace(fn) {
@@ -346,7 +348,11 @@ function relaceLangRibbon() {
 };
 
 function showWorkspace(w) { 
-  var startView, view, thisView;
+  var startView, view, thisView, nodes, i;
+  nodes=document.getElementById('WorkspaceArea').childNodes;
+  for (i=nodes.length-1; i>1; i--) {
+  	nodes[i].parentNode.removeChild(nodes[i]);
+  };
   document.getElementById('WorkspaceName').textContent=w.name+' ';
   relaceLangRibbon();
   for (var i=0; i<w.views.length; i++) {
@@ -449,15 +455,20 @@ function addView() {
 			 gutters: document.getElementById('openViewGutters').checked, 
 			 readOnly: document.getElementById('openViewReadonly').checked},   				 
 		 changed: true,
-		 language: LoLs.languages["raw"],
-// TODO: add input view field
-		 inputView: "",
+		 language: LoLs.languages[document.getElementById('openViewLang').value],
+		 inputView: document.getElementById('openViewInput').value,
 		 contents: "",
 		 references: [],
 		 langDefs: [],
 		 grammarDefs: []};
 	view.language.references[view.language.references.length]=view;
-	view.inputView=view;
+  if (view.inputView=="" || view.name==view.inputView) {
+  	view.inputView=view.name;
+  }; 
+  view.inputView=LoLs.views[view.inputView];
+  if (view.inputView===undefined) {
+  	view.inputView=view;
+  };
 	list=LoLs.views;
 	LoLs.views=[];
 	for (i=0; i<list.length; i++) {
@@ -468,13 +479,13 @@ function addView() {
 			LoLs.views[view.name]=view;	
 		};
 	};
-	// TODO: position new view
 	// TODO: position dialog box
   thisView=createACEeditor(view.name,view.id,
     view.editorProperties.height,
     view.editorProperties.gutters,
     view.editorProperties.readOnly,
-    view.contents);
+    view.contents,
+    OLDView.id);
   view.changeFn=function(e) {viewChanged(this[0].myView);};
   view.changeFn.myView=view;
   thisView.on('change', view.changeFn);
@@ -488,7 +499,7 @@ function addView() {
 }
 
 function updateView() {
-	var name, value, e;
+	var name, value, e, lang;
 	name=document.getElementById('openViewName').value;
 	if (name == undefined || name =="")
 		return;
@@ -505,6 +516,15 @@ function updateView() {
   LoLs.views[OLDView.name]=undefined;
   OLDView.name=name;
   LoLs.views[OLDView.name]=OLDView;
+  OLDView.inputView=document.getElementById('openViewInput').value;
+  if (OLDView.inputView=="" || OLDView.name==OLDView.inputView) {
+  	OLDView.inputView=OLDView.name;
+  }; 
+  OLDView.inputView=LoLs.views[OLDView.inputView];
+  if (OLDView.inputView===undefined) {
+  	OLDView.inputView=OLDView;
+  };
+  lang=LoLs.languages[document.getElementById('openViewLang').value];
   OLDView.editorProperties.height=value+"px";
   OLDView.editorProperties.readOnly=document.getElementById('openViewReadonly').checked;
   OLDView.editorProperties.gutters=document.getElementById('openViewGutters').checked;
@@ -515,15 +535,32 @@ function updateView() {
   e.setReadOnly(OLDView.editorProperties.readOnly);
 	document.getElementById(OLDView.id+"ViewName").textContent=OLDView.name+" ";
   popUp('openView');
+  if (OLDView.language!==lang) {
+  	OLDView.language=lang;
+  	reviewView(OLDView.name);
+  };
 	e.focus(); 
 }
+
 // TODO: eliminate global
 var OLDView;
 function openView(here) {
-	var view, name=here.parentNode.childNodes[3].textContent;
+	var i, view, name=here.parentNode.childNodes[3].textContent, str='', lang, elem, list;
 	view=LoLs.views[name.substring(0,name.length-1)];
 	OLDView=view;
 	document.getElementById('openViewName').value=view.name;
+	document.getElementById('openViewInput').value=view.inputView.name;
+	for (i=0; i<LoLs.languages.length; i++) {
+		lang=LoLs.languages[i].name;
+		str+='<option value="'+lang+'">'+lang+'</option>';
+	};
+	elem=document.getElementById('openViewLang');
+	list=elem.childNodes;
+	for (i=list.length-1; i>0; i--) {
+		list[i].parentNode.removeChild(list[i]);
+	};
+	elem.insertAdjacentHTML('beforeend',str);
+	elem.value=OLDView.language.name;
 	document.getElementById('openViewHeight').value=
 		view.editorProperties.height.substring(0,view.editorProperties.height.length-2);
 	document.getElementById('openViewReadonly').checked=view.editorProperties.readOnly;
@@ -567,9 +604,13 @@ function languageChanged(lang) {
   }
 }
 
-function createACEeditor(name,id,height,gutter,readOnly,value) {
-  var e, frame;
-  document.getElementById("WorkspaceArea").insertAdjacentHTML("beforeend",
+function createACEeditor(name,id,height,gutter,readOnly,value,beforeId) {
+  var e, frame, marker="afterend";
+  if (beforeId===undefined) {
+  	beforeId="WorkspaceArea";
+  	marker="beforeend";
+  };
+  document.getElementById(beforeId).insertAdjacentHTML(marker,
 	'<div class="LoLsView" name="'+name+'">' +
 	'	<div class="LoLsViewTitle">' +
 	'	  <input id ="'+ id +'Button" type="button" title="collapse" value="-" ' +
