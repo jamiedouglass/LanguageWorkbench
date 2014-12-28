@@ -426,17 +426,86 @@ function showOrHide(id, button) {
 }
 
 function addView() {
-  // TODO: open a copy of this view
-  alert("add a View");
-  popUp('openView');
+	var i, thisView, view, name, value, e, list;
+	name=document.getElementById('openViewName').value;
+	if (name == undefined || name == "" || LoLs.views[name] !== undefined)
+		return;
+	value=document.getElementById('openViewHeight').value;
+	try {
+		e=Number(value);
+		if (e<10 || e>1000)
+			throw "out of range";
+	} 
+	catch (e) {
+		alert("view height must be 10 to 1000.");
+		return;
+	}; 
+	view= {
+		name: name,
+		id: genLocalId(name),
+	 	editorProperties: 
+			{name: "ACE editor", 
+			 height: value+"px", 
+			 gutters: document.getElementById('openViewGutters').checked, 
+			 readOnly: document.getElementById('openViewReadonly').checked},   				 
+		 changed: true,
+		 language: LoLs.languages["raw"],
+// TODO: add input view field
+		 inputView: "",
+		 contents: "",
+		 references: [],
+		 langDefs: [],
+		 grammarDefs: []};
+	view.language.references[view.language.references.length]=view;
+	view.inputView=view;
+	list=LoLs.views;
+	LoLs.views=[];
+	for (i=0; i<list.length; i++) {
+		LoLs.views[LoLs.views.length]=list[i];
+		LoLs.views[list[i].name]=list[i];
+		if (list[i]===OLDView) {
+			LoLs.views[LoLs.views.length]=view;
+			LoLs.views[view.name]=view;	
+		};
+	};
+	// TODO: position new view
+	// TODO: position dialog box
+  thisView=createACEeditor(view.name,view.id,
+    view.editorProperties.height,
+    view.editorProperties.gutters,
+    view.editorProperties.readOnly,
+    view.contents);
+  view.changeFn=function(e) {viewChanged(this[0].myView);};
+  view.changeFn.myView=view;
+  thisView.on('change', view.changeFn);
+  view.focusFn=function() {viewFocus(this[0].myView);};
+  view.focusFn.myView=view;
+  thisView.on('focus', view.focusFn);
+  view.changed=true;
+  refreshView(name);
+  thisView.focus(); 
+  popUp('openView');  
 }
 
 function updateView() {
-	var e;
+	var name, value, e;
+	name=document.getElementById('openViewName').value;
+	if (name == undefined || name =="")
+		return;
+	value=document.getElementById('openViewHeight').value;
+	try {
+		e=Number(value);
+		if (e<10 || e>1000)
+			throw "out of range";
+	} 
+	catch (e) {
+		alert("view height must be 10 to 1000.");
+		return;
+	}; 
   LoLs.views[OLDView.name]=undefined;
-  OLDView.name=document.getElementById('openViewName').value;
+  OLDView.name=name;
   LoLs.views[OLDView.name]=OLDView;
-  OLDView.editorProperties.height=document.getElementById('openViewHeight').value+"px";
+  OLDView.editorProperties.height=value+"px";
   OLDView.editorProperties.readOnly=document.getElementById('openViewReadonly').checked;
   OLDView.editorProperties.gutters=document.getElementById('openViewGutters').checked;
   e=document.getElementById(OLDView.id);
@@ -446,6 +515,7 @@ function updateView() {
   e.setReadOnly(OLDView.editorProperties.readOnly);
 	document.getElementById(OLDView.id+"ViewName").textContent=OLDView.name+" ";
   popUp('openView');
+	e.focus(); 
 }
 // TODO: eliminate global
 var OLDView;
