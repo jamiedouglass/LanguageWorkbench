@@ -10,23 +10,25 @@
 <link rel="stylesheet" href="LoLsWorkbench.css">
 
 <script src="lib.js"></script>
-<script src="ometa-base.js"></script>
-<script src="parser.js"></script>
-<script src="bs-js-compiler.js"></script>
-<script src="bs-ometa-compiler.js"></script>
-<script src="bs-ometa-optimizer.js"></script>
-<script src="bs-ometa-js-compiler.js"></script>
+<script src="tools/parser.js"></script>
+<script src="metalanguages/ometa/parser.js"></script>
+<script src="metalanguages/ometa/bs-js-compiler.js"></script>
+<script src="metalanguages/ometa/bs-ometa-compiler.js"></script>
+<script src="metalanguages/ometa/bs-ometa-optimizer.js"></script>
+<script src="metalanguages/ometa/bs-ometa-js-compiler.js"></script>
 <script src="language-elements.js"></script>
 <!-- TODO: remove protocol -->
 <script src="http://d1n0x3qji82z53.cloudfront.net/src-min-noconflict/ace.js" ></script>
-<script src="LoLsWorkbenchUI.js"></script>
+<script src="LoLsWorkbench.js"></script>
+
+<script src="LoLsWorkspace.js"></script>
 
 <!-- temporary to load getting started workspace -->
-<script src="getting-started.js"></script>
+<script src="applications/getting-started/getting-started.js"></script>
 
 <!-- unit testing --
 <script src="http://yui.yahooapis.com/3.17.2/build/yui/yui-min.js"></script>
-<script src="unit-tests.js"></script>
+<script src="tools/unit-tests.js"></script>
  !-- end unit testing-->
 
 <body onLoad="setupPage();">
@@ -43,10 +45,14 @@
 </div>
 <div id="Banner">
   <a href="http://www.LanguageOfLanguages.com/">
-    <img id="lols-icon" src="tower-of-babel.png" alt="Tower of Babel">
-    <img id="lols-name" src="LoLsW-logo.png" alt="Language of Languages (LoLs) Workbench">
+    <img id="lols-icon" src="images/tower-of-babel.png" alt="Tower of Babel">
+    <img id="lols-name" src="images/LoLsW-logo.png" alt="Language of Languages (LoLs) Workbench">
   </a>
 </div>
+<!-- include form html
+<iframe src="lang-form.html">
+</iframe>
+-->
 <div id="langAdd">
 	<div>
 		<form autocomplete="off">
@@ -95,7 +101,7 @@
 				</select>	
 			</fieldset>
 			<br>
-			<button type="button" title="cancel" onClick="popUp('langAdd')">
+			<button type="button" title="cancel" onClick="top.popUp('langAdd')">
 				Cancel
 			</button>
 			<button type="button" title="add language" onClick="addLanguage('langAdd')">
@@ -177,13 +183,13 @@
 	<div class="WorkspaceTitle">
 	  <scan id="WorkspaceName">Workspace Name </scan><i>workspace</i>
 	  <button type="button" title="open workspace" onClick="openWorkspace(this)">
-		<img src="open-workspace.png" alt="Open Workspace">
+		<img src="images/open-workspace.png" alt="Open Workspace">
 	  </button>
 	  <button type="button" title="save workspace" onClick="saveWorkspace(this)">
-		<img src="save-workspace.png" alt="Save Workspace">
+		<img src="images/save-workspace.png" alt="Save Workspace">
 	  </button>
 	  <button id="refreshAll" type="button" title="refresh all" onClick="refreshAll()">
-		<img src="refresh.png" alt="Refresh All">
+		<img src="images/refresh.png" alt="Refresh All">
 	  </button>
 	</div>
 </div>
@@ -222,5 +228,5 @@
 
 <div id="acknowledgement">
   <p>Brought to you by <a href="http://www.ResearchOnKnowing.com/">
-	<img src="ROK.png" alt="Research On Knowing, LLC"></a>
+	<img src="images/ROK.png" alt="Research On Knowing, LLC"></a>
 </div>

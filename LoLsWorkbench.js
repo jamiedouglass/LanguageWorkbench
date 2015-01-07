@@ -597,7 +597,7 @@ function viewFocus(view) {
 	langButton=document.getElementById(LoLs.currentLanguage.name+"Lang");
 	langButton.style.color = "red";
 }
-
+// DONE
 function languageChanged(lang) {
   for (var i=0; i<lang.references.length; i++) {
     viewChanged(lang.references[i]);
@@ -617,14 +617,14 @@ function createACEeditor(name,id,height,gutter,readOnly,value,beforeId) {
 	'		onClick="showOrHide(\''+ id +'\',this)">' +
 	'	  <scan id="'+id+'ViewName">'+ name +' </scan><i>view</i>' +
 	'	  <button type="button" title="open view" onClick="openView(this)">' +
-	'		<img src="open-view.png" alt="Open View">' +
+	'		<img src="images/open-view.png" alt="Open View">' +
 	'	  </button>' +
 	'	  <button type="button" title="close view" onClick="closeView(this)">' +
-	'		<img src="close.gif" alt="Close View">' +
+	'		<img src="images/close.gif" alt="Close View">' +
 	'	  </button>' +
 	'	  <button id="'+id+'Refresh" type="button" title="refresh"' + 
 	' onClick="refreshView(\''+name+'\')">'+
-	'		<img src="refresh.png" alt="Refresh View">' +
+	'		<img src="images/refresh.png" alt="Refresh View">' +
 	'	  </button>' +
 	'	</div>' +
 	'	<div id="'+ id +'" class="LoLsViewEditor">' +
