@@ -1,29 +1,58 @@
-var LoLsW;
-
-function ACEeditor(height, gutter, readOnly) {
-	var e= objectThatDelegatesTo(ACEeditorClass, {
-		name: "ACE",
+function ACEeditor(height, gutters, readOnly) {
+	var e=objectThatDelegatesTo(ACEeditorClass);
+	e.initialize({
 		height: height,
-		gutter: (gutter===true) ? true : false,
-		readOnly: (readOnly===true) ? true : false});
+		gutters: gutters,
+		readOnly: readOnly});
 	return e;
 }
 
 ACEeditorClass={
+	initialize:function(info) {
+		this.name="ACE";
+		this.height="60px";
+		this.gutters=false;
+		this.readOnly=false; 
+		if (info!==undefined) {
+			if (info.name!==undefined) 
+				this.name=info.name;
+			if (info.height!==undefined) 
+				this.height=info.height;
+			if (info.gutters===true) 
+				this.gutters=info.gutters;
+			if (info.readOnly===true) 
+				this.readOnly=info.readOnly;
+		}; 
+	},
+	serialize:function(indent) {
+		var s="{";
+		s+='name: "'+this.name+'"';
+		if (this.height!=="60px")
+			s+=', height: "'+this.height+'"';
+		if (this.gutters)
+			s+=', gutters: true';
+		if (this.readOnly)
+			s+=', readOnly: true';			
+		s+="}";
+		return s; 
+	}
 };
 
 function Grammar(name, startRule, makeList) {
-	var g=objectThatDelegatesTo(GrammarClass, {
-		name: name,
-		startRule: startRule,
-		makeList: makeList==true,
-		language: undefined,
-		defView: undefined});
-	try {
-		g.rules=eval(name);
-	} catch (e) {
-		g.rules=undefined;
+	var g=objectThatDelegatesTo(GrammarClass);
+	g.initialize();
+	if (name!==undefined) {
+		g.name=name;
+		try {
+			g.rules=eval(name);
+		} catch (e) {
+			g.rules=undefined;
+		}
 	}
+	if (startRule!==undefined)
+		g.startRule=startRule;
+	if (makeList!==undefined)
+		g.makeList=makeList==true;
 	return g;
 }
 
@@ -40,14 +69,39 @@ GrammarClass= {
 			l.deleteGrammarObj(this);
 		} 
 	},
+	initialize:function(info) {
+		this.name="Unnamed";
+		this.startRule="start";
+		this.makeList=false;
+		this.language=undefined;
+		this.defView=undefined;
+		if (info!==undefined) {
+		// TODO: load from info
+		}
+		try {
+			this.rules=eval(this.name);
+		} catch (e) {
+			this.rules=undefined;
+		}
+	},
 	refresh:function() {
 		if (this.defView===undefined)
 			return;
 		this.defView.refresh();
 		this.rules=eval(this.name);
 	},
-	replaceWith:function(grammarObj) {
-	// TODO: 
+	serialize:function(indent) {
+		var s="{";
+		if (indent==undefined)
+			indent="";
+		s+='name: "'+this.name+'"';
+		s+=',\n'+indent+' startRule: "'+this.startRule+'"';
+		if (this.makeList)
+			s+=',\n'+indent+' makeList: true';
+		if (this.defView !== undefined)
+			s+=',\n'+indent+' defView: "'+this.defView.name+'"';
+		s+="}";
+		return s; 
 	},
 	setDefView:function(name) {
 		try {
@@ -70,22 +124,16 @@ GrammarClass= {
 			if (i<0)
 				ds[ds.length]=this;
 		}
-	},
-	// private
-	refByName:function() {
-	},
-	refByPtr:function() {
-	} 
+	}
 };
 
 function Language(name, meta) {
-	var l=objectThatDelegatesTo(LanguageClass, {
-		name: name,
-		meta: meta == true,
-		code: [],
-		decode: [],
-		references: [],
-		workspace: undefined});
+	var l=objectThatDelegatesTo(LanguageClass);
+	l.initialize();
+	if (name!==undefined) 
+		l.name=name;
+	if (meta==true)
+		l.meta=true;
 	if (name===undefined && meta===undefined) {
 		l.name="ometa";
 		l.meta=true;
@@ -168,6 +216,17 @@ LanguageClass= {
 			grammarObj.delete();
 		} 
 	},
+	initialize:function(info) {
+		this.name="Unnamed";
+		this.meta=false;
+		this.code=[];
+		this.decode=[];
+		this.references=[];
+		this.workspace=undefined;
+		if (info !== undefined) {
+		// TODO: load from info
+		}
+	},
 	referenceNames:function() {
 		var i, l=this.references.length, names=[];
 		for (i=0; i<l; i++) {
@@ -181,36 +240,48 @@ LanguageClass= {
 			this.code[i].refresh();
 		for (i=0; i<this.decode.length; i++) 
 			this.decode[i].refresh();
-	}, 
-	replaceWith:function(langObj) {
-	// TODO: 
 	},
-	// private
-	refByName:function() {
-	},
-	refByPtr:function() {
-	} 
+	serialize:function(indent) {
+		var i, s="{";
+		if (indent==undefined)
+			indent="";
+		s+='name: "'+this.name+'"';
+		if (this.meta)
+			s+=',\n'+indent+' meta: true';
+		if (this.code.length>0) {
+			s+=',\n'+indent+' code: [\n'+indent+'\t';
+			for (i=0; i<this.code.length; i++) {
+				if (i!=0) s+=',\n'+indent+'\t';
+				s+=this.code[i].serialize(indent+'\t');
+			}
+			s+="]";
+		}
+		if (this.decode.length>0) {
+			s+=',\n'+indent+' decode: [\n'+indent+'\t';
+			for (i=0; i<this.decode.length; i++) {
+				if (i!=0) s+=',\n'+indent+'\t';
+				s+=this.decode[i].serialize(indent+'\t');
+			}			
+			s+="]";
+		}
+		s+="}";
+		return s; 
+	}
 };
 
 function View(name, contents, editor) {
-	var v=objectThatDelegatesTo(ViewClass, {
-		name: name,
-		needsRefresh: false,
-		id: undefined,
-		editor: editor,
-		references: [],
-		language: undefined,
-		grammarDefs: [],
-		contents: contents,
-		workspace: undefined});
-	v.inputView=v;
-	if (name === undefined)
-		v.name="Unnamed";
-	if (contents === undefined)
-		v.contents="";
-	if (editor === undefined)
-		v.editor=ACEeditor("60px");	
-	v.editor.contents=contents;	
+	var v=objectThatDelegatesTo(ViewClass);
+	v.initialize();
+	if (name !== undefined)
+		v.name=name;
+	if (contents !== undefined) {
+		v.contents=contents;
+		v.editor.contents=contents;
+	}
+	if (editor !== undefined) {
+		v.editor=editor;	
+		v.editor.contents=contents;
+	}	
 	return v;
 }
 
@@ -245,6 +316,22 @@ ViewClass={
 	// TODO: view gets focus
 		this.workspace.currentView=this;
 	},
+	initialize:function(info) {
+		this.name="Unnamed";
+		this.needsRefresh=false;
+		this.id=undefined;
+		this.editor=ACEeditor();
+		this.references=[];
+		this.language=undefined;
+		this.grammarDefs=[];
+		this.contents="";
+		this.workspace=undefined;
+		this.inputView=this;
+		if (info !== undefined) {
+		// TODO: load from info
+		}
+		this.editor.contents=this.contents;	
+	},
 	referenceNames:function() {
 		var i, l=this.references.length, ns=[];
 		for (i=0; i<l; i++) {
@@ -272,8 +359,27 @@ ViewClass={
 		this.needsRefresh=false;
 		this.workspace.changed();
 	},
-	replaceWith:function(viewObj) {
-	// TODO: 
+	serialize:function(indent) {
+		var i, s="{";
+		if (indent==undefined)
+			indent="";
+		s+='name: "'+this.name+'"';
+		if (this.editor!==undefined)
+			s+=',\n'+indent+' editor:\n'+indent+' \t'+this.editor.serialize(indent+'\t');
+		if (this.language!==undefined)
+			s+=',\n'+indent+' language: "'+this.language.name+'"';
+		if (this.contentsURL!==undefined)
+			s+=',\n'+indent+' contentsURL: "'+this.contestsURL+'"';
+		else {
+			if (this.viewContents() !== "")
+				s+=',\n'+indent+' contents: '+this.viewContents().toString().toProgramString();	
+		}	
+		if (this.inputView!==undefined && this.inputView!==this)
+			s+=',\n'+indent+' inputView: "'+this.inputView.name+'"';		
+		if (this.needsRefresh)
+			s+=',\n'+indent+' needsRefresh: true';		
+		s+="}";
+		return s; 
 	},
 	setInputView:function(name) {
 		var v;
@@ -324,10 +430,11 @@ ViewClass={
 		}
 		return this;
 	},
-	// private
-	refByName:function() {
-	},
-	refByPtr:function() {
+	viewContents: function() {
+		if (this.inputView===this) 
+			return this.editor.contents;
+		else 
+			return this.contents;
 	}
 };
 
@@ -422,7 +529,8 @@ WorkspaceClass = {
 		if (v!==undefined)
 			v.focus();
 	},
-	initialize:function() {
+	initialize:function(info) {
+		var i, l;
 		this.name="Unnamed";
 		this.url=undefined;
 		this.unsaved=true;
@@ -430,6 +538,29 @@ WorkspaceClass = {
 		this.currentLanguage=null;
 		this.views=[];
 		this.currentView=null;
+		if (info !== undefined) {
+			this.name=info.name;
+			l=info.languages;
+			for (i=0; i<l.length; i++) 
+				this.languages[i]=Language(l.name);
+			l=info.views;
+			for (i=0; i<l.length; i++) 
+				this.views[i]=View(l.name);
+			l=info.languages;
+			for (i=0; i<l.length; i++) 
+				this.languages[i].initialize(l[i]);
+			l=info.views;
+			for (i=0; i<l.length; i++) 
+				this.views[i].initialize(l[i]);
+			if (info.currentView!==undefined)
+				this.currentView=this.views[info.currentView];
+			if (this.currentView == undefined)
+				this.currentView=null;
+			if (this.currentView !== null) 
+				this.currentLanguage=this.currentView.language;
+			if (this.currentLanguage == undefined)
+				this.currentLanguage=null;
+		}
 	},
 	languageNames:function() {
 		var i,names=[];
@@ -534,8 +665,12 @@ WorkspaceClass = {
 		this.unsaved=false;
 		return this;
 	},
-	refreshAll:function() {
+	refreshAll:function(force) {
 		var i, l=this.views.length;
+		if (force === true) {
+			for (i=0; i<l; i++) 
+				this.views[i].changed();
+		}
 		for (i=0; i<l; i++) 
 			this.views[i].refresh();
 		this.changed();
@@ -566,6 +701,33 @@ WorkspaceClass = {
 			throw "Need URL to save workspace.";
 	// TODO: save workspace to url file
 		this.unsaved=false;
+	},
+	serialize:function(indent) {
+		var i, s="{";
+		if (indent==undefined)
+			indent="";
+		s+='name: "'+this.name+'"';
+		if (this.languages.length>0) {
+			s+=',\n'+indent+' languages: [\n'+indent+'\t';
+			for (i=0; i<this.languages.length; i++) {
+				if (i!=0) s+=',\n'+indent+'\t';
+				s+=this.languages[i].serialize(indent+'\t');
+			}
+			s+="]";
+		}
+		if (this.views.length>0) {
+			s+=',\n'+indent+' views: [\n'+indent+'\t';
+			for (i=0; i<this.views.length; i++) {
+				if (i!=0) s+=',\n'+indent+'\t';
+				s+=this.views[i].serialize(indent+'\t');
+			}			
+			s+="]";
+		}
+		if (this.currentView!==undefined) 
+			s+=',\n'+indent+' currentView: "'+this.currentView.name+'"';
+
+		s+="}";
+		return s; 
 	},
 	setName:function(name) {
 		if (name===undefined || name===null || name=="") 

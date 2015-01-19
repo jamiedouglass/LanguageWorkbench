@@ -20,6 +20,7 @@
 <!-- TODO: remove protocol -->
 <script src="http://d1n0x3qji82z53.cloudfront.net/src-min-noconflict/ace.js" ></script>
 <script src="LoLsWorkbench.js"></script>
+<script src="LoLsWorkbenchForms.js"></script>
 
 <script src="LoLsWorkspace.js"></script>
 
@@ -49,66 +50,7 @@
     <img id="lols-name" src="images/LoLsW-logo.png" alt="Language of Languages (LoLs) Workbench">
   </a>
 </div>
-<!-- include form html
-<iframe src="lang-form.html">
-</iframe>
--->
-<div id="langAdd">
-	<div>
-		<form autocomplete="off">
-			Language Name: 
-			<input type="text" id="langAddName" value="Unnamed">
-			<br>
-			<input type="checkbox" id="langAddOutput" value="executable">Meta Language
-			<table id="langAddCode">
-				<tr>
-					<th>Grammar</th>
-					<th>Start Rule</th>		
-					<th>Input</th>
-					<th>View</th>
-				</tr>
-			</table>
-			<table id="langAddDecode">
-				<tr>
-					<th>Decode<br>Grammar</th>
-					<th>Start Rule</th>		
-					<th>Input</th>
-					<th>View</th>
-				</tr>
-			</table>
-			<fieldset id="grammarToAdd">
-				<legend>Grammar</legend>
-			  <button type="button" title="add grammar" 
-			    onClick="addGrammar('langAdd','grammarToAdd')">+</button>
-			  Name:
-				<input type="text" name="name"">
-				<br>
-				from View: 
-				<input type="text" name="defView">
-				<br>
-				Start Rule: 
-				<input type="text" name="startRule">
-				<br>
-				Flow:
-				<select name="flow">
-					<option value="code">code</option>
-					<option value="decode">decode</option>
-				</select>	
-				Input:
-				<select name="input">
-					<option value="List">List</option>
-					<option value="Object">Object</option>
-				</select>	
-			</fieldset>
-			<br>
-			<button type="button" title="cancel" onClick="top.popUp('langAdd')">
-				Cancel
-			</button>
-			<button type="button" title="add language" onClick="addLanguage('langAdd')">
-				Add Language
-			</button>
-		</form>
-	</div>
+<div id="WorkbenchForms">
 </div>
 <div id="langChange"> 
 	<div>
@@ -172,27 +114,6 @@
 		</form>
 	</div>
 </div>
-<div id="LangRibbon">
-  <scan>
-    <button type="button" title="add/remove language" onClick="popUp('langAdd')">
-    +Language</button>
-  </scan>
-</div>
-<hr>
-<div id="WorkspaceArea">
-	<div class="WorkspaceTitle">
-	  <scan id="WorkspaceName">Workspace Name </scan><i>workspace</i>
-	  <button type="button" title="open workspace" onClick="openWorkspace(this)">
-		<img src="images/open-workspace.png" alt="Open Workspace">
-	  </button>
-	  <button type="button" title="save workspace" onClick="saveWorkspace(this)">
-		<img src="images/save-workspace.png" alt="Save Workspace">
-	  </button>
-	  <button id="refreshAll" type="button" title="refresh all" onClick="refreshAll()">
-		<img src="images/refresh.png" alt="Refresh All">
-	  </button>
-	</div>
-</div>
 <div id="openView">
 	<div>
 		<form>
@@ -226,6 +147,27 @@
 	</div>
 </div>
 
+<div id="LangRibbon">
+  <scan>
+    <button type="button" title="add/remove language" onClick="popUp('langAdd')">
+    +Language</button>
+  </scan>
+</div>
+<hr>
+<div id="WorkspaceArea">
+	<div class="WorkspaceTitle">
+	  <scan id="WorkspaceName">Workspace Name </scan><i>workspace</i>
+	  <button type="button" title="open workspace" onClick="openWorkspace(this)">
+		<img src="images/open-workspace.png" alt="Open Workspace">
+	  </button>
+	  <button type="button" title="save workspace" onClick="saveWorkspace(this)">
+		<img src="images/save-workspace.png" alt="Save Workspace">
+	  </button>
+	  <button id="refreshAll" type="button" title="refresh all" onClick="refreshAll()">
+		<img src="images/refresh.png" alt="Refresh All">
+	  </button>
+	</div>
+</div>
 <div id="acknowledgement">
   <p>Brought to you by <a href="http://www.ResearchOnKnowing.com/">
 	<img src="images/ROK.png" alt="Research On Knowing, LLC"></a>
