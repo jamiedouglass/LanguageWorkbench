@@ -296,6 +296,7 @@ ViewClass={
 			for (var i=0; i<this.grammarDefs.length; i++)
 				this.grammarDefs[i].changed();
 		}
+		viewHasChanged(this);
 		return;
 	},
 	delete:function() {
@@ -344,7 +345,8 @@ ViewClass={
 		if (this.needsRefresh!==true) return;
 		this.needsRefresh=undefined;
 		if (this.inputView===this) {
-			s=this.editor.contents;
+			s=updateViewContents(this);
+			this.editor.contents=s;
 		} else {
 			this.inputView.refresh();
 			s=this.inputView.contents;
@@ -358,6 +360,7 @@ ViewClass={
 			this.inputView.contents=s;
 		this.needsRefresh=false;
 		this.workspace.changed();
+		refreshComplete(this);
 	},
 	serialize:function(indent) {
 		var i, s="{";
@@ -603,12 +606,12 @@ WorkspaceClass = {
 				ACEeditor("60px", false, false)));
 			v.setLanguage("math");
 			v=this.addViewObj(View("Answer", 
-				"", 
+				"14", 
 				ACEeditor("60px", false, true)));
 			v.setInputView("Math Problem");
 			v.setLanguage("calculate");
 			v=this.addViewObj(View("LET Explorer", 
-				"", 
+				".+. Add\n  2 Number\n  .*. Multiply\n    3 Number\n    4 Number\n", 
 				ACEeditor("200px", false, true)));
 			v.setInputView("Math Problem");
 			v.setLanguage("LET");

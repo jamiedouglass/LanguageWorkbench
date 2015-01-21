@@ -5,61 +5,26 @@ window.onbeforeunload = function() {
 }
 
 //functions
-function openWorkspace(url) {
-	var i, e, v, vs, thisView;
-// TODO: eliminate temp OLD code
-	if (OLD) 
-  	return OLDopenWorkspace();
-  
-  if (LoLs !== undefined && LoLs.unsaved) {
-    if (!confirm("Abandon the current workspace changes?"))
-    	return;
-  };
-	// TODO: make a single element for deleting views
-  e=document.getElementById('WorkspaceArea').childNodes;
-  for (i=e.length-1; i>1; i--) {
-  	e[i].parentNode.removeChild(e[i]);
-  };
-  
-  LoLs=Workspace(url);
-  document.getElementById('WorkspaceName').textContent=LoLs.name+' ';
-  relaceLangRibbon(LoLs.languageNames());
-  // TODO: Improve view display
-  vs=LoLs.views;
-  for (i=0; i<vs.length; i++) {
-  	v=vs[i];
-  	v.id=genLocalId(v.name);
-    thisView=createACEeditor(v.name,v.id,
-    	v.editor.height,
-    	v.editor.gutters,
-    	v.editor.readOnly,
-    	v.contents);
-    thisView.on('change',(function(x) {return function() {viewChanged(x)}})(v));
-    thisView.on('focus',(function(x) {return function() {viewFocus(x)}})(v));
-  };
-  LoLs.refreshAll(true);
-  
-  for (i=0; i<vs.length; i++) {
-  	v=vs[i];
-  	document.getElementById(v.id).editor.setValue("" + v.viewContents());
-	} 
-	document.getElementById(LoLs.currentView.id).editor.focus();
+function createACE(id,height,gutters,readOnly,value) {
+  var e=document.getElementById(id), f=ace.edit(id);
+	e.style.position="relative"; 
+	e.style.height=height;
+  f.getSession().setMode('ace/mode/textmate');
+  f.renderer.setShowGutter(gutters);
+  f.setValue(value);
+  f.setReadOnly(readOnly);
+  f.clearSelection();
+  e.editor=f;
+  return f;  
 }
-function refreshAll() {
-// TODO: eliminate temp OLD code
-  if (OLD) 
-  	return OLDrefreshAll();
-
-  LoLs.refreshAll();
-  if (LoLs.refreshNeeded())
-    document.getElementById("refreshAll").style.backgroundColor = "white";
+function createEditor(view) {
+	var e=view.editor;
+	if (e.name=="ACE") 
+		return createACE(view.id,e.height,e.gutters,e.readOnly,e.contents);
+	return createACE(view.id,e.height,e.gutters,e.readOnly,e.contents);
 }
-function relaceLangRibbon(names) { 
+function createLangRibbon(names) { 
   var e, i, n, str;
-// TODO: eliminate temp OLD
-	if (OLD)
-  	return OLDrelaceLangRibbon();
-  
   // TODO: create single element to hold languages
   e=document.getElementById("LangRibbon");
   for (i=e.childNodes.length-1; i>1; i--) {
@@ -76,15 +41,83 @@ function relaceLangRibbon(names) {
 	};
   e.insertAdjacentHTML("beforeend", str);
 };
+function createView(view,beforeId) {
+  var name=view.name, id=genLocalId(name), m="afterend", e;
+  view.id=id;
+  if (beforeId===undefined) {
+  	beforeId="WorkspaceArea";
+  	m="beforeend";
+  };
+  document.getElementById(beforeId).insertAdjacentHTML(m,
+	'<div class="LoLsView" name="'+name+'">' +
+	'	<div class="LoLsViewTitle">' +
+	'	  <input id ="'+ id +'Button" type="button" title="collapse" value="-" ' +
+	'			onClick="showOrHide(\''+ id +'\',this)">' +
+	'	  <scan id="'+id+'ViewName">'+ name +' </scan><i>view</i>' +
+	'	  <button type="button" title="open view" onClick="openView(this)">' +
+	'			<img src="images/open-view.png" alt="Open View">' +
+	'	  </button>' +
+	'	  <button type="button" title="close view" onClick="closeView(this)">' +
+	'			<img src="images/close.gif" alt="Close View">' +
+	'	  </button>' +
+	'	  <button id="'+id+'Refresh" type="button" title="refresh"' + 
+	' 		onClick="refreshView(\''+name+'\')">'+
+	'			<img src="images/refresh.png" alt="Refresh View">' +
+	'	  </button>' +
+	'	</div>' +
+	'	<div id="'+ id +'" class="LoLsViewEditor">' +
+	'	</div>' +
+	'</div>'); 
+	e=createEditor(view);
+	e.on('change',(function(x) {return function() {viewChanged(x)}})(view));
+  e.on('focus',(function(x) {return function() {viewFocus(x)}})(view));
+}
+function openWorkspace(url) {
+	var i, e;
+  if (LoLs !== undefined && LoLs.unsaved) {
+    if (!confirm("Abandon the current workspace changes?"))
+    	return;
+  };
+	// TODO: make a single element for deleting views
+  e=document.getElementById('WorkspaceArea').childNodes;
+  for (i=e.length-1; i>1; i--) {
+  	e[i].parentNode.removeChild(e[i]);
+  };
+  
+  LoLs=Workspace(url);
+  document.getElementById('WorkspaceName').textContent=LoLs.name+' ';
+  createLangRibbon(LoLs.languageNames());
+  for (i=0; i<LoLs.views.length; i++) 
+  	createView(LoLs.views[i]);
+  // TODO: load compiled languages without refreshing
+  LoLs.refreshAll(true);
+	document.getElementById(LoLs.currentView.id).editor.focus();
+}
+function refreshAll() {
+  LoLs.refreshAll();
+  if (!LoLs.refreshNeeded())
+    document.getElementById("refreshAll").style.backgroundColor = "white";
+}
+function refreshComplete(view) {
+  var e=document.getElementById(view.id).editor;
+  e.setValue("" + view.viewContents());
+	e.clearSelection();	
+	view.needsRefresh=false;
+	e=document.getElementById(view.id+"Refresh");    
+	e.style.backgroundColor = "white";
+	if (!LoLs.refreshNeeded()) {
+		e=document.getElementById("refreshAll");
+		e.style.backgroundColor = "white";
+	}
+}
+function refreshView(view) {
+  LoLs.views[view].refresh();
+}
 function saveWorkspace(id) {
   // TODO: save current workspace
   alert("Save Current Workspace");
 }
 function setupPage() { 
-	// TODO: eliminate temp OLD
-	if (OLD) 
-  	return OLDsetupPage();
-  
 	setUpForms();
 	// TODO: replace temporary url for getting starting 
   openWorkspace("getting-started.ws");
@@ -103,173 +136,32 @@ function showOrHide(id, button) {
   	button.value = "+";
   }
 }
+function updateViewContents(view) {
+  var e=document.getElementById(view.id).editor;
+  return e.getValue();
+}
 function viewChanged(view) {
-  var button;
-// TODO: eliminate temp OLD code
-	if (OLD) 
-  	return OLDviewChanged(view);
-	if (view.changed || view.changed==undefined)
-		return;
-	view.changed=true;
-	LoLs.changed=true;
-	button=document.getElementById(view.id+"Refresh");    
-	button.style.backgroundColor = "yellow";
-	for (var i=0;i<view.references.length;i++) {
-		viewChanged(view.references[i]);
-	};
-	for (var i=0;i<view.langDefs.length;i++) {
-		languageChanged(view.langDefs[i]);
-	};
-	button=document.getElementById("refreshAll");
-	button.style.backgroundColor = "yellow";
+	view.changed();
+}
+function viewFocus(view) {
+	var b;
+	if (LoLs.currentLanguage != undefined) {
+		b=document.getElementById(LoLs.currentLanguage.name+"Lang");
+		b.style.color = "white";
+	}
+	LoLs.currentView=view;
+	LoLs.currentLanguage=LoLs.currentView.language;
+	b=document.getElementById(LoLs.currentLanguage.name+"Lang");
+	b.style.color = "red";
+}
+function viewHasChanged(view) {
+  var e=document.getElementById(view.id+"Refresh");    
+	e.style.backgroundColor = "yellow";
+	e=document.getElementById("refreshAll");
+	e.style.backgroundColor = "yellow";
 }
 
-//OLD stuff
-// TODO: eliminate temp OLD
-var OLD=true;
-
-function OLDsetupPage() { 
-	setUpForms();
-  LoLs=getWorkspace("Getting Started");
-	linkWorkspace(LoLs);
-	showWorkspace(LoLs);
-}
-function OLDopenWorkspace(id) {
-  // TODO: open existing or create new workspace
-	LoLs=EmptyWorkspace; // copy???
-	linkWorkspace(LoLs);
-	showWorkspace(LoLs);
-}
-function getWorkspace(fn) {
-// TODO: load getting started as general workspace
-	if (fn == "Getting Started") {
-	  return GettingStarted;
-	};
-  // TODO: get existing workspace
-  alert("Can't Get Existing Workspace " + fn);	
-}
-function linkWorkspace(w) {
-  var lang, view, refs, defs;
-  w.changed=false;
-  for (var i=0; i<w.languages.length; i++) {
-  	lang=w.languages[i];
-  	w.languages[lang.name]=lang;
-  	lang.references=[];
-  	for (var j=0; j<lang.code.length; j++) {
-  	  lang.code[j].language=lang;
-  	  if (lang.code[j].defView === undefined)
-  	    lang.code[j].rules=eval(lang.code[j].name);
-  	};
-  	for (var j=0; j<lang.decode.length; j++) {
-  	  lang.decode[j].language=lang;
-  	  if (lang.decode[j].defView === undefined)
-  	    lang.decode[j].rules=eval(lang.decode[j].name);
-  	};
-	};
-  for (var i=0; i<w.views.length; i++) {
-  	view=w.views[i];
-    w.views[view.name]=view;
-    view.id=undefined;   																				// create on display
-    view.language=w.languages[view.language];
-    view.language.references[view.language.references.length]=view;
-    view.references=[];
-    view.langDefs=[];
-    view.grammarDefs=[];
-  };
-  for (var i=0; i<w.views.length; i++) {
-  	view=w.views[i];
-    view.inputView=w.views[view.inputView];
-    if (view.inputView !== view) {
-      refs=view.inputView.references;
-      refs[refs.length]=view;
-    };
-  };
-  for (var i=0; i<w.languages.length; i++) {
-  	lang=w.languages[i];
-  	for (var j=0; j<lang.code.length; j++) {
-  	  if (lang.code[j].defView!==undefined) {
-  	  	view=w.views[lang.code[j].defView];
-  	  	lang.code[j].defView=view;
-				defs=view.grammarDefs;
-				defs[defs.length]=lang.code[j];
-				if (view.langDefs.indexOf(lang)<0)
-				  view.langDefs[view.langDefs.length]=lang;
-  	  }
-  	};
-  	for (var j=0; j<lang.decode.length; j++) {
-  	  if (lang.decode[j].defView!==undefined) {
-  	  	view=w.views[lang.decode[j].defView];
-  	  	lang.decode[j].defView=view;
-				defs=view.grammarDefs;
-				defs[defs.length]=lang.decode[j];
-				if (view.langDefs.indexOf(lang)<0)
-				  view.langDefs[view.langDefs.length]=lang;
-  	  }
-  	};
-	};
-  w.currentView=w.views[w.currentView];
-  w.currentLanguage=w.currentView.language;
-  
-  return w;
-};
-function OLDrelaceLangRibbon() { 
-  var i, ribbon=[], str, doc, node;
-  for (i=0; i<LoLs.languages.length; i++) {
-  	ribbon.push(LoLs.languages[i].name);
-  };
-  ribbon.sort();
-  str='';
-  for (i=0; i<ribbon.length; i++) {
-		str=str + '<button id="' + ribbon[i] + 'Lang" type="button"' +
-			' onClick="setLanguage(\'' + ribbon[i] + '\')">' +
-			 ribbon[i] + '</button> ';
-	};
-  doc=document.getElementById("LangRibbon");
-  for (i=doc.childNodes.length-1; i>1; i--) {
-  	node=doc.childNodes[i];
-  	node.parentNode.removeChild(node);
-  };
-  doc.insertAdjacentHTML("beforeend", str);
-};
-function showWorkspace(w) { 
-  var startView, view, thisView, nodes, i;
-  nodes=document.getElementById('WorkspaceArea').childNodes;
-  for (i=nodes.length-1; i>1; i--) {
-  	nodes[i].parentNode.removeChild(nodes[i]);
-  };
-  document.getElementById('WorkspaceName').textContent=w.name+' ';
-  relaceLangRibbon();
-  for (var i=0; i<w.views.length; i++) {
-  	view=w.views[i];
-  	view.id=genLocalId(view.name);
-    thisView=createACEeditor(view.name,view.id,
-    	view.editorProperties.height,
-    	view.editorProperties.gutters,
-    	view.editorProperties.readOnly,
-    	view.contents);
-    if (view === w.currentView)
-      startView=thisView;
-    thisView.on('change',(function(v) {return function() {viewChanged(v)}})(view));
-    thisView.on('focus',(function(v) {return function() {viewFocus(v)}})(view));
-
-    view.changed=true;
-  };
-  refreshAll();
-  if (startView)
-  	startView.focus(); 
-}
-function OLDrefreshAll(id) {
-  var button, clear=true;
-  for (var i=0; i < LoLs.views.length; i++) {
-    refreshView(LoLs.views[i].name);
-    if (LoLs.views[i].changed)
-    	clear=false;
-  }
-  if (clear) {
-    button=document.getElementById("refreshAll");
-    button.style.backgroundColor = "white";
-  }
-}
+// Editor support
 function indexToPosition(doc, index) {
   var lines = doc.getAllLines(),
     newLineLen = doc.getNewLineCharacter().length,
@@ -286,6 +178,7 @@ function insertMessage(editor, index, message) {
   editor.find(message, {backwards:true}, false);
   editor.focus();
 }
+
 function addView() {
 	var i, thisView, view, name, value, e, list;
 	name=document.getElementById('openViewName').value;
@@ -421,77 +314,6 @@ function openView(here) {
 	document.getElementById('openViewGutters').checked=view.editorProperties.gutters;
   popUp('openView');
 }
-function OLDviewChanged(view) {
-  var button;
-	if (view.changed || view.changed==undefined)
-		return;
-	view.changed=true;
-	LoLs.changed=true;
-	button=document.getElementById(view.id+"Refresh");    
-	button.style.backgroundColor = "yellow";
-	for (var i=0;i<view.references.length;i++) {
-		viewChanged(view.references[i]);
-	};
-	for (var i=0;i<view.langDefs.length;i++) {
-		languageChanged(view.langDefs[i]);
-	};
-	button=document.getElementById("refreshAll");
-	button.style.backgroundColor = "yellow";
-}
-function viewFocus(view) {
-	var langButton;
-	if (LoLs.currentLanguage != undefined) {
-		langButton=document.getElementById(LoLs.currentLanguage.name+"Lang");
-		langButton.style.color = "white";
-	}
-	LoLs.currentView=view;
-	LoLs.currentLanguage=LoLs.currentView.language;
-	langButton=document.getElementById(LoLs.currentLanguage.name+"Lang");
-	langButton.style.color = "red";
-}
-function languageChanged(lang) {
-  for (var i=0; i<lang.references.length; i++) {
-    viewChanged(lang.references[i]);
-  }
-}
-function createACEeditor(name,id,height,gutters,readOnly,value,beforeId) {
-  var e, frame, marker="afterend";
-  if (beforeId===undefined) {
-  	beforeId="WorkspaceArea";
-  	marker="beforeend";
-  };
-  document.getElementById(beforeId).insertAdjacentHTML(marker,
-	'<div class="LoLsView" name="'+name+'">' +
-	'	<div class="LoLsViewTitle">' +
-	'	  <input id ="'+ id +'Button" type="button" title="collapse" value="-" ' +
-	'		onClick="showOrHide(\''+ id +'\',this)">' +
-	'	  <scan id="'+id+'ViewName">'+ name +' </scan><i>view</i>' +
-	'	  <button type="button" title="open view" onClick="openView(this)">' +
-	'		<img src="images/open-view.png" alt="Open View">' +
-	'	  </button>' +
-	'	  <button type="button" title="close view" onClick="closeView(this)">' +
-	'		<img src="images/close.gif" alt="Close View">' +
-	'	  </button>' +
-	'	  <button id="'+id+'Refresh" type="button" title="refresh"' + 
-	' onClick="refreshView(\''+name+'\')">'+
-	'		<img src="images/refresh.png" alt="Refresh View">' +
-	'	  </button>' +
-	'	</div>' +
-	'	<div id="'+ id +'" class="LoLsViewEditor">' +
-	'	</div>' +
-	'</div>'); 
-	e=document.getElementById(id);
-	e.style.position="relative"; 
-	e.style.height=height;
-  frame=ace.edit(id);
-  frame.getSession().setMode('ace/mode/textmate');
-  frame.renderer.setShowGutter(gutters);
-  frame.setValue(value);
-  frame.setReadOnly(readOnly);
-  frame.clearSelection();
-  e.editor=frame;
-  return frame;  
-}
 function closeView(id) {
 	var i, str, view, elem=id.parentNode.parentNode, found;
 	if (document.getElementById("WorkspaceArea").childNodes.length<=4) {
@@ -519,122 +341,69 @@ function closeView(id) {
 	};
 	elem.parentNode.removeChild(elem);	
 }
-function refreshView(viewName) {
-  var lolsView, editor, source, lang, langViews, button, cleared;
-  try {
-    lolsView=LoLs.views[viewName];
-// TODO: bidirectional view dependency support A updates B & B updates A
-    if (lolsView.changed==undefined)
-  	  return lolsView.contents;
-    lolsView.changed=undefined;
-   lang=lolsView.language.code;
-   for (var i=0; i <lang.length; i++) {
-    	if (lang[i].defView !== undefined)
-    		refreshView(lang[i].defView.name);
-    };
-    editor=document.getElementById(lolsView.id).editor;
-    if (lolsView.inputView === lolsView) {
-      source=editor.getValue();
-    } else {
-      source=refreshView(lolsView.inputView.name);
-    };
-    lolsView.contents=applyLanguage(lang,source);
-    if (lolsView.inputView !== lolsView) {
-      editor.setValue("" + lolsView.contents);
-    }
-    lolsView.changed=false;
-    button=document.getElementById(lolsView.id+"Refresh");    
-    button.style.backgroundColor = "white";
-    for (var i=0; i<lolsView.grammarDefs.length; i++) {
-    	lolsView.grammarDefs[i].rules=eval(lolsView.grammarDefs[i].name);
-    };
-    cleared=true;
-    for (var i=0; i <LoLs.views.length; i++) {
-    	if (LoLs.views[i].changed)
-    		cleared=false;
-    };
-    if (cleared) {
-      button=document.getElementById("refreshAll");
-      button.style.backgroundColor = "white";
-    };
-	  return lolsView.contents;
-  } catch (e) {
-    if (e.errorPos != undefined) {
-	    insertMessage(editor, e.errorPos, " Unknown-->");
-	  } else {
-      alert("" + viewName + " error at unknown position\n\n" + e);
-	  }
-	  if (lolsView.changed==undefined)
-	    lolsView.changed=true;
-    return lolsView.contents;
-  }
-}
 // TODO: eliminate global for language change
 var OLDLang;
 function setLanguage(lang) {
-  var i, langObj, elem, rows, str, inputOption, view;
-  if (event.altKey) {
-    langObj=LoLs.languages[lang];
-    OLDLang=langObj;
-    elem=document.getElementById('deleteLanguage');
-    elem.disabled=langObj.references.length>0;
-    elem=document.getElementById('langChangeName');
-    elem.value=langObj.name;
-    elem=document.getElementById('langChangeOutput');
-    elem.checked=(langObj.code[langObj.code.length-1].evalResults == true);
-    elem=document.getElementById('langChangeCode');
-		rows=elem.getElementsByTagName("tr");
-    for (i=rows.length-1; i>0; i--) {
-    	rows[i].parentNode.removeChild(rows[i]);
-    };
-    for (i=0; i<langObj.code.length; i++) {
-      if (langObj.code[i].inputIsList) {
-      	inputOption = "List";
-      } else {
-      	inputOption = "Object";
-      };
-      view = '';
-      if (langObj.code[i].defView!==undefined)
-      	view=langObj.code[i].defView.name;
-			str ='<tr><td>'+langObj.code[i].name+'</td>'+
-				 '<td>'+langObj.code[i].startRule+'</td>'+		
-				 '<td>'+inputOption+'</td>'+		
-				 '<td>'+view+'</td>'+		
-				'<td><button type="button" title="delete grammar"'+
-				' onclick="deleteGrammar(this)">X</button></td></tr>';
-			elem.insertAdjacentHTML("beforeend", str);
-    };
-    elem=document.getElementById('langChangeDecode');
-		rows=elem.getElementsByTagName("tr");
-    for (i=rows.length-1; i>0; i--) {
-    	rows[i].parentNode.removeChild(rows[i]);
-    };
-    for (i=0; i<langObj.decode.length; i++) {
-      if (langObj.decode[i].inputIsList) {
-      	inputOption = "List";
-      } else {
-      	inputOption = "Object";
-      };
-      view = '';
-      if (langObj.decode[i].defView!==undefined)
-      	view=langObj.decode[i].defView.name;
-			str ='<tr><td>'+langObj.decode[i].name+'</td>'+
-				 '<td>'+langObj.decode[i].startRule+'</td>'+		
-				 '<td>'+inputOption+'</td>'+		
-				 '<td>'+view+'</td>'+		
-				'<td><button type="button" title="delete grammar"'+
-				' onclick="deleteGrammar(this)">X</button></td></tr>';
-			elem.insertAdjacentHTML("beforeend", str);
-    };   
-  	popUp('langChange');
-  	return;
-  };
-  langObj=LoLs.currentView.language;
-  langObj.references=langObj.references.filter(function(x) {return x!==LoLs.currentView});
-  langObj=LoLs.languages[lang];
-  langObj.references=langObj.references.filter(function(x) {return x!==LoLs.currentView});
-  langObj.references[langObj.references.length]=LoLs.currentView;    
-  LoLs.currentView.language=langObj;
-  refreshView(LoLs.currentView.name);
+  if (event.altKey) 
+    return languageUpdateForm(lang);
+  LoLs.currentView.setLanguage(lang);
+  LoLs.currentView.changed();
+  LoLs.currentView.refresh();
   document.getElementById(LoLs.currentView.id).editor.focus();
+}
+function languageUpdateForm(lang) {
+  var i, langObj, elem, rows, str, inputOption, view;
+	langObj=LoLs.languages[lang];
+	OLDLang=langObj;
+	elem=document.getElementById('deleteLanguage');
+	elem.disabled=langObj.references.length>0;
+	elem=document.getElementById('langChangeName');
+	elem.value=langObj.name;
+	elem=document.getElementById('langChangeOutput');
+	elem.checked=(langObj.code[langObj.code.length-1].evalResults == true);
+	elem=document.getElementById('langChangeCode');
+	rows=elem.getElementsByTagName("tr");
+	for (i=rows.length-1; i>0; i--) {
+		rows[i].parentNode.removeChild(rows[i]);
+	};
+	for (i=0; i<langObj.code.length; i++) {
+		if (langObj.code[i].inputIsList) {
+			inputOption = "List";
+		} else {
+			inputOption = "Object";
+		};
+		view = '';
+		if (langObj.code[i].defView!==undefined)
+			view=langObj.code[i].defView.name;
+		str ='<tr><td>'+langObj.code[i].name+'</td>'+
+			 '<td>'+langObj.code[i].startRule+'</td>'+		
+			 '<td>'+inputOption+'</td>'+		
+			 '<td>'+view+'</td>'+		
+			'<td><button type="button" title="delete grammar"'+
+			' onclick="deleteGrammar(this)">X</button></td></tr>';
+		elem.insertAdjacentHTML("beforeend", str);
+	};
+	elem=document.getElementById('langChangeDecode');
+	rows=elem.getElementsByTagName("tr");
+	for (i=rows.length-1; i>0; i--) {
+		rows[i].parentNode.removeChild(rows[i]);
+	};
+	for (i=0; i<langObj.decode.length; i++) {
+		if (langObj.decode[i].inputIsList) {
+			inputOption = "List";
+		} else {
+			inputOption = "Object";
+		};
+		view = '';
+		if (langObj.decode[i].defView!==undefined)
+			view=langObj.decode[i].defView.name;
+		str ='<tr><td>'+langObj.decode[i].name+'</td>'+
+			 '<td>'+langObj.decode[i].startRule+'</td>'+		
+			 '<td>'+inputOption+'</td>'+		
+			 '<td>'+view+'</td>'+		
+			'<td><button type="button" title="delete grammar"'+
+			' onclick="deleteGrammar(this)">X</button></td></tr>';
+		elem.insertAdjacentHTML("beforeend", str);
+	};   
+	popUp('langChange');
 }
