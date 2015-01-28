@@ -28,6 +28,12 @@ YUI({useBrowserconsole: true}).use('test', function (Y) {
 	
 	var lolsTestCase = new Y.Test.Case({
 			name : "LoLs Test Case",
+			setUp : function () {
+					this.data = Workspace();
+			},
+			tearDown : function () {
+					delete this.data;
+			},
 			
 			testParse : function() {
 			    var genCode=applyLanguage(LoLs.languages["ometa"].code,'ometa text { doc = digit+ end}');

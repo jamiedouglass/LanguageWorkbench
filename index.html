@@ -17,15 +17,10 @@
 <script src="metalanguages/ometa/bs-ometa-optimizer.js"></script>
 <script src="metalanguages/ometa/bs-ometa-js-compiler.js"></script>
 <script src="language-elements.js"></script>
-<!-- TODO: remove protocol -->
 <script src="http://d1n0x3qji82z53.cloudfront.net/src-min-noconflict/ace.js" ></script>
 <script src="LoLsWorkbench.js"></script>
 <script src="LoLsWorkbenchForms.js"></script>
-
 <script src="LoLsWorkspace.js"></script>
-
-<!-- temporary to load getting started workspace -->
-<script src="applications/getting-started/getting-started.js"></script>
 
 <!-- unit testing --
 <script src="http://yui.yahooapis.com/3.17.2/build/yui/yui-min.js"></script>
@@ -33,11 +28,6 @@
  !-- end unit testing-->
 
 <body onLoad="setupPage();">
-<!-- TODO: remove wip div when bootstrap LoLs in built -->
-<div id="wip">
-  <h4>Under Construction</h4>
-  <hr>
-</div>
 <div id="SignInArea">
   <a id="SignIn" href="sign-in.html" target="_top">Sign in</a>
   <div id="LearnMore">
@@ -52,112 +42,19 @@
 </div>
 <div id="WorkbenchForms">
 </div>
-<div id="langChange"> 
-	<div>
-		<form autocomplete="off">
-			<button id="deleteLanguage" type="button" title="delete language" 
-				onClick="removeLanguage('langChange')">
-			  Delete Language
-			</button>
-			<br>
-			Language Name: 
-			<input type="text" id="langChangeName">
-			<br>
-			<input type="checkbox" id="langChangeOutput" value="executable">Meta Language
-			<table id="langChangeCode">
-				<tr>
-					<th>Grammar</th>
-					<th>Start Rule</th>		
-					<th>Input</th>
-					<th>View</th>
-				</tr>
-			</table>
-			<table id="langChangeDecode">
-				<tr>
-					<th>Decode<br>Grammar</th>
-					<th>Start Rule</th>		
-					<th>Input</th>
-					<th>View</th>
-				</tr>
-			</table>
-			<fieldset id="grammarToChange">
-				<legend>Grammar</legend>
-			  <button type="button" title="add grammar" 
-			    onClick="addGrammar('langChange','grammarToChange')">+</button>
-				Name:
-				<input type="text" name="name">
-				<br>
-				from View: 
-				<input type="text" name="defView">
-				<br>
-				Start Rule: 
-				<input type="text" name="startRule">
-				<br>
-				Flow:
-				<select name="flow">
-					<option value="code">code</option>
-					<option value="decode">decode</option>
-				</select>	
-				Input:
-				<select name="input">
-					<option value="List">List</option>
-					<option value="Object">Object</option>
-				</select>	
-			</fieldset>
-			<br>
-			<button type="button" title="cancel" onClick="popUp('langChange')">
-				Cancel
-			</button>
-			<button type="button" title="change language" onClick="changeLanguage('langChange')">
-				Change Language
-			</button>
-		</form>
-	</div>
-</div>
-<div id="openView">
-	<div>
-		<form>
-			Name: 
-			<input type="text" id="openViewName" value="Unnamed">
-			<br>
-			Input View: 
-			<input type="text" id="openViewInput">
-			<br>
-			Language:
-			<select id="openViewLang">
-			</select>
-			<br>
-			Height(in pixels):
-			<input type="number" id="openViewHeight" value="100" min="10" max="1000">
-			<br>
-			<input type="checkbox" id="openViewReadonly">Readonly
-			<br>
-			<input type="checkbox" id="openViewGutters">Gutters
-			<br>
-			<button type="button" title="cancel" onClick="popUp('openView')">
-				Cancel
-			</button>
-			<button type="button" title="update view" onClick="updateView()">
-				Update View
-			</button>
-			<button type="button" title="add view" onClick="addView()">
-				New View
-			</button>
-		</form>
-	</div>
-</div>
-
 <div id="LangRibbon">
   <scan>
-    <button type="button" title="add/remove language" onClick="popUp('langAdd')">
+    <button type="button" title="add/remove language" onClick="showHideForm('langAdd')">
     +Language</button>
+  </scan>
+  <scan id="LangArea">
   </scan>
 </div>
 <hr>
 <div id="WorkspaceArea">
 	<div class="WorkspaceTitle">
 	  <scan id="WorkspaceName">Workspace Name </scan><i>workspace</i>
-	  <button type="button" title="open workspace" onClick="openWorkspace(this)">
+	  <button type="button" title="open workspace" onClick="openForm('OpenWorkspace')">
 		<img src="images/open-workspace.png" alt="Open Workspace">
 	  </button>
 	  <button type="button" title="save workspace" onClick="saveWorkspace(this)">
@@ -166,6 +63,8 @@
 	  <button id="refreshAll" type="button" title="refresh all" onClick="refreshAll()">
 		<img src="images/refresh.png" alt="Refresh All">
 	  </button>
+	</div>
+	<div id="ViewArea">
 	</div>
 </div>
 <div id="acknowledgement">

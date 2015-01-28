@@ -1,39 +1,29 @@
 // events
 window.onbeforeunload = function() {
-  if (LoLs.changed) 
+  if (LoLs.unsaved) 
     return "By leaving this page, any unsaved changes will be lost.";
 }
 
-//functions
-function createACE(id,height,gutters,readOnly,value) {
-  var e=document.getElementById(id), f=ace.edit(id);
-	e.style.position="relative"; 
-	e.style.height=height;
-  f.getSession().setMode('ace/mode/textmate');
-  f.renderer.setShowGutter(gutters);
-  f.setValue(value);
-  f.setReadOnly(readOnly);
-  f.clearSelection();
-  e.editor=f;
-  return f;  
-}
-function createEditor(view) {
-	var e=view.editor;
-	if (e.name=="ACE") 
-		return createACE(view.id,e.height,e.gutters,e.readOnly,e.contents);
-	return createACE(view.id,e.height,e.gutters,e.readOnly,e.contents);
+// functions for page
+function closeView(id) {
+	var v, e=document.getElementById(id);
+	if (LoLs.views.length<=1) {
+		alert("Workspace must have at least one view");
+		return;
+	}
+	v=LoLs.views[e.getAttribute("name")];
+	try {
+		v.delete();
+	} catch (e) {
+		alert(e);
+		return;
+	}
+	e.parentNode.removeChild(e);	
 }
 function createLangRibbon(names) { 
-  var e, i, n, str;
-  // TODO: create single element to hold languages
-  e=document.getElementById("LangRibbon");
-  for (i=e.childNodes.length-1; i>1; i--) {
-  	n=e.childNodes[i];
-  	n.parentNode.removeChild(n);
-  };
-  
+  var e=document.getElementById("LangArea"), i, str='';
+  e.innerHTML="";
   // TODO: ids need to not have spaces etc.
-  str='';
   for (i=0; i<names.length; i++) {
 		str+='<button id="' + names[i] + 'Lang" type="button"' +
 			' onClick="setLanguage(\'' + names[i] + '\')">' +
@@ -42,22 +32,21 @@ function createLangRibbon(names) {
   e.insertAdjacentHTML("beforeend", str);
 };
 function createView(view,beforeId) {
-  var name=view.name, id=genLocalId(name), m="afterend", e;
-  view.id=id;
+  var name=view.name, id=genLocalId(name), m="afterend";
   if (beforeId===undefined) {
-  	beforeId="WorkspaceArea";
+  	beforeId="ViewArea";
   	m="beforeend";
   };
   document.getElementById(beforeId).insertAdjacentHTML(m,
-	'<div class="LoLsView" name="'+name+'">' +
+	'<div id="'+id+'View" class="LoLsView" name="'+name+'">' +
 	'	<div class="LoLsViewTitle">' +
 	'	  <input id ="'+ id +'Button" type="button" title="collapse" value="-" ' +
 	'			onClick="showOrHide(\''+ id +'\',this)">' +
 	'	  <scan id="'+id+'ViewName">'+ name +' </scan><i>view</i>' +
-	'	  <button type="button" title="open view" onClick="openView(this)">' +
+	'	  <button type="button" title="open view" onClick="openView(\''+id+'View\')">' +
 	'			<img src="images/open-view.png" alt="Open View">' +
 	'	  </button>' +
-	'	  <button type="button" title="close view" onClick="closeView(this)">' +
+	'	  <button type="button" title="close view" onClick="closeView(\''+id+'View\')">' +
 	'			<img src="images/close.gif" alt="Close View">' +
 	'	  </button>' +
 	'	  <button id="'+id+'Refresh" type="button" title="refresh"' + 
@@ -68,59 +57,179 @@ function createView(view,beforeId) {
 	'	<div id="'+ id +'" class="LoLsViewEditor">' +
 	'	</div>' +
 	'</div>'); 
-	e=createEditor(view);
-	e.on('change',(function(x) {return function() {viewChanged(x)}})(view));
-  e.on('focus',(function(x) {return function() {viewFocus(x)}})(view));
+	view.createEditor(id);
 }
-function openWorkspace(url) {
-	var i, e;
-  if (LoLs !== undefined && LoLs.unsaved) {
-    if (!confirm("Abandon the current workspace changes?"))
-    	return;
-  };
-	// TODO: make a single element for deleting views
-  e=document.getElementById('WorkspaceArea').childNodes;
-  for (i=e.length-1; i>1; i--) {
-  	e[i].parentNode.removeChild(e[i]);
-  };
-  
-  LoLs=Workspace(url);
+function openWorkspace(info) {
+	var i;
+  document.getElementById('ViewArea').innerHTML="";  
+  LoLs=Workspace(info);
+	if (info===undefined) {
+		LoLs.createLanguage();
+		LoLs.createView('Unnamed');
+		LoLs.views['Unnamed'].setLanguage('ometa');
+		LoLs.currentView=LoLs.views['Unnamed'];
+	}
   document.getElementById('WorkspaceName').textContent=LoLs.name+' ';
   createLangRibbon(LoLs.languageNames());
   for (i=0; i<LoLs.views.length; i++) 
   	createView(LoLs.views[i]);
-  // TODO: load compiled languages without refreshing
+  // TODO: load grammar rules without refreshing
   LoLs.refreshAll(true);
-	document.getElementById(LoLs.currentView.id).editor.focus();
+  
+  LoLs.unsaved=false;
+	LoLs.currentView.focus(true);
 }
 function refreshAll() {
-  LoLs.refreshAll();
-  if (!LoLs.refreshNeeded())
+	try {
+  	LoLs.refreshAll(event.altKey);
+  } catch (e) {
+  	if (e.errorPos!==undefined)
+  		insertMessage(e.view.id, e.errorPos, 'Unknown->');
+  	else
+  		alert(e);
+  }
+  if (!LoLs.isRefreshNeeded())
     document.getElementById("refreshAll").style.backgroundColor = "white";
 }
-function refreshComplete(view) {
-  var e=document.getElementById(view.id).editor;
-  e.setValue("" + view.viewContents());
-	e.clearSelection();	
-	view.needsRefresh=false;
-	e=document.getElementById(view.id+"Refresh");    
+function refreshCompleted(view) {
+  var e=document.getElementById(view.id+"Refresh");	    
 	e.style.backgroundColor = "white";
-	if (!LoLs.refreshNeeded()) {
+	if (!LoLs.isRefreshNeeded()) {
 		e=document.getElementById("refreshAll");
 		e.style.backgroundColor = "white";
 	}
 }
-function refreshView(view) {
-  LoLs.views[view].refresh();
+function refreshView(viewName) {
+	try {
+  	LoLs.views[viewName].refresh(event.altKey);
+  } catch (e) {
+  	if (e.errorPos!==undefined)
+  		insertMessage(e.view.id, e.errorPos, 'Unknown->');
+  	else
+  		alert(e);
+  }
 }
 function saveWorkspace(id) {
-  // TODO: save current workspace
-  alert("Save Current Workspace");
+  var f=new Blob([LoLs.serialize()],{type: 'text/plain'}),
+  	  l=document.createElement('a');
+  l.setAttribute('href',window.URL.createObjectURL(f));
+  l.setAttribute('download', LoLs.name+'.txt');
+  l.click();
 }
-function setupPage() { 
-	setUpForms();
-	// TODO: replace temporary url for getting starting 
-  openWorkspace("getting-started.ws");
+function setLanguage(lang) {
+  if (event.altKey) 
+    return languageUpdateForm(lang);
+  LoLs.currentView.setLanguage(lang);
+  LoLs.currentView.changed();
+  LoLs.currentView.refresh();
+  document.getElementById(LoLs.currentView.id).editor.focus();
+}
+function setupPage() {
+	var gs={name: "Getting Started",
+ languages: [
+	{name: "ometa",
+	 meta: true,
+	 code: [
+		{name: "BSOMetaJSParser",
+		 startRule: "topLevel"},
+		{name: "BSOMetaJSTranslator",
+		 startRule: "trans",
+		 makeList: true}]},
+	{name: "math",
+	 code: [
+		{name: "math",
+		 startRule: "expression",
+		 defView: "Grammar"}]},
+	{name: "calculate",
+	 code: [
+		{name: "calculate",
+		 startRule: "le",
+		 makeList: true,
+		 defView: "Grammar"}]},
+	{name: "LET",
+	 code: [
+		{name: "LET",
+		 startRule: "let",
+		 makeList: true,
+		 defView: "Grammar"}]},
+	{name: "raw",
+	 code: [
+		{name: "raw",
+		 startRule: "it",
+		 defView: "Grammar"}]}],
+ views: [
+	{name: "Read Me First",
+	 editor:
+	 	{name: "ACE", height: "100px", readOnly: true},
+	 language: "raw",
+	 contents: "Welcome to the Language Workbench for Language of Languages (LoLs).\n"+
+	 "Select a workspace and interact with it using the language areas below.\n"+
+	 "Each area displays the workspace according to a selected language.\n"+
+	 "Changes in one area update all other areas and the Language Element\n"+
+	 "Tree (LET) which defines the LoLs workspace."},
+	{name: "Math Problem",
+	 editor:
+	 	{name: "ACE"},
+	 language: "math",
+	 contents: "2+3*4"},
+	{name: "Answer",
+	 editor:
+	 	{name: "ACE", readOnly: true},
+	 language: "calculate",
+	 contents: "14",
+	 inputView: "Math Problem"},
+	{name: "LET Explorer",
+	 editor:
+	 	{name: "ACE", height: "200px", readOnly: true},
+	 language: "LET",
+	 contents: ".+. Add\n  2 Number\n  .*. Multiply\n    3 Number\n    4 Number\n",
+	 inputView: "Math Problem"},
+	{name: "Grammar",
+	 editor:
+	 	{name: "ACE", height: "250px", gutters: true},
+	 language: "ometa",
+	 contents: "ometa math {\n"+
+	 "  expression = term:t space* end           -> t,\n"+
+	 "  term       = term:t \"+\" factor:f         -> Le(\'Add\', t, f)\n"+
+	 "             | term:t \"-\" factor:f         -> Le(\'Subtract\', t, f)\n"+
+	 "             | factor,\n"+
+	 "  factor     = factor:f \"*\" primary:p      -> Le(\'Multiply\', f, p)\n"+
+	 "             | factor:f \"/\" primary:p      -> Le(\'Divide\', f, p)\n"+
+	 "             | primary,\n"+
+	 "  primary    = Group\n"+
+	 "             | Number,\n"+
+	 "  Group      = \"(\" term:t \")\"              -> Le(\'Group\', t),\n"+
+	 "  Number     = space* digits:n             -> Le(\'Number\', n),\n"+
+	 "  digits     = digits:n digit:d            -> (n * 10 + d)\n"+
+	 "             | digit,\n"+
+	 "  digit      = ^digit:d                    -> d.digitValue()\n"+
+	 "}\n\n"+
+	 "ometa calculate {\n"+
+	 "  le     = [\'Number\' anything:n]  -> n\n"+
+	 "         | [\'Group\' le:x]         -> x\n"+
+	 "         | [\'Add\' le:l le:r]      -> (l + r)\n"+
+	 "         | [\'Subtract\' le:l le:r] -> (l - r)\n"+
+	 "         | [\'Multiply\' le:l le:r] -> (l * r)\n"+
+	 "         | [\'Divide\' le:l le:r]   -> (l / r)\n"+
+	 "}\n\n"+
+	 "ometa LET {\n"+
+	 "  let = [\'Number\' anything:n]:x    -> (sp(x)+n+\' Number\\n\')\n"+
+	 "      | [\'Group\' let:e]:x          -> (sp(x)+\'(.) Group\\n\'+e)\n"+
+	 "      | [\'Add\' let:l let:r]:x      -> (sp(x)+\'.+. Add\\n\'+l+r)\n"+
+	 "      | [\'Subtract\' let:l let:r]:x -> (sp(x)+\'.-. Subtract\\n\'+l+r)\n"+
+	 "      | [\'Multiply\' let:l let:r]:x -> (sp(x)+\'.*. Multiply\\n\'+l+r)\n"+
+	 "      | [\'Divide\' let:l let:r]:x   -> (sp(x)+\'./. Divide\\n\'+l+r)\n"+
+	 "}\n\n"+
+	 "function sp(node) {\n  var s=\"\", i=node.depth();\n"+
+	 "  while (i-- > 1) {s=s+\"  \"};\n"+
+	 "  return s;\n"+
+	 "}\n\n"+
+	 "ometa raw {\n"+
+	 "  it = anything*\n"+
+	 "}"}],
+ currentView: "Math Problem"}; 
+	setupForms();
+  openWorkspace(gs);
 }
 function showOrHide(id, button) {
   var s = document.getElementById(id).style;
@@ -136,23 +245,16 @@ function showOrHide(id, button) {
   	button.value = "+";
   }
 }
-function updateViewContents(view) {
-  var e=document.getElementById(view.id).editor;
-  return e.getValue();
-}
-function viewChanged(view) {
-	view.changed();
-}
-function viewFocus(view) {
-	var b;
-	if (LoLs.currentLanguage != undefined) {
-		b=document.getElementById(LoLs.currentLanguage.name+"Lang");
-		b.style.color = "white";
-	}
-	LoLs.currentView=view;
-	LoLs.currentLanguage=LoLs.currentView.language;
-	b=document.getElementById(LoLs.currentLanguage.name+"Lang");
-	b.style.color = "red";
+function switchLang(fromLang, toLang) {
+	var b1, b2;
+	if (fromLang!==undefined) 
+		b1=document.getElementById(fromLang.name+"Lang");
+	if (b1!== undefined && b1!==null)	
+		b1.style.color = "white";
+	if (toLang!==undefined) 
+		b2=document.getElementById(toLang.name+"Lang");
+	if (b2!== undefined && b2!==null)	
+		b2.style.color = "red";
 }
 function viewHasChanged(view) {
   var e=document.getElementById(view.id+"Refresh");    
@@ -162,248 +264,19 @@ function viewHasChanged(view) {
 }
 
 // Editor support
-function indexToPosition(doc, index) {
-  var lines = doc.getAllLines(),
-    newLineLen = doc.getNewLineCharacter().length,
-    column = index;
-  for (var row = 0; column >= lines[row].length + newLineLen; row ++) {
-    column -= lines[row].length + newLineLen;
-  }
-  return {row:row, column:column};
-}
-function insertMessage(editor, index, message) {
-  var doc = editor.getSession().getDocument(),
+function insertMessage(id, index, message) {
+	function indexToPosition(doc, index) {
+		var lines = doc.getAllLines(),
+			newLineLen = doc.getNewLineCharacter().length,
+			row, column = index;
+		for (row = 0; column >= lines[row].length + newLineLen; row ++) 
+			column -= lines[row].length + newLineLen;
+		return {row:row, column:column};
+	}
+  var editor = document.getElementById(id).editor,
+  	doc = editor.getSession().getDocument(),
     pos = indexToPosition(doc, index);
   doc.insert(pos, message);
   editor.find(message, {backwards:true}, false);
   editor.focus();
-}
-
-function addView() {
-	var i, thisView, view, name, value, e, list;
-	name=document.getElementById('openViewName').value;
-	if (name == undefined || name == "" || LoLs.views[name] !== undefined)
-		return;
-	value=document.getElementById('openViewHeight').value;
-	try {
-		e=Number(value);
-		if (e<10 || e>1000)
-			throw "out of range";
-	} 
-	catch (e) {
-		alert("view height must be 10 to 1000.");
-		return;
-	}; 
-	view= {
-		name: name,
-		id: genLocalId(name),
-	 	editorProperties: 
-			{name: "ACE editor", 
-			 height: value+"px", 
-			 gutters: document.getElementById('openViewGutters').checked, 
-			 readOnly: document.getElementById('openViewReadonly').checked},   				 
-		 changed: true,
-		 language: LoLs.languages[document.getElementById('openViewLang').value],
-		 inputView: document.getElementById('openViewInput').value,
-		 contents: "",
-		 references: [],
-		 langDefs: [],
-		 grammarDefs: []};
-	view.language.references[view.language.references.length]=view;
-  if (view.inputView=="" || view.name==view.inputView) {
-  	view.inputView=view.name;
-  }; 
-  view.inputView=LoLs.views[view.inputView];
-  if (view.inputView===undefined) {
-  	view.inputView=view;
-  };
-	list=LoLs.views;
-	LoLs.views=[];
-	for (i=0; i<list.length; i++) {
-		LoLs.views[LoLs.views.length]=list[i];
-		LoLs.views[list[i].name]=list[i];
-		if (list[i]===OLDView) {
-			LoLs.views[LoLs.views.length]=view;
-			LoLs.views[view.name]=view;	
-		};
-	};
-	// TODO: position dialog box
-  thisView=createACEeditor(view.name,view.id,
-    view.editorProperties.height,
-    view.editorProperties.gutters,
-    view.editorProperties.readOnly,
-    view.contents,
-    OLDView.id);
-  view.changeFn=function(e) {viewChanged(this[0].myView);};
-  view.changeFn.myView=view;
-  thisView.on('change', view.changeFn);
-  view.focusFn=function() {viewFocus(this[0].myView);};
-  view.focusFn.myView=view;
-  thisView.on('focus', view.focusFn);
-  view.changed=true;
-  refreshView(name);
-  thisView.focus(); 
-  popUp('openView');  
-}
-function updateView() {
-	var name, value, e, lang;
-	name=document.getElementById('openViewName').value;
-	if (name == undefined || name =="")
-		return;
-	value=document.getElementById('openViewHeight').value;
-	try {
-		e=Number(value);
-		if (e<10 || e>1000)
-			throw "out of range";
-	} 
-	catch (e) {
-		alert("view height must be 10 to 1000.");
-		return;
-	}; 
-  LoLs.views[OLDView.name]=undefined;
-  OLDView.name=name;
-  LoLs.views[OLDView.name]=OLDView;
-  OLDView.inputView=document.getElementById('openViewInput').value;
-  if (OLDView.inputView=="" || OLDView.name==OLDView.inputView) {
-  	OLDView.inputView=OLDView.name;
-  }; 
-  OLDView.inputView=LoLs.views[OLDView.inputView];
-  if (OLDView.inputView===undefined) {
-  	OLDView.inputView=OLDView;
-  };
-  lang=LoLs.languages[document.getElementById('openViewLang').value];
-  OLDView.editorProperties.height=value+"px";
-  OLDView.editorProperties.readOnly=document.getElementById('openViewReadonly').checked;
-  OLDView.editorProperties.gutters=document.getElementById('openViewGutters').checked;
-  e=document.getElementById(OLDView.id);
-	e.style.height=OLDView.editorProperties.height;
-	e=e.editor;
-  e.renderer.setShowGutter(OLDView.editorProperties.gutters);
-  e.setReadOnly(OLDView.editorProperties.readOnly);
-	document.getElementById(OLDView.id+"ViewName").textContent=OLDView.name+" ";
-  popUp('openView');
-  if (OLDView.language!==lang) {
-  	OLDView.language=lang;
-  	reviewView(OLDView.name);
-  };
-	e.focus(); 
-}
-
-// TODO: eliminate global
-var OLDView;
-function openView(here) {
-	var i, view, name=here.parentNode.childNodes[3].textContent, str='', lang, elem, list;
-	view=LoLs.views[name.substring(0,name.length-1)];
-	OLDView=view;
-	document.getElementById('openViewName').value=view.name;
-	document.getElementById('openViewInput').value=view.inputView.name;
-	for (i=0; i<LoLs.languages.length; i++) {
-		lang=LoLs.languages[i].name;
-		str+='<option value="'+lang+'">'+lang+'</option>';
-	};
-	elem=document.getElementById('openViewLang');
-	list=elem.childNodes;
-	for (i=list.length-1; i>0; i--) {
-		list[i].parentNode.removeChild(list[i]);
-	};
-	elem.insertAdjacentHTML('beforeend',str);
-	elem.value=OLDView.language.name;
-	document.getElementById('openViewHeight').value=
-		view.editorProperties.height.substring(0,view.editorProperties.height.length-2);
-	document.getElementById('openViewReadonly').checked=view.editorProperties.readOnly;
-	document.getElementById('openViewGutters').checked=view.editorProperties.gutters;
-  popUp('openView');
-}
-function closeView(id) {
-	var i, str, view, elem=id.parentNode.parentNode, found;
-	if (document.getElementById("WorkspaceArea").childNodes.length<=4) {
-		alert("Workspace must have at least one view");
-		return;
-	};
-	view=LoLs.views[elem.getAttribute("name")];
-	if (view.references.length>0) {
-	  str="view is input to ";
-	  for (i=0; i<view.references.length; i++) {
-	  	str +=view.references[i].name+' ';
-	  };
-		alert(str);
-		return;
-	};
-	for (i=0; i<view.grammarDefs.length; i++) {
-		view.grammarDefs[i].defView=undefined;
-	};
-	view.language.references=view.language.references.filter(function(x) {return x!==view});
-	if (view.inputView !== view)
-		view.inputView.references=view.inputView.references.filter(function(x) {return x!==view});
-	LoLs.views=LoLs.views.filter(function(x) { return x!==view});
-	for (i=0; i<LoLs.views.length; i++) {
-		LoLs.views[LoLs.views[i].name]=LoLs.views[i];
-	};
-	elem.parentNode.removeChild(elem);	
-}
-// TODO: eliminate global for language change
-var OLDLang;
-function setLanguage(lang) {
-  if (event.altKey) 
-    return languageUpdateForm(lang);
-  LoLs.currentView.setLanguage(lang);
-  LoLs.currentView.changed();
-  LoLs.currentView.refresh();
-  document.getElementById(LoLs.currentView.id).editor.focus();
-}
-function languageUpdateForm(lang) {
-  var i, langObj, elem, rows, str, inputOption, view;
-	langObj=LoLs.languages[lang];
-	OLDLang=langObj;
-	elem=document.getElementById('deleteLanguage');
-	elem.disabled=langObj.references.length>0;
-	elem=document.getElementById('langChangeName');
-	elem.value=langObj.name;
-	elem=document.getElementById('langChangeOutput');
-	elem.checked=(langObj.code[langObj.code.length-1].evalResults == true);
-	elem=document.getElementById('langChangeCode');
-	rows=elem.getElementsByTagName("tr");
-	for (i=rows.length-1; i>0; i--) {
-		rows[i].parentNode.removeChild(rows[i]);
-	};
-	for (i=0; i<langObj.code.length; i++) {
-		if (langObj.code[i].inputIsList) {
-			inputOption = "List";
-		} else {
-			inputOption = "Object";
-		};
-		view = '';
-		if (langObj.code[i].defView!==undefined)
-			view=langObj.code[i].defView.name;
-		str ='<tr><td>'+langObj.code[i].name+'</td>'+
-			 '<td>'+langObj.code[i].startRule+'</td>'+		
-			 '<td>'+inputOption+'</td>'+		
-			 '<td>'+view+'</td>'+		
-			'<td><button type="button" title="delete grammar"'+
-			' onclick="deleteGrammar(this)">X</button></td></tr>';
-		elem.insertAdjacentHTML("beforeend", str);
-	};
-	elem=document.getElementById('langChangeDecode');
-	rows=elem.getElementsByTagName("tr");
-	for (i=rows.length-1; i>0; i--) {
-		rows[i].parentNode.removeChild(rows[i]);
-	};
-	for (i=0; i<langObj.decode.length; i++) {
-		if (langObj.decode[i].inputIsList) {
-			inputOption = "List";
-		} else {
-			inputOption = "Object";
-		};
-		view = '';
-		if (langObj.decode[i].defView!==undefined)
-			view=langObj.decode[i].defView.name;
-		str ='<tr><td>'+langObj.decode[i].name+'</td>'+
-			 '<td>'+langObj.decode[i].startRule+'</td>'+		
-			 '<td>'+inputOption+'</td>'+		
-			 '<td>'+view+'</td>'+		
-			'<td><button type="button" title="delete grammar"'+
-			' onclick="deleteGrammar(this)">X</button></td></tr>';
-		elem.insertAdjacentHTML("beforeend", str);
-	};   
-	popUp('langChange');
 }
