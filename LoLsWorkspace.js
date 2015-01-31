@@ -37,6 +37,7 @@ ACEeditorClass={
 		f.on('focus', (function(ed) {return function() {ed.focus()}})(this));
   },
 	deserialize:function(info) {
+		var e=document.getElementById(this.view.id);
 		if (info===undefined)
 			return this;
 		if (typeof info.name=="string" && info.name=="ACE")
@@ -51,6 +52,12 @@ ACEeditorClass={
 			this.readOnly=true;
 		if (info.readOnly===false) 
 			this.readOnly=false;
+		if (e!==undefined && e!=null) {
+			e.style.height=this.height;
+			e=e.editor;
+  		e.renderer.setShowGutter(this.gutters);
+  		e.setReadOnly(this.readOnly);
+		}
 		return this;
 	}, 
   focus: function(force) {
@@ -71,17 +78,17 @@ ACEeditorClass={
   },
 	serialize:function(indent,all) {
 		var s="{";
-		s+='name: "'+this.name+'"';
+		s+='"name": "'+this.name+'"';
 		if (all===true || this.height!=="60px")
-			s+=', height: "'+this.height+'"';
+			s+=', "height": "'+this.height+'"';
 		if (this.gutters)
-			s+=', gutters: true';
+			s+=', "gutters": true';
 		if (all===true && !this.gutters)
-			s+=', gutters: false';
+			s+=', "gutters": false';
 		if (this.readOnly)
-			s+=', readOnly: true';			
+			s+=', "readOnly": true';			
 		if (all===true && !this.readOnly)
-			s+=', readOnly: false';
+			s+=', "readOnly": false';
 		s+="}";
 		return s; 
 	},
@@ -178,16 +185,16 @@ GrammarClass= {
 		var s="{";
 		if (indent==undefined)
 			indent="";
-		s+='name: "'+this.name+'"';
-		s+=',\n'+indent+' startRule: "'+this.startRule+'"';
+		s+='"name": "'+this.name+'"';
+		s+=',\n'+indent+' "startRule": "'+this.startRule+'"';
 		if (this.makeList)
-			s+=',\n'+indent+' makeList: true';
+			s+=',\n'+indent+' "makeList": true';
 		if (all===true && !this.makeList)
-			s+=',\n'+indent+' makeList: false';
+			s+=',\n'+indent+' "makeList": false';
 		if (this.defView !== undefined)
-			s+=',\n'+indent+' defView: "'+this.defView.name+'"';
+			s+=',\n'+indent+' "defView": "'+this.defView.name+'"';
 		if (all===true && this.defView === undefined)
-			s+=',\n'+indent+' defView: ""';
+			s+=',\n'+indent+' "defView": ""';
 		s+="}";
 		return s; 
 	},
@@ -336,6 +343,7 @@ LanguageClass= {
 			for (i=0; i<info.decode.length; i++)
 				Grammar(info.code[i],this,true);
 		}
+		return this;
 	},
 	referenceNames:function() {
 		var i, len=this.references.length, names=[];
@@ -355,13 +363,13 @@ LanguageClass= {
 		var i, s="{";
 		if (indent==undefined)
 			indent="";
-		s+='name: "'+this.name+'"';
+		s+='"name": "'+this.name+'"';
 		if (this.meta)
-			s+=',\n'+indent+' meta: true';
+			s+=',\n'+indent+' "meta": true';
 		if (!this.meta && all===true)
-			s+=',\n'+indent+' meta: false';
+			s+=',\n'+indent+' "meta": false';
 		if (this.code.length>0) {
-			s+=',\n'+indent+' code: [\n'+indent+'\t';
+			s+=',\n'+indent+' "code": [\n'+indent+'\t';
 			for (i=0; i<this.code.length; i++) {
 				if (i!=0) s+=',\n'+indent+'\t';
 				s+=this.code[i].serialize(indent+'\t',all);
@@ -370,10 +378,10 @@ LanguageClass= {
 		}
 		else {
 			if (all===true)
-				s+=',\n'+indent+' code: []';
+				s+=',\n'+indent+' "code": []';
 		}		
 		if (this.decode.length>0) {
-			s+=',\n'+indent+' decode: [\n'+indent+'\t';
+			s+=',\n'+indent+' "decode": [\n'+indent+'\t';
 			for (i=0; i<this.decode.length; i++) {
 				if (i!=0) s+=',\n'+indent+'\t';
 				s+=this.decode[i].serialize(indent+'\t',all);
@@ -382,7 +390,7 @@ LanguageClass= {
 		}
 		else {
 			if (all===true)
-				s+=',\n'+indent+' decode: []';
+				s+=',\n'+indent+' "decode": []';
 		}		
 		s+="}";
 		return s; 
@@ -448,7 +456,7 @@ ViewClass={
 		if (this.references.length>0) 
 			throw "'"+this.name+"' is input to "+this.referenceNames().join(',');
 		this.setInputView();
-		this.setLanguages();
+		this.setLanguage();
 		for (var i=ds.length-1; i>=0; i--) 
 			ds[i].setDefView();
 		if (w!==undefined) {
@@ -476,6 +484,7 @@ ViewClass={
 		}
 		if (info.contents!==undefined)
 			this.setContents(info.contents);
+		return this;
 	},
 	focus:function(force) {
 		if (force===true) 
@@ -539,7 +548,7 @@ ViewClass={
 					if (e.errorPos!==undefined) 
 						e.view=this;
 					else 
-						e=this.view.name+" error at unknown position\n\n"+e;
+						e=this.name+" error at unknown position\n\n"+e;
 					throw e;
 				}
 			}
@@ -556,19 +565,19 @@ ViewClass={
 		var i, s="{";
 		if (indent==undefined)
 			indent="";
-		s+='name: "'+this.name+'"';
+		s+='"name": "'+this.name+'"';
 		if (this.language!==undefined)
-			s+=',\n'+indent+' language: "'+this.language.name+'"';
+			s+=',\n'+indent+' "language": "'+this.language.name+'"';
 		if (this.inputView!==undefined && (this.inputView!==this || all===true))
-			s+=',\n'+indent+' inputView: "'+this.inputView.name+'"';		
+			s+=',\n'+indent+' "inputView": "'+this.inputView.name+'"';		
 		if (this.needsRefresh)
-			s+=',\n'+indent+' needsRefresh: true';		
+			s+=',\n'+indent+' "needsRefresh": true';		
 		if (!this.needsRefresh && all===true)
-			s+=',\n'+indent+' needsRefresh: false';		
+			s+=',\n'+indent+' "needsRefresh": false';		
 		if (this.editor!==undefined)
-			s+=',\n'+indent+' editor:\n'+indent+' \t'+this.editor.serialize(indent+'\t',all);
+			s+=',\n'+indent+' "editor": '+this.editor.serialize(indent+'\t',all);
 		if (this.getContents() !== "" || all===true)
-			s+=',\n'+indent+' contents: '+this.getContents().toString().toProgramString();	
+			s+=',\n'+indent+' "contents": '+JSON.stringify(this.getContents());
 		s+="}";
 		return s; 
 	},
@@ -620,7 +629,6 @@ ViewClass={
 				lang.references[lang.references.length]=this;
 		}
 		switchLang(old,lang);
-		return;
 	},
 	setName:function(name) {
 		var oldName=this.name;
@@ -697,7 +705,7 @@ WorkspaceClass = {
 		if (view.workspace!==undefined) 
 			throw "View '"+view.name+"' already in workspace.";
 		i=this.views.indexOf(viewBefore);
-		i= (i>=0) ?	i++ : this.views.length;
+		i= (i>=0) ?	i+1 : this.views.length;
 		this.views.splice(i,0,view);
 		this.views[view.name]=view;
 		view.workspace=this;
@@ -859,9 +867,9 @@ WorkspaceClass = {
 		var i, s="{";
 		if (indent==undefined)
 			indent="";
-		s+='name: "'+this.name+'"';
+		s+='"name": "'+this.name+'"';
 		if (this.languages.length>0) {
-			s+=',\n'+indent+' languages: [\n'+indent+'\t';
+			s+=',\n'+indent+' "languages": [\n'+indent+'\t';
 			for (i=0; i<this.languages.length; i++) {
 				if (i!=0) s+=',\n'+indent+'\t';
 				s+=this.languages[i].serialize(indent+'\t',all);
@@ -869,7 +877,7 @@ WorkspaceClass = {
 			s+="]";
 		}
 		if (this.views.length>0) {
-			s+=',\n'+indent+' views: [\n'+indent+'\t';
+			s+=',\n'+indent+' "views": [\n'+indent+'\t';
 			for (i=0; i<this.views.length; i++) {
 				if (i!=0) s+=',\n'+indent+'\t';
 				s+=this.views[i].serialize(indent+'\t',all);
@@ -877,7 +885,7 @@ WorkspaceClass = {
 			s+="]";
 		}
 		if (this.currentView!==undefined) 
-			s+=',\n'+indent+' currentView: "'+this.currentView.name+'"';
+			s+=',\n'+indent+' "currentView": "'+this.currentView.name+'"';
 		s+="}";
 		return s; 
 	},

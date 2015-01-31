@@ -29,19 +29,18 @@ YUI({useBrowserconsole: true}).use('test', function (Y) {
 	var lolsTestCase = new Y.Test.Case({
 			name : "LoLs Test Case",
 			setUp : function () {
-					this.data = Workspace();
+					this.data = Workspace(EmptyWorkspace);
 			},
 			tearDown : function () {
 					delete this.data;
 			},
 			
 			testParse : function() {
-			    var genCode=applyLanguage(LoLs.languages["ometa"].code,'ometa text { doc = digit+ end}');
-    			eval(genCode);
-				
-					// Check top-level grammar constructs
-					text.matchAll('this is text', 'doc', undefined, 
-	  function(m, i) { Y.Assert.fail("Bad parse"); });
+					try {
+						this.data.views[0].refresh(true);
+			    } catch (e) {
+			    	Y.Assert.fail("Bad parse: "+e);
+			    }
 			}
 	});
 

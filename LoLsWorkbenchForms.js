@@ -1,124 +1,38 @@
 function setupForms() {
 	var e=document.getElementById('WorkbenchForms');
 	setupLanguageForm(e);
-	setupChangeForm(e);
-	setupOpenForm(e);
+	setupWorkspaceForm(e);
 	setupViewForm(e);
 }
 
 function setupLanguageForm(elem) {
-var str='<div id="langAdd">' +
+	var str='<div id="langForm">' +
 	'<div>' +
 	'	<form autocomplete="off">' +
-	'		Language Name:' + 
-	'		<input type="text" id="langAddName" value="Unnamed">' +
-	'		<br>' +
-	'		<input type="checkbox" id="langAddOutput" value="executable">Meta Language' +
-	'		<table id="langAddCode">' +
-	'			<tr>' +
-	'				<th>Grammar</th>' +
-	'				<th>Start Rule</th>' +		
-	'				<th>Input</th>' +
-	'				<th>View</th>' +
-	'			</tr>' +
-	'		</table>' +
-	'		<table id="langAddDecode">' +
-	'			<tr>' +
-	'				<th>Decode<br>Grammar</th>' +
-	'				<th>Start Rule</th>' +	
-	'				<th>Input</th>' +
-	'				<th>View</th>' +
-	'			</tr>' +
-	'		</table>' +
-	'		<fieldset id="grammarToAdd">' +
-	'			<legend>Grammar</legend>' +
-	'		  <button type="button" title="add grammar"' +
-	'		    onClick="addGrammar(\'langAdd\',\'grammarToAdd\')">+</button>' +
-	'		  Name:' +
-	'			<input type="text" name="name"">' +
-	'			<br>' +
-	'			from View:' +
-	'			<input type="text" name="defView">' +
-	'			<br>' +
-	'			Start Rule:' + 
-	'			<input type="text" name="startRule">' +
-	'			<br>' +
-	'			Flow:' +
-	'			<select name="flow">' +
-	'				<option value="code">code</option>' +
-	'				<option value="decode">decode</option>' +
-	'			</select>' +
-	'			Input:' +
-	'			<select name="input">' +
-	'				<option value="List">List</option>' +
-	'				<option value="Object">Object</option>' +
-	'			</select>' +	
-	'		</fieldset>' +
-	'		<br>' +
-	'		<button type="button" title="cancel" onClick="top.showHideForm(\'langAdd\')">' +
-	'			Cancel' +
-	'		</button>' +
-	'		<button type="button" title="add language" onClick="addLanguage(\'langAdd\')">' +
-	'			Add Language' +
-	'		</button>' +
-	'	</form>' +
-	'</div>' +
-  '</div>';
-	elem.insertAdjacentHTML("beforeend", str);
-}
-function setupOpenForm(elem) {
-	var str='<div id="OpenWorkspace">' +
-	'<div>' +
-	'	<form autocomplete="off">' +
-	'   <input id="localFile" type="file">' +
-	'		<br>' +
-	'		<button type="button" title="cancel" onClick="showHideForm(\'OpenWorkspace\')">' +
-	'			Cancel' +
-	'		</button>' +
-	'		<button type="button" title="new workspace" onClick="openNew()">' +
-	'			New' +
-	'		</button>'+
-	'		<button type="button" title="open workspace" onClick="openFile()">' +
-	'			Open' +
-	'		</button>'+
-	'	</form>' +
-	'</div>' +
-  '</div>';
-	elem.insertAdjacentHTML("beforeend", str);	
-}
-function setupChangeForm(elem) {
-var str='<div id="langChange">' +
-	'<div>' +
-	'	<form autocomplete="off">' +
-	'		<button id="deleteLanguage" type="button" title="delete language"' +
-	'			onClick="removeLanguage(\'langChange\')">' +
+	'		<h3>Language</h3>' +
+	'		<button id="deleteLang" type="button" title="delete language"' +
+	'			onClick="removeLanguage()">' +
 	'		  Delete Language' +
 	'		</button>' +
 	'		<br>' +
 	'		Language Name:' +
-	'		<input type="text" id="langChangeName">' +
+	'		<input type="text" id="langFormName" value="Unnamed" onchange="checkButtons()">' +
 	'		<br>' +
-	'		<input type="checkbox" id="langChangeOutput" value="executable">Meta Language' +
-	'		<table id="langChangeCode">' +
+	'		<input type="checkbox" id="langFormOutput">Meta Language' +
+	'		<table id="langFormCode">' +
 	'			<tr>' +
-	'				<th>Grammar</th>' +
-	'				<th>Start Rule</th>' +	
-	'				<th>Input</th>' +
-	'				<th>View</th>' +
+	'				<th>Grammar</th> <th>Start Rule</th> <th>Input</th> <th>View</th>' +
 	'			</tr>' +
 	'		</table>' +
-	'		<table id="langChangeDecode">' +
+	'		<table id="langFormDecode">' +
 	'			<tr>' +
-	'				<th>Decode<br>Grammar</th>' +
-	'				<th>Start Rule</th>' +	
-	'				<th>Input</th>' +
-	'				<th>View</th>' +
+	'				<th>Decode<br>Grammar</th> <th>Start Rule</th> <th>Input</th> <th>View</th>' +
 	'			</tr>' +
 	'		</table>' +
-	'		<fieldset id="grammarToChange">' +
+	'		<fieldset id="grammarToLang">' +
 	'			<legend>Grammar</legend>' +
 	'		  <button type="button" title="add grammar"' +
-	'		    onClick="addGrammar(\'langChange\',\'grammarToChange\')">+</button>' +
+	'		    onClick="addGrammar(\'langForm\',\'grammarToLang\')">+</button>' +
 	'			Name:' +
 	'			<input type="text" name="name">' +
 	'			<br>' +
@@ -140,21 +54,49 @@ var str='<div id="langChange">' +
 	'			</select>' +
 	'		</fieldset>' +
 	'		<br>' +
-	'		<button type="button" title="cancel" onClick="showHideForm(\'langChange\')">' +
+	'		<button type="button" title="cancel" onClick="hideForm(\'langForm\')">' +
 	'			Cancel' +
 	'		</button>' +
-	'		<button type="button" title="change language" onClick="changeLanguage(\'langChange\')">' +
-	'			Change Language' +
+	'		<button id="addLang" type="button" title="add language"' +
+	' 		onClick="addLanguage()">' +
+	'			Add Language' +
+	'		</button>' +
+	'		<button id="updateLang" type="button" title="update language"' +
+	' 		onClick="updateLanguage()">' +
+	'			Update Language' +
 	'		</button>' +
 	'	</form>' +
 	'</div>' +
   '</div>';
 	elem.insertAdjacentHTML("beforeend", str);
 }
+function setupWorkspaceForm(elem) {
+	var str='<div id="OpenWorkspace">' +
+	'<div>' +
+	'	<form autocomplete="off">' +
+	'		<h3>Open Workspace</h3>' +
+	'   <input id="localFile" type="file" onchange="enableButton(\'openFormButton\')">' +
+	'		<br><br><hr>' +
+	'		<button type="button" title="cancel" onClick="hideForm(\'OpenWorkspace\')">' +
+	'			Cancel' +
+	'		</button>' +
+	'		<button type="button" title="new workspace" onClick="openNew()">' +
+	'			New' +
+	'		</button>'+
+	'		<button id="openFormButton" type="button" title="open workspace"'+
+	'     onClick="openFile()" disabled>' +
+	'			Open' +
+	'		</button>'+
+	'	</form>' +
+	'</div>' +
+  '</div>';
+	elem.insertAdjacentHTML("beforeend", str);	
+}
 function setupViewForm(elem) {
 var str='<div id="openView">' +
 	'<div>' +
 	'	<form>' +
+	'		<h3>View</h3>' +
 	'		Name:' +
 	'		<input type="text" id="openViewName" value="Unnamed">' +
 	'		<br>' +
@@ -172,7 +114,7 @@ var str='<div id="openView">' +
 	'		<br>' +
 	'		<input type="checkbox" id="openViewGutters">Gutters' +
 	'		<br>' +
-	'		<button type="button" title="cancel" onClick="showHideForm(\'openView\')">' +
+	'		<button type="button" title="cancel" onClick="hideForm(\'openView\')">' +
 	'			Cancel' +
 	'		</button>' +
 	'		<button type="button" title="update view" onClick="updateView()">' +
@@ -186,55 +128,26 @@ var str='<div id="openView">' +
 	'</div>';
 	elem.insertAdjacentHTML("beforeend", str);
 }
-function showHideForm(id) {
+function enableButton(id) {
+	var e=document.getElementById(id);
+	e.disabled=false;
+}
+function disableButton(id) {
+	var e=document.getElementById(id);
+	e.disabled=true;
+}
+function showForm(id) {
 	var el = document.getElementById(id);
-	el.style.visibility = (el.style.visibility == "visible") ? "hidden" : "visible";
+	el.style.visibility = "visible";
 }
-function openForm(id) {
-	if (LoLs !== undefined && LoLs.unsaved) {
-    if (!confirm("Abandon the current workspace changes?"))
-    	return;
-  };	
-	showHideForm(id);
-}
-function openFile() {
-	var f=document.getElementById("localFile").files[0], r=new FileReader();
-	if (f === undefined || f === null) {
-		alert("Must select file to open");
-		return;
-	}
-	if (LoLs !== undefined && LoLs.unsaved) {
-    if (!confirm("Abandon the current workspace changes?"))
-    	return;
-  };
-	r.onloadend = function (evt) {
-    openWorkspace(eval(evt.target.result));
-    showHideForm('OpenWorkspace');
-  }
-  function errorHandler(evt) {
-        switch (evt.target.error.code) {
-            case evt.target.error.NOT_FOUND_ERR:
-                alert("File Not Found!");
-                break;
-            case evt.target.error.NOT_READABLE_ERR:
-                alert("File is not readable");
-                break;
-            case evt.target.error.ABORT_ERR:
-                break; // noop
-            default:
-                alert("An error occurred reading this file.");
-        };
-  }
-	r.onerror = errorHandler;
-  r.readAsText(f);
-}
-function openNew() {
-	openWorkspace();
-	showHideForm('OpenWorkspace');
+function hideForm(id) {
+	var el = document.getElementById(id);
+	el.style.visibility = "hidden";
 }
 function addGrammar(form,gid) {
-  var str, t, g = document.getElementById(gid), elem = [], grammarData=[];
-  for (var i = 0; i < g.elements.length ;i++) {
+  var i, str, t, elem = [], grammarData=[],
+  		g=document.getElementById(gid);
+  for (i=0; i<g.elements.length ;i++) {
     if (g.elements[i].name) {
     	grammarData[g.elements[i].name] = g.elements[i].value;
     	elem[g.elements[i].name]=g.elements[i];
@@ -245,8 +158,9 @@ function addGrammar(form,gid) {
 			elem["name"].value += " error";
 			elem["name"].focus();
 			return;
-    };
+    }
   } else {
+		elem["name"].value += " name required";
   	elem["name"].focus();
   	return;
   };
@@ -263,6 +177,7 @@ function addGrammar(form,gid) {
 			return;
     };
   } else {
+		elem["startRule"].value += " start rule required";
   	elem["startRule"].focus();
   	return;
   };
@@ -293,232 +208,179 @@ function deleteGrammar(here) {
 	var row=here.parentNode.parentNode;
 	row.parentNode.removeChild(row);
 }
-function addLanguage(id) {
-	var i, elem=document.getElementById(id+'Name'), lang, view;	
-	lang=pullLangInfo('langAdd');
-	if (lang.name == '') {
-		elem.value += 'needs value';
-		elem.focus();
-		return;
-	};
-	if (LoLs.languages[lang.name] !== undefined) {
-		elem.value += ' already defined';
-		elem.focus();
-		return;
-	};
-	if (lang.code.length<1) {
-		elem.value += ' at least one code grammar';
-		elem.focus();
-		return;
-	};
-	for (i=0; i<lang.code.length; i++) {
-		view=lang.code[i].defView;
-		if (view.langDefs.indexOf(lang)<0)
-			view.langDefs[view.langDefs.length]=lang;
+function pullLangInfo() {
+	var info;
+	function pullGrammarInfo(tableName) {
+		var i, r, info=[],
+				table=document.getElementById(tableName),
+				rows=table.getElementsByTagName("tr");
+		for (i=1; i<rows.length; i++) {
+			r=rows[i].getElementsByTagName("td");
+			info[info.length]=
+				{name: r[0].textContent,
+			 	 startRule: r[1].textContent,
+			 	 makeList: (r[2].textContent=="Object"),
+			 	 defView: r[3].textContent};
+		}
+		return info;
 	}
-	for (i=0; i<lang.decode.length; i++) {
-		view=lang.decode[i].defView;
-		if (view.langDefs.indexOf(lang)<0)
-			view.langDefs[view.langDefs.length]=lang;
+	info={name: document.getElementById('langFormName').value,
+				meta: document.getElementById('langFormOutput').checked};
+	info.code=pullGrammarInfo('langFormCode');
+	info.decode=pullGrammarInfo('langFormDecode');	
+	return info;
+}
+function addLanguage() {
+	var lang;	
+	try {
+		lang=pullLangInfo();
+		if (lang.code.length<1) 
+			throw ' at least one code grammar';
+		Language(lang,LoLs);
+	} catch (e) {
+		alert(e);
+		return;
 	}
-	LoLs.languages[LoLs.languages.length]=lang;
-	LoLs.languages[lang.name]=lang;
-	createLangRibbon(); 
-  showHideForm(id);  
+	createLangRibbon(LoLs.languageNames()); 
+  hideForm('langForm');  
 	if (LoLs.currentView !== undefined)
-		document.getElementById(LoLs.currentView.id).editor.focus(); 
+		LoLs.currentView.focus(true); 
 }
-function pullLangInfo(pre) {
-	var i, elem=document.getElementById(pre+'Name'), checked, table, rows, g;
-	var lang={name: elem.value,
-		code: [],
-		decode: [],
-		references: []};
-	checked=document.getElementById(pre+'Output').checked;
-	table=document.getElementById(pre+'Code');
-	rows=table.getElementsByTagName("tr");
-	for (i=1; i<rows.length; i++) {
-		g=rows[i].getElementsByTagName("td");
-		g={name: g[0].textContent,
-		 rules: eval(g[0].textContent),
-		 startRule: g[1].textContent,
-		 language: lang,
-		 inputIsList: g[2].textContent,
-		 defView: g[3].textContent};
-		if (g.inputIsList == "List") {
-		  g.inputIsList=true;
-		} else {
-		  g.inputIsList=false;
-		};
-		lang.code[lang.code.length]=g;
-		if (g.defView == "") {
-			g.defView=undefined;
-		} else {
-			g.defView=LoLs.views[g.defView];
-		};	 
-	};
-	table=document.getElementById(pre+'Decode');
-	rows=table.getElementsByTagName("tr");
-	for (i=1; i<rows.length; i++) {
-		g=rows[i].getElementsByTagName("td");
-		g={name: g[0].textContent,
-		 rules: eval(g[0].textContent),
-		 startRule: g[1].textContent,
-		 language: lang,
-		 inputIsList: g[2].textContent,
-		 defView: g[3].textContent};
-		if (g.inputIsList == "List") {
-		  g.inputIsList=true;
-		} else {
-		  g.inputIsList=false;
-		};
-		lang.decode[lang.decode.length]=g;		 
-		if (g.defView == "") {
-			g.defView=undefined;
-		} else {
-			g.defView=LoLs.views[g.defView];
-		};	 
-	};
-	if (checked && lang.code.length>=1)
-		lang.code[lang.code.length-1].evalResults=true;
-	return lang;
-}
-function removeLanguage(id) {
-	var form=document.getElementById('langChangeName');
-	removeLanguageObj(LoLs.languages[form.value]);
-	createLangRibbon();
-  showHideForm(id);  
-	if (LoLs.currentView)
-		document.getElementById(LoLs.currentView.id).editor.focus(); 
-}
-function removeLanguageObj(langObj) {
-	var view;
-	if (langObj === undefined)
+function removeLanguage() {
+	var name;
+	try {
+		name=document.getElementById('langFormName').value;
+		LoLs.removeLanguage(name);
+	} catch (e) {
+		alert(e);
 		return;
-	if (langObj.references.length>0)
-		return;
-	for (var i=0; i<langObj.code.length; i++) {
-		if (langObj.code[i].defView !== undefined) {
-			view=langObj.code[i].defView;
-			view.grammarDefs=view.grammarDefs.filter(function(x) {return x !== langObj.code[i]});
-			view.langDefs=view.langDefs.filter(function(x) {return x !== langObj});
-		};
-	};
-	for (var i=0; i<langObj.decode.length; i++) {
-		if (langObj.decode[i].defView !== undefined) {
-			view=langObj.decode[i].defView;
-			view.grammarDefs=view.grammarDefs.filter(function(x) {return x !== langObj.code[i]});
-			view.langDefs=view.langDefs.filter(function(x) {return x !== langObj});
-		};
-	};
-	LoLs.languages=LoLs.languages.filter(function (x) {return x !== langObj});
-	for (var i=0; i<LoLs.languages.length; i++) {
-		LoLs.languages[LoLs.languages[i].name]=LoLs.languages[i];
-	};
+	}
+	createLangRibbon(LoLs.languageNames());
+  hideForm('langForm');  
+	if (LoLs.currentView!==undefined)
+		LoLs.currentView.focus(true); 
 }
-var OLDLang;
-function changeLanguage(id) {
-	var elem=document.getElementById('langChangeName'), lang, 
-		refs=LoLs.currentLanguage.references, view;
-	var i;
-  lang=pullLangInfo('langChange');
-	if (lang.name == '') {
-		elem.value += 'needs value';
-		elem.focus();
+function updateLanguage() {
+	var oldName, lang;	
+	try {
+		oldName=document.getElementById('langForm').name;
+		lang=pullLangInfo();
+		if (lang.code.length<1) 
+			throw ' at least one code grammar';
+		LoLs.languages[oldName].deserialize(lang);
+	} catch (e) {
+		alert(e);
 		return;
-	};
-	if (lang.code.length<1) {
-		elem.value += ' at least one code grammar';
-		elem.focus();
+	}
+	createLangRibbon(LoLs.languageNames()); 
+  hideForm('langForm');  
+	if (LoLs.currentView !== undefined)
+		LoLs.currentView.focus(true); 
+}
+function languageForm(name) {
+  var i, lang, elem, rows, str, inputOption, view;
+  function pushLangInfo(lang) {
+  	var i;
+  	function pushGrammarInfo(grammars,tableName) {
+			var i, str='', dataType, defView,
+					table=document.getElementById(tableName),
+					rows=table.getElementsByTagName("tr");
+			for (i=rows.length-1; i>0; i--) 
+					rows[i].parentNode.removeChild(rows[i]);
+			for (i=0; i<grammars.length; i++) {
+				dataType=(grammars[i].makeList) ? "Object" : "List";
+				defView=(grammars[i].defView===undefined) ? '' : grammars[i].defView.name;
+				str+='<tr><td>'+grammars[i].name+'</td>'+
+								 '<td>'+grammars[i].startRule+'</td>'+		
+								 '<td>'+dataType+'</td>'+		
+								 '<td>'+defView+'</td>'+		
+								'<td><button type="button" title="delete grammar"'+
+								' onclick="deleteGrammar(this)">X</button></td></tr>';
+			}
+			table.insertAdjacentHTML("beforeend", str);
+		}
+  	document.getElementById('langFormName').value=lang.name;
+  	document.getElementById('langFormOutput').checked=lang.meta;
+  	pushGrammarInfo(lang.code,'langFormCode');
+  	pushGrammarInfo(lang.decode,'langFormDecode');
+  }
+	elem=document.getElementById('langForm');
+  if (name!==undefined) {
+		lang=LoLs.languages[name];
+		elem.name=lang.name;
+		pushLangInfo(lang);
+	}
+	checkButtons();
+	showForm('langForm');
+}
+function checkButtons() {
+	var lang, elem;
+	lang=LoLs.languages[document.getElementById('langFormName').value];
+	if (lang!==undefined) {
+		elem=document.getElementById('deleteLang');
+		elem.disabled=lang.references.length>0;
+		document.getElementById('addLang').disabled=true;
+		document.getElementById('updateLang').disabled=false;
+	}
+	else {
+		document.getElementById('deleteLang').disabled=true;
+		document.getElementById('addLang').disabled=false;
+		document.getElementById('updateLang').disabled=true;
+	}
+}
+function openWorkspaceForm() {
+	if (LoLs !== undefined && LoLs.unsaved) {
+    if (!confirm("Abandon the current workspace changes?"))
+    	return;
+  };	
+	showForm('OpenWorkspace');
+}
+function openFile() {
+	var f=document.getElementById("localFile").files[0], reader=new FileReader();
+	if (f === undefined || f === null) {
+		alert("Must select file to open");
 		return;
-	};
-  OLDLang.references=[];
-  removeLanguageObj(OLDLang);
-	for (i=0; i<lang.code.length; i++) {
-		view=lang.code[i].defView;
-		if (view.langDefs.indexOf(lang)<0)
-			view.langDefs[view.langDefs.length]=lang;
-	};
-	for (i=0; i<lang.decode.length; i++) {
-		view=lang.decode[i].defView;
-		if (view.langDefs.indexOf(lang)<0)
-			view.langDefs[view.langDefs.length]=lang;
-	};
-	for (i=0; i<refs.length; i++) {
-		view=refs[i];
-		view.language=lang;
-		view.references[view.references.length]=view;
-	};
-	LoLs.languages[LoLs.languages.length]=lang;
-	LoLs.languages[lang.name]=lang;
-	createLangRibbon(); 
-  showHideForm(id);  
-	if (LoLs.currentView)
-		document.getElementById(LoLs.currentView.id).editor.focus();   
+	}
+	reader.onloadend = function (evt) {
+		var info;
+		try {
+			info=JSON.parse(evt.target.result);
+    	openWorkspace(info);
+		} catch (e) {
+			alert("Error in file: "+e);
+			return;
+		}
+    hideForm('OpenWorkspace');
+  }
+  function errorHandler(evt) {
+        switch (evt.target.error.code) {
+            case evt.target.error.NOT_FOUND_ERR:
+                alert("File Not Found!");
+                break;
+            case evt.target.error.NOT_READABLE_ERR:
+                alert("File is not readable");
+                break;
+            case evt.target.error.ABORT_ERR:
+                break; // noop
+            default:
+                alert("An error occurred reading this file.");
+        };
+  }
+	reader.onerror = errorHandler;
+  reader.readAsText(f);
 }
-function languageUpdateForm(lang) {
-  var i, langObj, elem, rows, str, inputOption, view;
-	langObj=LoLs.languages[lang];
-	OLDLang=langObj;
-	elem=document.getElementById('deleteLanguage');
-	elem.disabled=langObj.references.length>0;
-	elem=document.getElementById('langChangeName');
-	elem.value=langObj.name;
-	elem=document.getElementById('langChangeOutput');
-	elem.checked=(langObj.code[langObj.code.length-1].evalResults == true);
-	elem=document.getElementById('langChangeCode');
-	rows=elem.getElementsByTagName("tr");
-	for (i=rows.length-1; i>0; i--) {
-		rows[i].parentNode.removeChild(rows[i]);
-	};
-	for (i=0; i<langObj.code.length; i++) {
-		if (langObj.code[i].inputIsList) {
-			inputOption = "List";
-		} else {
-			inputOption = "Object";
-		};
-		view = '';
-		if (langObj.code[i].defView!==undefined)
-			view=langObj.code[i].defView.name;
-		str ='<tr><td>'+langObj.code[i].name+'</td>'+
-			 '<td>'+langObj.code[i].startRule+'</td>'+		
-			 '<td>'+inputOption+'</td>'+		
-			 '<td>'+view+'</td>'+		
-			'<td><button type="button" title="delete grammar"'+
-			' onclick="deleteGrammar(this)">X</button></td></tr>';
-		elem.insertAdjacentHTML("beforeend", str);
-	};
-	elem=document.getElementById('langChangeDecode');
-	rows=elem.getElementsByTagName("tr");
-	for (i=rows.length-1; i>0; i--) {
-		rows[i].parentNode.removeChild(rows[i]);
-	};
-	for (i=0; i<langObj.decode.length; i++) {
-		if (langObj.decode[i].inputIsList) {
-			inputOption = "List";
-		} else {
-			inputOption = "Object";
-		};
-		view = '';
-		if (langObj.decode[i].defView!==undefined)
-			view=langObj.decode[i].defView.name;
-		str ='<tr><td>'+langObj.decode[i].name+'</td>'+
-			 '<td>'+langObj.decode[i].startRule+'</td>'+		
-			 '<td>'+inputOption+'</td>'+		
-			 '<td>'+view+'</td>'+		
-			'<td><button type="button" title="delete grammar"'+
-			' onclick="deleteGrammar(this)">X</button></td></tr>';
-		elem.insertAdjacentHTML("beforeend", str);
-	};   
-	showHideForm('langChange');
+function openNew() {
+	openWorkspace();
+	hideForm('OpenWorkspace');
 }
-var OLDView;
 function openView(id) {
-	var i, v, n=document.getElementById(id).getAttribute("name"), str='', lang, elem, list;
-	v=LoLs.views[n];
-	OLDView=v;
-	document.getElementById('openViewName').value=v.name;
-	document.getElementById('openViewInput').value=v.inputView.name;
+	var i,lang, elem, list, str='',
+			name=document.getElementById(id).getAttribute("name"),
+			view=LoLs.views[name];
+	// TODO: position form visible on screen
+	document.getElementById('openView').name=view.name;
+	document.getElementById('openViewName').value=view.name;
+	document.getElementById('openViewInput').value=view.inputView.name;
 	list=LoLs.languageNames();
 	for (i=0; i<list.length; i++) {
 		lang=list[i];
@@ -527,119 +389,68 @@ function openView(id) {
 	elem=document.getElementById('openViewLang');
 	elem.innerHTML="";
 	elem.insertAdjacentHTML('beforeend',str);
-	elem.value=OLDView.language.name;
-	document.getElementById('openViewHeight').value=
-		v.editor.height.substring(0,v.editor.height.length-2);
-	document.getElementById('openViewReadonly').checked=v.editor.readOnly;
-	document.getElementById('openViewGutters').checked=v.editor.gutters;
-  showHideForm('openView');
+	elem.value=view.language.name;
+	str=view.editor.height.substring(0,view.editor.height.length-2);
+	document.getElementById('openViewHeight').value=str;
+	document.getElementById('openViewReadonly').checked=view.editor.readOnly;
+	document.getElementById('openViewGutters').checked=view.editor.gutters;
+  showForm('openView');
 }
 function addView() {
-	var i, thisView, view, name, value, e, list;
-	name=document.getElementById('openViewName').value;
-	if (name == undefined || name == "" || LoLs.views[name] !== undefined)
-		return;
-	value=document.getElementById('openViewHeight').value;
+	var view, beforeView, value, n;
 	try {
-		e=Number(value);
-		if (e<10 || e>1000)
-			throw "out of range";
+		beforeView=document.getElementById('openView').name;
+		beforeView=LoLs.views[beforeView];
+		value=document.getElementById('openViewHeight').value;
+		n=Number(value);
+		if (Math.round(n)!=n)
+			throw "height must be a whole number.";
+		if (n<10 || n>1000)
+			throw "view height must be 10 to 1000.";
+		view= {
+			name: document.getElementById('openViewName').value,
+			editor: 
+				{name: "ACE", 
+				 height: value+"px", 
+				 gutters: document.getElementById('openViewGutters').checked, 
+				 readOnly: document.getElementById('openViewReadonly').checked},   				 
+			 language: document.getElementById('openViewLang').value,
+			 inputView: document.getElementById('openViewInput').value};
+		view=View(view,LoLs,beforeView);
+		createView(view,beforeView.id);
+		view.focus(true);
 	} 
 	catch (e) {
-		alert("view height must be 10 to 1000.");
+		alert(e);
 		return;
-	}; 
-	view= {
-		name: name,
-		id: genLocalId(name),
-	 	editorProperties: 
-			{name: "ACE editor", 
-			 height: value+"px", 
-			 gutters: document.getElementById('openViewGutters').checked, 
-			 readOnly: document.getElementById('openViewReadonly').checked},   				 
-		 changed: true,
-		 language: LoLs.languages[document.getElementById('openViewLang').value],
-		 inputView: document.getElementById('openViewInput').value,
-		 contents: "",
-		 references: [],
-		 langDefs: [],
-		 grammarDefs: []};
-	view.language.references[view.language.references.length]=view;
-  if (view.inputView=="" || view.name==view.inputView) {
-  	view.inputView=view.name;
-  }; 
-  view.inputView=LoLs.views[view.inputView];
-  if (view.inputView===undefined) {
-  	view.inputView=view;
-  };
-	list=LoLs.views;
-	LoLs.views=[];
-	for (i=0; i<list.length; i++) {
-		LoLs.views[LoLs.views.length]=list[i];
-		LoLs.views[list[i].name]=list[i];
-		if (list[i]===OLDView) {
-			LoLs.views[LoLs.views.length]=view;
-			LoLs.views[view.name]=view;	
-		};
-	};
-	// TODO: position dialog box
-  thisView=createACEeditor(view.name,view.id,
-    view.editorProperties.height,
-    view.editorProperties.gutters,
-    view.editorProperties.readOnly,
-    view.contents,
-    OLDView.id);
-  view.changeFn=function(e) {viewChanged(this[0].myView);};
-  view.changeFn.myView=view;
-  thisView.on('change', view.changeFn);
-  view.focusFn=function() {viewFocus(this[0].myView);};
-  view.focusFn.myView=view;
-  thisView.on('focus', view.focusFn);
-  view.changed=true;
-  refreshView(name);
-  thisView.focus(); 
-  showHideForm('openView');  
+	} 
+  hideForm('openView');  
 }
 function updateView() {
-	var name, value, e, lang;
-	name=document.getElementById('openViewName').value;
-	if (name == undefined || name =="")
-		return;
-	value=document.getElementById('openViewHeight').value;
+	var oldName, value, n, view;
 	try {
-		e=Number(value);
-		if (e<10 || e>1000)
-			throw "out of range";
+		oldName=document.getElementById('openView').name;
+		value=document.getElementById('openViewHeight').value;
+		n=Number(value);
+		if (Math.round(n)!=n)
+			throw "height must be a whole number.";
+		if (n<10 || n>1000)
+			throw "view height must be 10 to 1000.";
+		view= {
+			name: document.getElementById('openViewName').value,
+			editor: 
+				{name: "ACE", 
+				 height: value+"px", 
+				 gutters: document.getElementById('openViewGutters').checked, 
+				 readOnly: document.getElementById('openViewReadonly').checked},   				 
+			 language: document.getElementById('openViewLang').value,
+			 inputView: document.getElementById('openViewInput').value};
+		view=LoLs.views[oldName].deserialize(view);
+		view.focus(true);
 	} 
 	catch (e) {
-		alert("view height must be 10 to 1000.");
+		alert(e);
 		return;
-	}; 
-  LoLs.views[OLDView.name]=undefined;
-  OLDView.name=name;
-  LoLs.views[OLDView.name]=OLDView;
-  OLDView.inputView=document.getElementById('openViewInput').value;
-  if (OLDView.inputView=="" || OLDView.name==OLDView.inputView) {
-  	OLDView.inputView=OLDView.name;
-  }; 
-  OLDView.inputView=LoLs.views[OLDView.inputView];
-  if (OLDView.inputView===undefined) {
-  	OLDView.inputView=OLDView;
-  };
-  lang=LoLs.languages[document.getElementById('openViewLang').value];
-  OLDView.editorProperties.height=value+"px";
-  OLDView.editorProperties.readOnly=document.getElementById('openViewReadonly').checked;
-  OLDView.editorProperties.gutters=document.getElementById('openViewGutters').checked;
-  e=document.getElementById(OLDView.id);
-	e.style.height=OLDView.editorProperties.height;
-	e=e.editor;
-  e.renderer.setShowGutter(OLDView.editorProperties.gutters);
-  e.setReadOnly(OLDView.editorProperties.readOnly);
-	document.getElementById(OLDView.id+"ViewName").textContent=OLDView.name+" ";
-  showHideForm('openView');
-  if (OLDView.language!==lang) {
-  	OLDView.language=lang;
-  	reviewView(OLDView.name);
-  };
-	e.focus(); 
+	} 
+  hideForm('openView');  
 }

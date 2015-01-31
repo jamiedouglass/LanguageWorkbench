@@ -1,60 +1,57 @@
-{name: "Getting Started",		
- languages: [
-		{name: "ometa",
-		 meta: true,
-		 code: [
-			 {name: "BSOMetaJSParser",
-				startRule: "topLevel"},
-			 {name: "BSOMetaJSTranslator",
-				startRule: "trans",
-				makeList: true}]},
- 		{name: "math",
-		 code: [
-			 {name: "math",
-    		startRule: "expression",
-        defView: "Grammar"}]},
- 		{name: "calculate",
-		 code: [
-			 {name: "calculate",
-    		startRule: "le",
-    		makeList: true,
-        defView: "Grammar"}]},
- 		{name: "LET",
-		 code: [
-			 {name: "LET",
-    		startRule: "let",
-    		makeList: true,
-        defView: "Grammar"}]},
- 		{name: "raw",
-		 code: [
-			 {name: "raw",
-    		startRule: "it",
-        defView: "Grammar"}]}],	
- views: [
-		{name: "Read Me First",	
-		 editorProperties: 
-			 {name: "ACE editor", height: "100px", gutters: false, readOnly: true},   				 
-		 language: "raw",
-		 contentsURL: "getting-welcome-getting-started.txt"},
-		{name: "Math Problem",	
-		 editorProperties: 
-			 {name: "ACE editor", height: "60px", gutters: false, readOnly: false},   				 
-		 language: "math",
-		 contents: "2+3*4"},
-		{name: "Answer",	
-		 editorProperties: 
-			 {name: "ACE editor", height: "60px", gutters: false, readOnly: true},   				 
-		 language: "calculate",
-		 inputView: "Math Problem"},
-		{name: "LET Explorer",	
-		 editorProperties: 
-			 {name: "ACE editor", height: "200px", gutters: false, readOnly: true},   				 
-		 language: "LET",
-		 inputView: "Math Problem"},
-		{name: "Grammar",	
-		 editorProperties: 
-			 {name: "ACE editor", height: "250px", gutters: true, readOnly: false},   				 
-		 language: "ometa",
-		 contentsURL: 	"grammar-getting-started.ometa"}],
- currentView: "Math Problem"}			
- 
+{"name": "Getting Started",
+ "languages": [
+	{"name": "ometa",
+	 "meta": true,
+	 "code": [
+		{"name": "BSOMetaJSParser",
+		 "startRule": "topLevel"},
+		{"name": "BSOMetaJSTranslator",
+		 "startRule": "trans",
+		 "makeList": true}]},
+	{"name": "math",
+	 "code": [
+		{"name": "math",
+		 "startRule": "expression",
+		 "defView": "Grammar"}]},
+	{"name": "calculate",
+	 "code": [
+		{"name": "calculate",
+		 "startRule": "le",
+		 "makeList": true,
+		 "defView": "Grammar"}]},
+	{"name": "LET",
+	 "code": [
+		{"name": "LET",
+		 "startRule": "let",
+		 "makeList": true,
+		 "defView": "Grammar"}]},
+	{"name": "raw",
+	 "code": [
+		{"name": "raw",
+		 "startRule": "it",
+		 "defView": "Grammar"}]}],
+ "views": [
+	{"name": "Read Me First",
+	 "language": "raw",
+	 "editor": {"name": "ACE", "height": "100px", "readOnly": true},
+		 "contentsFile": "getting-welcome-getting-started.txt"},
+	{"name": "Math Problem",
+	 "language": "math",
+	 "editor": {"name": "ACE"},
+	 "contents": "2+3*4"},
+	{"name": "Answer",
+	 "language": "calculate",
+	 "inputView": "Math Problem",
+	 "editor": {"name": "ACE", "readOnly": true},
+	 "contents": "14"},
+	{"name": "LET Explorer",
+	 "language": "LET",
+	 "inputView": "Math Problem",
+	 "editor": {"name": "ACE", "height": "200px", "readOnly": true},
+	 "contents": ".+. Add\n  2 Number\n  .*. Multiply\n    3 Number\n    4 Number\n"},
+	{"name": "Grammar",
+	 "language": "ometa",
+	 "editor":
+	 	{"name": "ACE", "height": "250px", "gutters": true},
+		 "contentsFile": 	"grammar-getting-started.ometa"}],
+ "currentView": "Math Problem"} 

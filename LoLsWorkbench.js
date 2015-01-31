@@ -5,17 +5,61 @@ window.onbeforeunload = function() {
 }
 
 // functions for page
+function getStyle(e,styleProp) {
+  if (e.currentStyle) {
+    return e.currentStyle[styleProp];
+  } else if (document.defaultView && document.defaultView.getComputedStyle) {
+    return document.defaultView.getComputedStyle(e,null).getPropertyValue(styleProp);
+  } else {
+    return e.style[styleProp]; 
+  }
+}
+function inputSize(elem, pad) {
+	var font, value=elem.value, e=document.getElementById('measure');
+	if (value===undefined)
+		value=' ';
+	if (pad===undefined)
+		pad=0;
+	e.style.font=getStyle(elem,'font');
+	e.textContent=value;
+	elem.style.width=e.clientWidth+pad+'px';
+}
+function setWorkspaceName(elem) {
+	var name=elem.value;
+	inputSize(elem);
+	if (LoLs.name == name)
+		return;
+	try {
+		LoLs.setName(name);
+	} catch (e) {
+		alert(e);
+	}
+}
+function setViewName(elem) {
+	var oldName=elem.name, name=elem.value;
+	inputSize(elem);
+	if (name == oldName)
+		return;
+	try {
+			LoLs.renameView(oldName,name);
+			elem.name=name;
+	} catch (e) {
+		alert(e);
+		elem.name=oldName;
+		elem.value=oldName;
+		inputSize(elem);
+	}
+}
 function closeView(id) {
 	var v, e=document.getElementById(id);
 	if (LoLs.views.length<=1) {
 		alert("Workspace must have at least one view");
 		return;
 	}
-	v=LoLs.views[e.getAttribute("name")];
 	try {
-		v.delete();
-	} catch (e) {
-		alert(e);
+		LoLs.views[e.getAttribute("name")].delete();
+	} catch (err) {
+		alert(err);
 		return;
 	}
 	e.parentNode.removeChild(e);	
@@ -36,13 +80,17 @@ function createView(view,beforeId) {
   if (beforeId===undefined) {
   	beforeId="ViewArea";
   	m="beforeend";
-  };
+  }
+  else 
+  	beforeId+="View";
   document.getElementById(beforeId).insertAdjacentHTML(m,
 	'<div id="'+id+'View" class="LoLsView" name="'+name+'">' +
 	'	<div class="LoLsViewTitle">' +
-	'	  <input id ="'+ id +'Button" type="button" title="collapse" value="-" ' +
+	'	  <input id ="'+ id +'Button" type="button" title="collapse" value="-"' +
 	'			onClick="showOrHide(\''+ id +'\',this)">' +
-	'	  <scan id="'+id+'ViewName">'+ name +' </scan><i>view</i>' +
+	'	  <input id="'+id+'ViewName" class="LoLsViewName" name="'+name+'"'+
+	'     type="text" oninput="inputSize(this,10)"' +
+	'  	  onblur="setViewName(this)" value="'+name+'">&thinsp;<i>view</i>' +
 	'	  <button type="button" title="open view" onClick="openView(\''+id+'View\')">' +
 	'			<img src="images/open-view.png" alt="Open View">' +
 	'	  </button>' +
@@ -58,25 +106,25 @@ function createView(view,beforeId) {
 	'	</div>' +
 	'</div>'); 
 	view.createEditor(id);
+	inputSize(document.getElementById(id+'ViewName'));
 }
 function openWorkspace(info) {
-	var i;
-  document.getElementById('ViewArea').innerHTML="";  
-  LoLs=Workspace(info);
-	if (info===undefined) {
-		LoLs.createLanguage();
-		LoLs.createView('Unnamed');
-		LoLs.views['Unnamed'].setLanguage('ometa');
-		LoLs.currentView=LoLs.views['Unnamed'];
-	}
-  document.getElementById('WorkspaceName').textContent=LoLs.name+' ';
+	var i, e;
+  document.getElementById('ViewArea').innerHTML=""; 
+	if (info===undefined)
+		LoLs=Workspace(EmptyWorkspace);
+	else
+  	LoLs=Workspace(info);
+  e=document.getElementById('WorkspaceName')
+  e.value=LoLs.name;
+  inputSize(e);
   createLangRibbon(LoLs.languageNames());
   for (i=0; i<LoLs.views.length; i++) 
   	createView(LoLs.views[i]);
   // TODO: load grammar rules without refreshing
   LoLs.refreshAll(true);
-  
-  LoLs.unsaved=false;
+  if (info!==undefined)
+  	LoLs.unsaved=false;
 	LoLs.currentView.focus(true);
 }
 function refreshAll() {
@@ -109,127 +157,27 @@ function refreshView(viewName) {
   		alert(e);
   }
 }
-function saveWorkspace(id) {
-  var f=new Blob([LoLs.serialize()],{type: 'text/plain'}),
-  	  l=document.createElement('a');
-  l.setAttribute('href',window.URL.createObjectURL(f));
-  l.setAttribute('download', LoLs.name+'.txt');
-  l.click();
+function saveWorkspace() {
+  var d=new Blob([LoLs.serialize()],{type: 'text/plain'}),
+  	  e=document.createElement('a');
+  e.setAttribute('href',window.URL.createObjectURL(d));
+  e.setAttribute('download', LoLs.name+'.txt');
+  e.click();
+  LoLs.unsaved=false;
 }
-function setLanguage(lang) {
+function setLanguage(name) {
   if (event.altKey) 
-    return languageUpdateForm(lang);
-  LoLs.currentView.setLanguage(lang);
-  LoLs.currentView.changed();
-  LoLs.currentView.refresh();
-  document.getElementById(LoLs.currentView.id).editor.focus();
+    return languageForm(name);
+  if (LoLs.currentView!==undefined) {
+  	LoLs.currentView.setLanguage(name);
+		LoLs.currentView.changed();
+		LoLs.currentView.refresh();
+  	document.getElementById(LoLs.currentView.id).editor.focus();
+  }
 }
 function setupPage() {
-	var gs={name: "Getting Started",
- languages: [
-	{name: "ometa",
-	 meta: true,
-	 code: [
-		{name: "BSOMetaJSParser",
-		 startRule: "topLevel"},
-		{name: "BSOMetaJSTranslator",
-		 startRule: "trans",
-		 makeList: true}]},
-	{name: "math",
-	 code: [
-		{name: "math",
-		 startRule: "expression",
-		 defView: "Grammar"}]},
-	{name: "calculate",
-	 code: [
-		{name: "calculate",
-		 startRule: "le",
-		 makeList: true,
-		 defView: "Grammar"}]},
-	{name: "LET",
-	 code: [
-		{name: "LET",
-		 startRule: "let",
-		 makeList: true,
-		 defView: "Grammar"}]},
-	{name: "raw",
-	 code: [
-		{name: "raw",
-		 startRule: "it",
-		 defView: "Grammar"}]}],
- views: [
-	{name: "Read Me First",
-	 editor:
-	 	{name: "ACE", height: "100px", readOnly: true},
-	 language: "raw",
-	 contents: "Welcome to the Language Workbench for Language of Languages (LoLs).\n"+
-	 "Select a workspace and interact with it using the language areas below.\n"+
-	 "Each area displays the workspace according to a selected language.\n"+
-	 "Changes in one area update all other areas and the Language Element\n"+
-	 "Tree (LET) which defines the LoLs workspace."},
-	{name: "Math Problem",
-	 editor:
-	 	{name: "ACE"},
-	 language: "math",
-	 contents: "2+3*4"},
-	{name: "Answer",
-	 editor:
-	 	{name: "ACE", readOnly: true},
-	 language: "calculate",
-	 contents: "14",
-	 inputView: "Math Problem"},
-	{name: "LET Explorer",
-	 editor:
-	 	{name: "ACE", height: "200px", readOnly: true},
-	 language: "LET",
-	 contents: ".+. Add\n  2 Number\n  .*. Multiply\n    3 Number\n    4 Number\n",
-	 inputView: "Math Problem"},
-	{name: "Grammar",
-	 editor:
-	 	{name: "ACE", height: "250px", gutters: true},
-	 language: "ometa",
-	 contents: "ometa math {\n"+
-	 "  expression = term:t space* end           -> t,\n"+
-	 "  term       = term:t \"+\" factor:f         -> Le(\'Add\', t, f)\n"+
-	 "             | term:t \"-\" factor:f         -> Le(\'Subtract\', t, f)\n"+
-	 "             | factor,\n"+
-	 "  factor     = factor:f \"*\" primary:p      -> Le(\'Multiply\', f, p)\n"+
-	 "             | factor:f \"/\" primary:p      -> Le(\'Divide\', f, p)\n"+
-	 "             | primary,\n"+
-	 "  primary    = Group\n"+
-	 "             | Number,\n"+
-	 "  Group      = \"(\" term:t \")\"              -> Le(\'Group\', t),\n"+
-	 "  Number     = space* digits:n             -> Le(\'Number\', n),\n"+
-	 "  digits     = digits:n digit:d            -> (n * 10 + d)\n"+
-	 "             | digit,\n"+
-	 "  digit      = ^digit:d                    -> d.digitValue()\n"+
-	 "}\n\n"+
-	 "ometa calculate {\n"+
-	 "  le     = [\'Number\' anything:n]  -> n\n"+
-	 "         | [\'Group\' le:x]         -> x\n"+
-	 "         | [\'Add\' le:l le:r]      -> (l + r)\n"+
-	 "         | [\'Subtract\' le:l le:r] -> (l - r)\n"+
-	 "         | [\'Multiply\' le:l le:r] -> (l * r)\n"+
-	 "         | [\'Divide\' le:l le:r]   -> (l / r)\n"+
-	 "}\n\n"+
-	 "ometa LET {\n"+
-	 "  let = [\'Number\' anything:n]:x    -> (sp(x)+n+\' Number\\n\')\n"+
-	 "      | [\'Group\' let:e]:x          -> (sp(x)+\'(.) Group\\n\'+e)\n"+
-	 "      | [\'Add\' let:l let:r]:x      -> (sp(x)+\'.+. Add\\n\'+l+r)\n"+
-	 "      | [\'Subtract\' let:l let:r]:x -> (sp(x)+\'.-. Subtract\\n\'+l+r)\n"+
-	 "      | [\'Multiply\' let:l let:r]:x -> (sp(x)+\'.*. Multiply\\n\'+l+r)\n"+
-	 "      | [\'Divide\' let:l let:r]:x   -> (sp(x)+\'./. Divide\\n\'+l+r)\n"+
-	 "}\n\n"+
-	 "function sp(node) {\n  var s=\"\", i=node.depth();\n"+
-	 "  while (i-- > 1) {s=s+\"  \"};\n"+
-	 "  return s;\n"+
-	 "}\n\n"+
-	 "ometa raw {\n"+
-	 "  it = anything*\n"+
-	 "}"}],
- currentView: "Math Problem"}; 
 	setupForms();
-  openWorkspace(gs);
+  openWorkspace(GettingStarted);
 }
 function showOrHide(id, button) {
   var s = document.getElementById(id).style;
@@ -257,10 +205,13 @@ function switchLang(fromLang, toLang) {
 		b2.style.color = "red";
 }
 function viewHasChanged(view) {
-  var e=document.getElementById(view.id+"Refresh");    
-	e.style.backgroundColor = "yellow";
+  var e;
+  e=document.getElementById(view.id+"Refresh");
+  if (e!== undefined && e!==null)    
+		e.style.backgroundColor = "yellow";
 	e=document.getElementById("refreshAll");
-	e.style.backgroundColor = "yellow";
+  if (e!== undefined && e!==null)    
+		e.style.backgroundColor = "yellow";
 }
 
 // Editor support

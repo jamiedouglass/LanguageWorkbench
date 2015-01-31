@@ -44,7 +44,7 @@
 </div>
 <div id="LangRibbon">
   <scan>
-    <button type="button" title="add/remove language" onClick="showHideForm('langAdd')">
+    <button type="button" title="add/remove language" onClick="languageForm()">
     +Language</button>
   </scan>
   <scan id="LangArea">
@@ -53,11 +53,12 @@
 <hr>
 <div id="WorkspaceArea">
 	<div class="WorkspaceTitle">
-	  <scan id="WorkspaceName">Workspace Name </scan><i>workspace</i>
-	  <button type="button" title="open workspace" onClick="openForm('OpenWorkspace')">
+	  <input id="WorkspaceName" type="text" oninput="inputSize(this,10)" 
+	  	onblur="setWorkspaceName(this)" value="Workspace Name">&thinsp;<i>workspace</i>
+	  <button type="button" title="open workspace" onClick="openWorkspaceForm()">
 		<img src="images/open-workspace.png" alt="Open Workspace">
 	  </button>
-	  <button type="button" title="save workspace" onClick="saveWorkspace(this)">
+	  <button type="button" title="save workspace" onClick="saveWorkspace()">
 		<img src="images/save-workspace.png" alt="Save Workspace">
 	  </button>
 	  <button id="refreshAll" type="button" title="refresh all" onClick="refreshAll()">
@@ -71,3 +72,4 @@
   <p>Brought to you by <a href="http://www.ResearchOnKnowing.com/">
 	<img src="images/ROK.png" alt="Research On Knowing, LLC"></a>
 </div>
+<span id="measure"></span>
