@@ -499,3 +499,5 @@ OMeta = {
     return m
   }
 }
+
+Parser=objectThatDelegatesTo(OMeta);
