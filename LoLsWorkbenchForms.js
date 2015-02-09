@@ -101,7 +101,7 @@ var str='<div id="openView">' +
 	'		<input type="text" id="openViewName" value="Unnamed">' +
 	'		<br>' +
 	'		Input View:' +
-	'		<input type="text" id="openViewInput">' +
+	'		<input type="text" id="openViewInput" value="">' +
 	'		<br>' +
 	'		Language:' +
 	'		<select id="openViewLang">' +
@@ -117,7 +117,7 @@ var str='<div id="openView">' +
 	'		<button type="button" title="cancel" onClick="hideForm(\'openView\')">' +
 	'			Cancel' +
 	'		</button>' +
-	'		<button type="button" title="update view" onClick="updateView()">' +
+	'		<button type="button" id="updateViewButton" title="update view" onClick="updateView()">' +
 	'			Update View' +
 	'		</button>' +
 	'		<button type="button" title="add view" onClick="addView()">' +
@@ -373,10 +373,26 @@ function openNew() {
 	openWorkspace();
 	hideForm('OpenWorkspace');
 }
+function addFirstView() {
+	var i,lang, elem, list, str='';
+	// TODO: position form visible on screen
+	document.getElementById('openView').name=undefined;
+	list=LoLs.languageNames();
+	for (i=0; i<list.length; i++) {
+		lang=list[i];
+		str+='<option value="'+lang+'">'+lang+'</option>';
+	};
+	elem=document.getElementById('openViewLang');
+	elem.innerHTML="";
+	elem.insertAdjacentHTML('beforeend',str);
+	elem.value=LoLs.languages[0].name;
+	disableButton('updateViewButton');
+  showForm('openView');
+}
 function openView(id) {
-	var i,lang, elem, list, str='',
-			name=document.getElementById(id).getAttribute("name"),
-			view=LoLs.views[name];
+	var i,lang, elem, list, str='', name, view;
+	name=document.getElementById(id).getAttribute("name");
+	view=LoLs.views[name];
 	// TODO: position form visible on screen
 	document.getElementById('openView').name=view.name;
 	document.getElementById('openViewName').value=view.name;
@@ -394,13 +410,15 @@ function openView(id) {
 	document.getElementById('openViewHeight').value=str;
 	document.getElementById('openViewReadonly').checked=view.editor.readOnly;
 	document.getElementById('openViewGutters').checked=view.editor.gutters;
+	enableButton('updateViewButton');  
   showForm('openView');
 }
 function addView() {
 	var view, beforeView, value, n;
 	try {
 		beforeView=document.getElementById('openView').name;
-		beforeView=LoLs.views[beforeView];
+		if (beforeView!==undefined)
+			beforeView=LoLs.views[beforeView];
 		value=document.getElementById('openViewHeight').value;
 		n=Number(value);
 		if (Math.round(n)!=n)
@@ -416,8 +434,14 @@ function addView() {
 				 readOnly: document.getElementById('openViewReadonly').checked},   				 
 			 language: document.getElementById('openViewLang').value,
 			 inputView: document.getElementById('openViewInput').value};
-		view=View(view,LoLs,beforeView);
-		createView(view,beforeView.id);
+		if (beforeView===undefined) {
+			view=View(view,LoLs);
+			createView(view);
+		}
+		else {
+			view=View(view,LoLs,beforeView);
+			createView(view,beforeView.id);
+		}
 		view.focus(true);
 	} 
 	catch (e) {

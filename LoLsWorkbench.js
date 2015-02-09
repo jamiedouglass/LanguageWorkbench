@@ -50,6 +50,20 @@ function setViewName(elem) {
 		inputSize(elem);
 	}
 }
+function setInputViewName(viewName,elem) {
+	var oldName=elem.name, name=elem.value;
+	inputSize(elem);
+  if (name == oldName)
+		return;
+	try {
+			LoLs.views[viewName].setInputView(name);
+	} catch (e) {
+		alert(e);
+		elem.name=oldName;
+		elem.value=oldName;
+		inputSize(elem);
+	} 
+}
 function closeView(id) {
 	var v, e=document.getElementById(id);
 	if (LoLs.views.length<=1) {
@@ -70,16 +84,19 @@ function createLangRibbon(names) {
   // TODO: ids need to not have spaces etc.
   for (i=0; i<names.length; i++) {
 		str+='<button id="' + names[i] + 'Lang" type="button"' +
-			' onClick="setLanguage(\'' + names[i] + '\')">' +
+			' onClick="languageForm(\'' + names[i] + '\')">' +
 			 names[i] + '</button> ';
 	};
   e.insertAdjacentHTML("beforeend", str);
+  for (i=0; i<LoLs.views.length; i++) {
+  	updateViewLanguageList(LoLs.views[i]);
+  }
 };
 function createView(view,beforeId) {
-  var name=view.name, id=genLocalId(name), m="afterend";
+  var name=view.name, id=genLocalId(name), m="afterend", i, str, list, lang, elem;
   if (beforeId===undefined) {
   	beforeId="ViewArea";
-  	m="beforeend";
+  	m="afterbegin";
   }
   else 
   	beforeId+="View";
@@ -91,6 +108,16 @@ function createView(view,beforeId) {
 	'	  <input id="'+id+'ViewName" class="LoLsViewName" name="'+name+'"'+
 	'     type="text" oninput="inputSize(this,10)"' +
 	'  	  onblur="setViewName(this)" value="'+name+'">&thinsp;<i>view</i>' +
+	'		<scan id="'+id+'InputView" class="LoLsViewTitle"><i>from</i>' +
+	'	    <input id="'+id+'InputViewName" class="LoLsViewName"'+
+	'       type="text" oninput="inputSize(this,10)"' +
+	'  	    onblur="setInputViewName(\''+name+'\',this)" value="'+view.inputView.name+'">' +
+	'		</scan>' +	
+	'	  <scan><i>in</i>&thinsp;<scan class="LoLsViewName">' +
+	'		<select id="'+id+'ViewLang" class="LoLsViewName"' +
+	'			onchange="setViewLanguage(\''+name+'\',\''+id+'ViewLang\')">' +
+	'		</select>' +
+	'		</scan>' +	
 	'	  <button type="button" title="open view" onClick="openView(\''+id+'View\')">' +
 	'			<img src="images/open-view.png" alt="Open View">' +
 	'	  </button>' +
@@ -105,8 +132,27 @@ function createView(view,beforeId) {
 	'	<div id="'+ id +'" class="LoLsViewEditor">' +
 	'	</div>' +
 	'</div>'); 
+	document.getElementById(id+'InputView').name=view.inputView.name;
+	if (view.inputView===view)
+		document.getElementById(id+'InputView').hidden=true; 
 	view.createEditor(id);
+	updateViewLanguageList(view);
 	inputSize(document.getElementById(id+'ViewName'));
+	inputSize(document.getElementById(id+'InputViewName'));
+}
+function updateViewLanguageList(view) {
+	var i, lang, list, str='', elem, id=view.id;
+	if (view.id===undefined)
+		return;
+	list=LoLs.languageNames();
+	for (i=0; i<list.length; i++) {
+		lang=list[i];
+		str+='<option value="'+lang+'">'+lang+'</option>';
+	};
+	elem=document.getElementById(id+'ViewLang');
+	elem.innerHTML="";
+	elem.insertAdjacentHTML('beforeend',str);
+	elem.value=view.language.name;
 }
 function openWorkspace(info) {
 	var i, e;
@@ -165,14 +211,14 @@ function saveWorkspace() {
   e.click();
   LoLs.unsaved=false;
 }
-function setLanguage(name) {
-  if (event.altKey) 
-    return languageForm(name);
-  if (LoLs.currentView!==undefined) {
-  	LoLs.currentView.setLanguage(name);
-		LoLs.currentView.changed();
-		LoLs.currentView.refresh();
-  	document.getElementById(LoLs.currentView.id).editor.focus();
+function setViewLanguage(viewName,id) {
+	var view=LoLs.views[viewName], lang;
+  if (view!==undefined) {
+  	view.focus(true);
+  	lang=document.getElementById(id).value;
+  	view.setLanguage(lang);
+		view.changed();
+		view.refresh();
   }
 }
 function setupPage() {
