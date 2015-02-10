@@ -241,7 +241,11 @@ function addLanguage() {
 		alert(e);
 		return;
 	}
-	createLangRibbon(LoLs.languageNames()); 
+	createLangRibbon(LoLs.languageNames());
+		document.getElementById(id+'InputView').name=view.inputView.name;
+	if (view.inputView===view)
+		document.getElementById(id+'InputView').hidden=true; 
+ 
   hideForm('langForm');  
 	if (LoLs.currentView !== undefined)
 		LoLs.currentView.focus(true); 
@@ -435,8 +439,8 @@ function addView() {
 			 language: document.getElementById('openViewLang').value,
 			 inputView: document.getElementById('openViewInput').value};
 		if (beforeView===undefined) {
-			view=View(view,LoLs);
-			createView(view);
+			view=View(view,LoLs,'');
+			createView(view,'firstView');
 		}
 		else {
 			view=View(view,LoLs,beforeView);

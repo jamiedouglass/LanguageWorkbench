@@ -94,9 +94,12 @@ function createLangRibbon(names) {
 };
 function createView(view,beforeId) {
   var name=view.name, id=genLocalId(name), m="afterend", i, str, list, lang, elem;
-  if (beforeId===undefined) {
+  if (beforeId===undefined || beforeId=="firstView") {
+		if (beforeId=="firstView") 
+			m="afterbegin";
+		else
+		 	m="beforeend";
   	beforeId="ViewArea";
-  	m="afterbegin";
   }
   else 
   	beforeId+="View";

@@ -704,8 +704,12 @@ WorkspaceClass = {
 			throw "View '"+view.name+"' already defined.";
 		if (view.workspace!==undefined) 
 			throw "View '"+view.name+"' already in workspace.";
-		i=this.views.indexOf(viewBefore);
-		i= (i>=0) ?	i+1 : 0;
+		if (viewBefore!="") {
+			i=this.views.indexOf(viewBefore);
+			i= (i>=0) ?	i+1 : this.views.length;
+		}
+		else
+			i=0;
 		this.views.splice(i,0,view);
 		this.views[view.name]=view;
 		view.workspace=this;
