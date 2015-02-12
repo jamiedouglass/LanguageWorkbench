@@ -558,7 +558,7 @@ ViewClass={
 		this.needsRefresh=false;
 		this.workspace.changed();
 		refreshCompleted(this);
-		if (typeof view.name=="string")
+		if (view!==undefined && typeof view.name=="string")
 			this.workspace.focus(view.name)
 	},
 	serialize:function(indent,all) {
@@ -651,7 +651,6 @@ ViewClass={
 function Workspace(info) {
 	var i, ls, w=objectThatDelegatesTo(WorkspaceClass,
 		{name:"Unnamed",
-		 url:undefined,
 		 unsaved:true,
 		 languages:[],
 		 currentLanguage:undefined,
@@ -688,6 +687,8 @@ function Workspace(info) {
 
 WorkspaceClass = { 
 	addLanguage:function(lang) {
+		if (lang===undefined)
+			throw "Language to add is undefined."; 
 		if (this.languages[lang.name]!==undefined) 
 			throw	"Language '"+lang.name+"' already defined.";
 		if (lang.workspace!==undefined)
@@ -700,6 +701,8 @@ WorkspaceClass = {
 	},
 	addView:function(view,viewBefore) {
 		var i;
+		if (view===undefined)
+			throw "View to add is undefined."; 
 		if (this.views[view.name]!==undefined) 
 			throw "View '"+view.name+"' already defined.";
 		if (view.workspace!==undefined) 
@@ -730,20 +733,16 @@ WorkspaceClass = {
 		return View({name:name},this,this.views[before]);
 	},
 	deleteLanguage:function(lang) {
-		var i, l=this.languages[lang.name];
+		var i, l;
+		if (lang===undefined)
+			throw "Language to delete required";
+		l=this.languages[lang.name];
 		if (l===undefined) 
 			throw "Language '"+lang.name+"' not defined.";
 		if (lang!==l)
 			throw	"Language '"+lang.name+"' in another workspace.";
-		if (lang.workspace!==undefined) {
-			lang.workspace=undefined;
-			try {
-				lang.delete();
-			} catch (e) {
-				lang.workspace=this;
-				throw e;
-			}
-		}
+		if (lang.workspace!==undefined) 
+			lang.delete();
 		if ((i=this.languages.indexOf(lang))>=0)
 			this.languages.splice(i,1);
 		delete this.languages[lang.name];
@@ -751,23 +750,21 @@ WorkspaceClass = {
 		return lang;
 	},
 	deleteView:function(view) {
-		var i, v=this.views[view.name];
+		var i, v;
+		if (view===undefined)
+			throw "View to delete required";
+		v=this.views[view.name];
 		if (v===undefined) 
 			throw "View '"+view.name+"' not defined.";
 		if (view!==v)
 			throw	"View '"+view.name+"' in another workspace.";
-		if (view.workspace!==undefined) {
-			view.workspace=undefined;
-			try {
-				view.delete();
-			} catch (e) {
-				view.workspace=this;
-				throw e;
-			}
-		}
+		if (view.workspace!==undefined) 
+			view.delete();
 		if ((i=this.views.indexOf(view))>=0)
 			this.views.splice(i,1);
 		delete this.views[view.name];
+		if (this.currentView===view)
+			this.currentView=undefined;
 		this.changed();
 		return view;
 	},
@@ -775,11 +772,17 @@ WorkspaceClass = {
 		var view=this.views[name];
 		if (view!==undefined)
 			view.focus(true);
+		else {
+			this.languageView=undefined;
+			this.currentView=undefined;
+		}
 	},
 	focusView:function(view) {
-		var lang=this.currentLanguage;
-		if (this.views.indexOf(view)<0)
-			throw "View :\'"+view.name+"\' not in workspace.";
+		var lang=this.currentLanguage, name;
+		if (this.views.indexOf(view)<0) {
+			name= (view===undefined) ? 'undefined' : "'"+view.name+"'";
+			throw "View: "+name+" not in workspace.";
+		}
 		this.currentView=view;
 		this.currentLanguage=view.language;
 		switchLang(lang,this.currentLanguage);
@@ -809,8 +812,9 @@ WorkspaceClass = {
 		}
 		for (i=0; i<len; i++) 
 			this.views[i].refresh();
-		this.changed();
-		if (typeof v.name=="string")
+		if (this.views.length>0)
+			this.changed();
+		if (v!==undefined && typeof v.name=="string")
 			this.focus(v.name);
 	},
 	removeLanguage:function(name) {
@@ -820,8 +824,8 @@ WorkspaceClass = {
 		return this.deleteLanguage(lang);
 	},
 	renameLanguage:function(oldName,newName) {
-		var lang=this.languages[oldName], l=this.languages[newName];
-		if (lang===undefined && l!==undefined && l.name==newName)
+		var lang=this.languages[oldName], l=this.languages[newName], wsp;
+		if (lang!==undefined && lang===l)
 			return;
 		if (lang===undefined)
 			throw "Language '"+oldName+"' not defined.";
@@ -832,10 +836,14 @@ WorkspaceClass = {
 		delete this.languages[oldName];
 		this.languages[newName]=lang;
 		try {
+			wsp=lang.workspace;
+			lang.workspace=undefined;
 			lang.setName(newName);
+			lang.workspace=wsp;
 		} catch (e) {
 			this.languages[oldName]=lang;
 			delete this.languages[newName];
+			lang.workspace=wsp;
 			throw e;
 		}
 		this.changed();
@@ -847,32 +855,37 @@ WorkspaceClass = {
 		return this.deleteView(view);
 	},
 	renameView:function(oldName,newName) {
-		var view=this.views[oldName], v=this.views[newName];
-		if (view===undefined && v!==undefined && v.name==newName)
+		var view=this.views[oldName], v=this.views[newName], wsp;
+		if (view!==undefined && view===v)
 			return;
 		if (view===undefined)
 			throw "View '"+oldName+"' not defined.";
 		if (typeof newName!="string" || newName=="")
 			throw "View name required.";
-		if (this.views[newName]!==undefined) 
+		if (v!==undefined) 
 			throw "View '"+newName+"' is already defined.";
 		delete this.views[oldName];
 		this.views[newName]=view;
 		try {
+			wsp=view.workspace;
+			view.workspace=undefined;
 			view.setName(newName);
+			view.workspace=wsp;
 		} catch (e) {
 			this.views[oldName]=view;
 			delete this.views[newName];
+			view.workspace=wsp;
 			throw e;
 		}
 		this.changed();
 	},
 	serialize:function(indent,all) {
-		var i, s="{";
+		var i, s="";
 		if (indent==undefined)
 			indent="";
+		s+=indent+'{';
 		s+='"name": "'+this.name+'"';
-		if (this.languages.length>0) {
+		if (this.languages.length>0 || all===true) {
 			s+=',\n'+indent+' "languages": [\n'+indent+'\t';
 			for (i=0; i<this.languages.length; i++) {
 				if (i!=0) s+=',\n'+indent+'\t';
@@ -880,7 +893,7 @@ WorkspaceClass = {
 			}
 			s+="]";
 		}
-		if (this.views.length>0) {
+		if (this.views.length>0 || all===true) {
 			s+=',\n'+indent+' "views": [\n'+indent+'\t';
 			for (i=0; i<this.views.length; i++) {
 				if (i!=0) s+=',\n'+indent+'\t';
@@ -890,6 +903,8 @@ WorkspaceClass = {
 		}
 		if (this.currentView!==undefined) 
 			s+=',\n'+indent+' "currentView": "'+this.currentView.name+'"';
+		if (this.currentView===undefined && all===true) 
+			s+=',\n'+indent+' "currentView": undefined';
 		s+="}";
 		return s; 
 	},

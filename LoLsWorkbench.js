@@ -189,7 +189,10 @@ function refreshAll() {
     document.getElementById("refreshAll").style.backgroundColor = "white";
 }
 function refreshCompleted(view) {
-  var e=document.getElementById(view.id+"Refresh");	    
+  var e;
+  if (view===undefined || view.id===undefined)
+  	return;
+  e=document.getElementById(view.id+"Refresh");	    
 	e.style.backgroundColor = "white";
 	if (!LoLs.isRefreshNeeded()) {
 		e=document.getElementById("refreshAll");
