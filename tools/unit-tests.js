@@ -848,10 +848,224 @@ YUI({useBrowserconsole: true}).use('test', function (Y) {
 			Y.Assert.areEqual(false,this.wsp.unsaved, "Is workspace unsaved?");
 		}
 	});
+	var lolsLanguageGrammarTest = new Y.Test.Case({
+		name: "LoLs Language/Grammar",
+		setUp: function () {
+			this.wsp = Workspace();
+		},
+		tearDown: function () {
+			delete this.data;
+		},
+		testDefaultGrammar: function() {
+			var g=Grammar();
+			Y.Assert.areEqual("Unnamed",g.name,"Grammar name");
+			Y.Assert.areEqual("start",g.startRule,"Grammar start rule");
+			Y.Assert.areEqual(undefined,g.rules,"Grammar rules");
+			Y.Assert.areEqual(false,g.makeList,"Grammar make list");
+			Y.Assert.areEqual(undefined,g.language,"Grammar language");
+			Y.Assert.areEqual(undefined,g.defView,"Grammar definition view");
+		},
+		testGrammarWithRules: function() {
+			var g=Grammar({name: "BSOMetaJSParser", startRule: "first", makeList: true});
+			Y.Assert.areEqual("BSOMetaJSParser",g.name,"Grammar name");
+			Y.Assert.areEqual("first",g.startRule,"Grammar start rule");
+			Y.Assert.areNotEqual(undefined,g.rules,"Grammar rules");
+			Y.Assert.areEqual(true,g.makeList,"Grammar make list");
+			Y.Assert.areEqual(undefined,g.language,"Grammar language");
+			Y.Assert.areEqual(undefined,g.defView,"Grammar definition view");
+		},
+		testLast: function() {
+		}		
+	});			
+	var lolsViewEditorTest = new Y.Test.Case({
+		name: "LoLs View/Editor",
+		setUp: function () {
+			this.wsp = Workspace();
+		},
+		tearDown: function () {
+			delete this.data;
+		},
+		testFirst: function() {
+		},
+		testLast: function() {
+		}		
+	});			
+	var lolsDemoUseCaseTest = new Y.Test.Case({
+		name: "LoLs Demo Use Case",
+		setUp: function () {
+			this.wsp = Workspace(GettingStarted);
+		},
+		tearDown: function () {
+			delete this.data;
+		},
+		testCheckSetup: function() {
+			var lang, gram, view, ed;
+			Y.Assert.areEqual("Getting Started",this.wsp.name,"Workspace name");
+			Y.Assert.areEqual(5,this.wsp.languages.length,"number of languages");
+			lang=this.wsp.languages[0];
+			Y.Assert.areEqual("ometa",lang.name,"language name");
+			Y.Assert.areEqual(lang,this.wsp.languages["ometa"],"language by name");
+			Y.Assert.areEqual(true,lang.meta,"language meta");
+			Y.Assert.areEqual(2,lang.code.length,"language code length");
+			gram=lang.code[0];
+			Y.Assert.areEqual("BSOMetaJSParser",gram.name,"code grammar name");
+			Y.Assert.areEqual("topLevel",gram.startRule,"code grammar start rule");
+			Y.Assert.areNotEqual(undefined,gram.rules,"code grammar rules");
+			Y.Assert.areEqual(false,gram.makeList,"code grammar make list");
+			Y.Assert.areEqual(lang,gram.language,"code grammar language");
+			Y.Assert.areEqual(undefined,gram.defView,"code grammar definition view");
+			gram=lang.code[1];
+			Y.Assert.areEqual("BSOMetaJSTranslator",gram.name,"code grammar name");
+			Y.Assert.areEqual("trans",gram.startRule,"code grammar start rule");
+			Y.Assert.areNotEqual(undefined,gram.rules,"code grammar rules");
+			Y.Assert.areEqual(true,gram.makeList,"code grammar make list");
+			Y.Assert.areEqual(lang,gram.language,"code grammar language");
+			Y.Assert.areEqual(undefined,gram.defView,"code grammar definition view");		
+			Y.Assert.areEqual(0,lang.decode.length,"language decode length");	
+			lang=this.wsp.languages[1];
+			Y.Assert.areEqual("math",lang.name,"language name");
+			Y.Assert.areEqual(lang,this.wsp.languages["math"],"language by name");
+//			Y.Assert.areEqual(this.wsp.views["Grammar"],lang.defView,
+//				"language definition view");
+			Y.Assert.areEqual(false,lang.meta,"language meta");
+			Y.Assert.areEqual(1,lang.code.length,"language code length");
+			gram=lang.code[0];
+			Y.Assert.areEqual("math",gram.name,"code grammar name");
+			Y.Assert.areEqual("expression",gram.startRule,"code grammar start rule");
+			Y.Assert.areNotEqual(undefined,gram.rules,"code grammar rules");
+			Y.Assert.areEqual(false,gram.makeList,"code grammar make list");
+			Y.Assert.areEqual(lang,gram.language,"code grammar language");
+			Y.Assert.areEqual(this.wsp.views["Grammar"],gram.defView,"code grammar definition view");			
+			Y.Assert.areEqual(0,lang.decode.length,"language decode length");		
+			lang=this.wsp.languages[2];
+			Y.Assert.areEqual("calculate",lang.name,"language name");
+			Y.Assert.areEqual(lang,this.wsp.languages["calculate"],"language by name");
+//			Y.Assert.areEqual(this.wsp.views["Grammar"],lang.defView,
+//				"language definition view");
+			Y.Assert.areEqual(false,lang.meta,"language meta");
+			Y.Assert.areEqual(1,lang.code.length,"language code length");
+			gram=lang.code[0];
+			Y.Assert.areEqual("calculate",gram.name,"code grammar name");
+			Y.Assert.areEqual("le",gram.startRule,"code grammar start rule");
+			Y.Assert.areNotEqual(undefined,gram.rules,"code grammar rules");
+			Y.Assert.areEqual(true,gram.makeList,"code grammar make list");
+			Y.Assert.areEqual(lang,gram.language,"code grammar language");
+			Y.Assert.areEqual(this.wsp.views["Grammar"],gram.defView,"code grammar definition view");						
+			Y.Assert.areEqual(0,lang.decode.length,"language decode length");		
+			lang=this.wsp.languages[3];
+			Y.Assert.areEqual("LET",lang.name,"language name");
+			Y.Assert.areEqual(lang,this.wsp.languages["LET"],"language by name");
+//			Y.Assert.areEqual(this.wsp.views["Grammar"],lang.defView,
+//				"language definition view");
+			Y.Assert.areEqual(false,lang.meta,"language meta");
+			Y.Assert.areEqual(1,lang.code.length,"language code length");
+			gram=lang.code[0];
+			Y.Assert.areEqual("LET",gram.name,"code grammar name");
+			Y.Assert.areEqual("let",gram.startRule,"code grammar start rule");
+			Y.Assert.areNotEqual(undefined,gram.rules,"code grammar rules");
+			Y.Assert.areEqual(true,gram.makeList,"code grammar make list");
+			Y.Assert.areEqual(lang,gram.language,"code grammar language");
+			Y.Assert.areEqual(this.wsp.views["Grammar"],gram.defView,"code grammar definition view");					
+			Y.Assert.areEqual(0,lang.decode.length,"language decode length");			
+			lang=this.wsp.languages[4];
+			Y.Assert.areEqual("raw",lang.name,"language name");
+			Y.Assert.areEqual(lang,this.wsp.languages["raw"],"language by name");
+//			Y.Assert.areEqual(this.wsp.views["Grammar"],lang.defView,
+//				"language definition view");
+			Y.Assert.areEqual(false,lang.meta,"language meta");
+			Y.Assert.areEqual(1,lang.code.length,"language code length");
+			gram=lang.code[0];
+			Y.Assert.areEqual("raw",gram.name,"code grammar name");
+			Y.Assert.areEqual("it",gram.startRule,"code grammar start rule");
+			Y.Assert.areNotEqual(undefined,gram.rules,"code grammar rules");
+			Y.Assert.areEqual(false,gram.makeList,"code grammar make list");
+			Y.Assert.areEqual(lang,gram.language,"code grammar language");
+			Y.Assert.areEqual(this.wsp.views["Grammar"],gram.defView,"code grammar definition view");			
+			
+			Y.Assert.areEqual(5,this.wsp.views.length,"number of views");
+			view=this.wsp.views[0];
+			Y.Assert.areEqual("Read Me First",view.name,"view name");
+			Y.Assert.areEqual(view,this.wsp.views["Read Me First"],"view by name");
+			ed=view.editor;
+			Y.Assert.areEqual("ACE",ed.name,"editor name");
+			Y.Assert.areEqual("100px",ed.height,"editor height");
+			Y.Assert.areEqual(false,ed.gutters,"editor gutters");
+			Y.Assert.areEqual(true,ed.readOnly,"editor read only");
+			Y.Assert.areEqual(this.wsp.languages["raw"],view.language,"view language");
+			
+			view=this.wsp.views[1];
+			Y.Assert.areEqual("Math Problem",view.name,"view name");
+			Y.Assert.areEqual(view,this.wsp.views["Math Problem"],"view by name");
+			ed=view.editor;
+			Y.Assert.areEqual("ACE",ed.name,"editor name");
+			Y.Assert.areEqual("60px",ed.height,"editor height");
+			Y.Assert.areEqual(false,ed.gutters,"editor gutters");
+			Y.Assert.areEqual(false,ed.readOnly,"editor read only");
+			Y.Assert.areEqual(this.wsp.languages["math"],view.language,"view language");
+			Y.Assert.areEqual(view,view.inputView,"input view");
+			
+			view=this.wsp.views[2];
+			Y.Assert.areEqual("Answer",view.name,"view name");
+			Y.Assert.areEqual(view,this.wsp.views["Answer"],"view by name");
+			ed=view.editor;
+			Y.Assert.areEqual("ACE",ed.name,"editor name");
+			Y.Assert.areEqual("60px",ed.height,"editor height");
+			Y.Assert.areEqual(false,ed.gutters,"editor gutters");
+			Y.Assert.areEqual(true,ed.readOnly,"editor read only");
+			Y.Assert.areEqual(this.wsp.languages["calculate"],view.language,"view language");
+			Y.Assert.areEqual(this.wsp.views["Math Problem"],view.inputView,"input view");
+			
+			view=this.wsp.views[3];
+			Y.Assert.areEqual("LET Explorer",view.name,"view name");
+			Y.Assert.areEqual(view,this.wsp.views["LET Explorer"],"view by name");
+			ed=view.editor;
+			Y.Assert.areEqual("ACE",ed.name,"editor name");
+			Y.Assert.areEqual("200px",ed.height,"editor height");
+			Y.Assert.areEqual(false,ed.gutters,"editor gutters");
+			Y.Assert.areEqual(true,ed.readOnly,"editor read only");
+			Y.Assert.areEqual(this.wsp.languages["LET"],view.language,"view language");
+			Y.Assert.areEqual(this.wsp.views["Math Problem"],view.inputView,"input view");
+			
+			view=this.wsp.views[4];
+			Y.Assert.areEqual("Grammar",view.name,"view name");
+			Y.Assert.areEqual(view,this.wsp.views["Grammar"],"view by name");
+			ed=view.editor;
+			Y.Assert.areEqual("ACE",ed.name,"editor name");
+			Y.Assert.areEqual("250px",ed.height,"editor height");
+			Y.Assert.areEqual(true,ed.gutters,"editor gutters");
+			Y.Assert.areEqual(false,ed.readOnly,"editor read only");
+			Y.Assert.areEqual(this.wsp.languages["ometa"],view.language,"view language");
+			Y.Assert.areEqual(view,view.inputView,"input view");
+			
+			view=this.wsp.views["Math Problem"];
+			Y.Assert.areEqual(view,this.wsp.currentView,"current view");
+			lang=this.wsp.languages["math"];
+			Y.Assert.areEqual(lang,this.wsp.currentLanguage,"current language");
+		},
+		testLast: function() {
+		}		
+	});			
+	var lolsOMetaJSTest = new Y.Test.Case({
+		name: "OMeta JS Tests",
+		setUp: function () {
+			this.wsp = Workspace();
+		},
+		tearDown: function () {
+			delete this.data;
+		},
+		testFirst: function() {
+		},
+		testLast: function() {
+		}		
+	});			
 	// Create and run test suite
-	var suite = new Y.Test.Suite("Workspace Test");
+	var suite = new Y.Test.Suite("LoLs Workbench Testing");
 	suite.add(lolsWorkspaceTest);
 	suite.add(lolsBasicWorkspaceTest);
+	suite.add(lolsLanguageGrammarTest);
+	suite.add(lolsViewEditorTest);
+	suite.add(lolsDemoUseCaseTest);
+	suite.add(lolsOMetaJSTest);
 	Y.Test.Runner.add(suite);
 	Y.Test.Runner.run();
 	});
