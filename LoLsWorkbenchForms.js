@@ -1,5 +1,6 @@
 function setupForms() {
 	var e=document.getElementById('WorkbenchForms');
+	setupSignInForm(e);
 	setupLanguageForm(e);
 	setupWorkspaceForm(e);
 	setupViewForm(e);

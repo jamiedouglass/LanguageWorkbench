@@ -532,7 +532,7 @@ ViewClass={
 						e.view=this;
 				}
 				else 
-					e=this.view.name+" error at unknown position\n\n"+e;
+					e=this.name+" error at unknown position\n\n"+e;
 				throw e;
 			}
 		}
