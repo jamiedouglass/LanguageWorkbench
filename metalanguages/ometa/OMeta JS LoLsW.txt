@@ -1,6 +1,6 @@
 {"name": "OMeta JS LoLsW",
  "languages": [
-	{"name": "ometa",
+	{"name": "OMeta JS",
 	 "meta": true,
 	 "code": [
 		{"name": "BSOMetaJSParser",

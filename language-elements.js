@@ -2,7 +2,7 @@ var LoLs;
 
 var EmptyWorkspace={name: "My Work",	
  languages: [
-		{name: "ometa",
+		{name: "OMeta JS",
 		 meta: true,
 		 code: [
 			 {name: "BSOMetaJSParser",
@@ -13,13 +13,13 @@ var EmptyWorkspace={name: "My Work",
  views: [
 		{name: "My View",	
 		 editor: {name: "ACE", height: "300px", gutters: true, readOnly: false},   				 
-		 language: "ometa",
+		 language: "OMeta JS",
 		 contents: 	'ometa MyLanguage {\n  start=anything*\n}'}],
  currentView: "My View"};			
 		
 var GettingStarted={name: "Getting Started",
  languages: [
-	{name: "ometa",
+	{name: "OMeta JS",
 	 meta: true,
 	 code: [
 		{name: "BSOMetaJSParser",
@@ -79,7 +79,7 @@ var GettingStarted={name: "Getting Started",
 	{name: "Grammar",
 	 editor:
 	 	{name: "ACE", height: "250px", gutters: true},
-	 language: "ometa",
+	 language: "OMeta JS",
 	 contents: "ometa math {\n"+
 	 "  expression = term:t space* end           -> t,\n"+
 	 "  term       = term:t \"+\" factor:f         -> Le(\'Add\', t, f)\n"+
@@ -150,6 +150,11 @@ Array.prototype.concept = function() {
 
 Array.prototype.children = function() {
   return this.slice(1);
+}
+
+Array.prototype.child = function(index) {
+  if (this.hasOwnProperty(index)) return this[index];
+  return undefined;
 }
 
 Array.prototype.depth = function() {

@@ -1,6 +1,6 @@
 {"name": "Getting Started",
  "languages": [
-	{"name": "ometa",
+	{"name": "OMeta JS",
 	 "meta": true,
 	 "code": [
 		{"name": "BSOMetaJSParser",
@@ -50,7 +50,7 @@
 	 "editor": {"name": "ACE", "height": "200px", "readOnly": true},
 	 "contents": ".+. Add\n  2 Number\n  .*. Multiply\n    3 Number\n    4 Number\n"},
 	{"name": "Grammar",
-	 "language": "ometa",
+	 "language": "OMeta JS",
 	 "editor":
 	 	{"name": "ACE", "height": "250px", "gutters": true},
 		 "contentsFile": 	"grammar-getting-started.ometa"}],
