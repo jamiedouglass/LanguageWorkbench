@@ -8,6 +8,7 @@
 -->
 
 <link rel="stylesheet" href="LoLsWorkbench.css">
+<link rel="stylesheet" href="css-social-buttons/css/zocial.css" />
 
 <script src="lib.js"></script>
 <script src="tools/parser.js"></script>
@@ -19,9 +20,9 @@
 <script src="http://d1n0x3qji82z53.cloudfront.net/src-min-noconflict/ace.js" ></script>
 <script src="LoLsWorkbench.js"></script>
 <script src="LoLsWorkbenchForms.js"></script>
+<script src="hello.all.js"></script>
 <script src="LoLsSignInForm.js"></script>
-<script src="hello.js"></script>
-<link rel="stylesheet" href="css-social-buttons/css/zocial.css" />
+
 <script src="LoLsWorkspace.js"></script>
 
 
@@ -32,7 +33,10 @@
 
 <body onLoad="setupPage();">
 <div id="SignInArea">
-  <a id="SignIn" href="sign-in.html" target="_top">Sign in</a>
+    <button type="button" title="user sign in" onClick="signInForm()">
+    Sign in</button>
+    
+ <!-- <a id="SignIn" href="sign-in.html" target="_top">Sign in</a> -->
   <div id="LearnMore">
     <a href="http://www.LanguageOfLanguages.com/">learn more</a>
   </div>
