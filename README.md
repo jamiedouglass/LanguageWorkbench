@@ -26,7 +26,7 @@ Please join us to make Language of Languages available to everyone.
 >
 > Your help is greatly appreciated. Thank you very much!
 >
-> (see [CONTRIBUTING.md](CONTRIBUTING.md) for further details)
+> (see [Contributing to LoLs](https://github.com/jamiedouglass/LanguageOfLanguages/wiki/Contributing-to-LoLs) for further details)
 
 Overview
 --------
@@ -46,12 +46,12 @@ Reporting issues
 ----------------
 
 Issues with Language of Languages can be reported to [issues](https://github.com/jamiedouglass/LanguageOfLanguages/issues).
-Please refer to [CONTRIBUTING.md](CONTRIBUTING.md) for further details.
+Please refer to [Contributing to LoLs](https://github.com/jamiedouglass/LanguageOfLanguages/wiki/Contributing-to-LoLs) for further details.
 
 Developing Language of languages (LoLs)
 ---------------------------------------
 
-Please refer to [CONTRIBUTING.md](CONTRIBUTING.md) for further details.
+Please refer to [Contributing to LoLs](https://github.com/jamiedouglass/LanguageOfLanguages/wiki/Contributing-to-LoLs) for further details.
 It explains the LoLs development setup and how to contribute.
 
 
