@@ -2,6 +2,7 @@ Language of Languages (LoLs)
 ====
 By Jamie Douglass Jamie@ResearchOnKnowing.com and [Language of Languages contributors](https://github.com/jamiedouglass/LanguageOfLanguages/graphs/contributors)
 
+<<<<<<< HEAD
 Language of Languages (LoLs) is a language workbench for quickly and easily implementing 
 Domain Specific Languages (DSLs) to gain the 10x productivity improvement DSLs promise. 
 LoLs creates interpreters and translators to other languages and integrates languages 
@@ -66,3 +67,8 @@ More information
 ----------------
 
 For more see the [project website](http://www.languageoflanguages.com)
+=======
+Language of Languages (LoLs) is a Language Workbench for integrating languages with different notations. Languages can be quickly implemented in LoLs using OMeta/JS to create an interpreter or translator to another language. This open source development leverages OMeta/JS to bootstrap the initial release of the LoLs Workbench. Currently, a seed release is available. Most of the workbench features are yet to be implemented. We have a minimal working language workbench. This version supports textual languages and enough functionality to develop future releases.
+
+We are creating a Software as a Service Language Workbench which operates only on the client side. Nothing to download or install. All user information remains on the clients computer.
+>>>>>>> origin/master
