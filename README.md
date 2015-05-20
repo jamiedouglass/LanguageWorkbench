@@ -65,5 +65,4 @@ All contributions made for inclusion are licensed to Research on Knowing, LLC.
 More information 
 ----------------
 
-For more see the [project website](http://www.languageoflanguages.com)
-Language of Languages (LoLs) is a Language Workbench for integrating languages with different notations. Languages can be quickly implemented in LoLs using OMeta/JS to create an interpreter or translator to another language. This open source development leverages OMeta/JS to bootstrap the initial release of the LoLs Workbench. Currently, a seed release is available. Most of the workbench features are yet to be implemented. We have a minimal working language workbench. This version supports textual languages and enough functionality to develop future releases.
+For more see the [project website](http://www.languageoflanguages.com).
