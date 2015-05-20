@@ -1,8 +1,8 @@
 Language of Languages (LoLs) 
 ====
 
-[![Join the chat at https://gitter.im/jamiedouglass/LanguageOfLanguages](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/jamiedouglass/LanguageOfLanguages?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 By Jamie Douglass Jamie@ResearchOnKnowing.com and [Language of Languages contributors](https://github.com/jamiedouglass/LanguageOfLanguages/graphs/contributors)
+[![Join the chat at https://gitter.im/jamiedouglass/LanguageOfLanguages](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/jamiedouglass/LanguageOfLanguages?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 Language of Languages (LoLs) is a language workbench for quickly and easily implementing 
 Domain Specific Languages (DSLs) to gain the 10x productivity improvement DSLs promise. 
