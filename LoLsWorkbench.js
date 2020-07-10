@@ -64,8 +64,58 @@ function setInputViewName(viewName,elem) {
 		inputSize(elem);
 	} 
 }
+function openViewFile(id) {
+  	var e=document.createElement('input');
+    e.setAttribute('id','localViewFile');
+    e.setAttribute('type', 'file');
+    e.onchange = function(evt){
+		var f=evt.target.files[0], 
+	    reader=new FileReader();
+		if (f === undefined || f === null) {
+			return;
+		}
+		reader.onloadend = function (evt) {
+			var info, e=document.getElementById(id),
+			view = LoLs.views[e.getAttribute("name")];
+			try {
+				info=evt.target.result;
+				view.setContents(info);
+			} catch (e) {
+				alert("Error in file: "+e);
+				return;
+			}
+  		}
+  		function errorHandler(evt) {
+        	switch (evt.target.error.code) {
+            	case evt.target.error.NOT_FOUND_ERR:
+                	alert("File Not Found!");
+                	break;
+           		 case evt.target.error.NOT_READABLE_ERR:
+                	alert("File is not readable");
+               		 break;
+            	case evt.target.error.ABORT_ERR:
+               		 break; // noop
+           		default:
+                	alert("An error occurred reading this file.");
+        	}
+  		}
+  		reader.onerror = errorHandler;
+  		reader.readAsText(f);
+	}
+	e.click();
+}
+function saveViewFile(id) {
+	var  e=document.getElementById(id),
+	view = LoLs.views[e.getAttribute("name")],
+	name=view.name,
+  	d=new Blob([view.getContents()],{type: 'text/plain'}); 
+  	e=document.createElement('a');
+    e.setAttribute('href',window.URL.createObjectURL(d));
+    e.setAttribute('download', name + '.txt');
+    e.click();
+}
 function closeView(id) {
-	var v, e=document.getElementById(id);
+	var e=document.getElementById(id);
 	if (LoLs.views.length<=1) {
 		alert("Workspace must have at least one view");
 		return;
@@ -120,7 +170,13 @@ function createView(view,beforeId) {
 	'		<select id="'+id+'ViewLang" class="LoLsViewName"' +
 	'			onchange="setViewLanguage(\''+name+'\',\''+id+'ViewLang\')">' +
 	'		</select>' +
-	'		</scan>' +	
+	'		</scan>' +
+	'	  <button type="button" title="open view" onClick="openViewFile(\''+id+'View\')">' +
+	'	        <img src="images/open-workspace.png" alt="Open View">' +
+	'     </button>' +
+	'	  <button type="button" title="save view" onClick="saveViewFile(\''+id+'View\')">' +
+	'	        <img src="images/save-workspace.png" alt="Save View">' +
+	'     </button>' +
 	'	  <button type="button" title="open view" onClick="openView(\''+id+'View\')">' +
 	'			<img src="images/open-view.png" alt="Open View">' +
 	'	  </button>' +
@@ -229,7 +285,7 @@ function setViewLanguage(viewName,id) {
 }
 function setupPage() {
 	setupForms();
-  openWorkspace(GettingStarted);
+	openWorkspace(GettingStarted);
 }
 function showOrHide(id, button) {
   var s = document.getElementById(id).style;
