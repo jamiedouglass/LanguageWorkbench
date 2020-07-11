@@ -65,6 +65,14 @@ function setInputViewName(viewName,elem) {
 	} 
 }
 function openViewFile(id) {
+	var info, e=document.getElementById(id),
+		view = LoLs.views[e.getAttribute("name")],
+		name=view.name;
+	if (view.isRefreshNeeded()) {
+		if (!confirm(name + " needs to be refreshed. Load view anyway?")) {
+			return;
+		}
+	}
   	var e=document.createElement('input');
     e.setAttribute('id','localViewFile');
     e.setAttribute('type', 'file');
@@ -75,8 +83,6 @@ function openViewFile(id) {
 			return;
 		}
 		reader.onloadend = function (evt) {
-			var info, e=document.getElementById(id),
-			view = LoLs.views[e.getAttribute("name")];
 			try {
 				info=evt.target.result;
 				view.setContents(info);
@@ -107,7 +113,12 @@ function openViewFile(id) {
 function saveViewFile(id) {
 	var  e=document.getElementById(id),
 	view = LoLs.views[e.getAttribute("name")],
-	name=view.name,
+	name=view.name;
+	if (view.isRefreshNeeded()) {
+		if (!confirm(name + " needs to be refreshed. Save view anyway?")) {
+			return;
+		}
+	}
   	d=new Blob([view.getContents()],{type: 'text/plain'}); 
   	e=document.createElement('a');
     e.setAttribute('href',window.URL.createObjectURL(d));
@@ -171,8 +182,8 @@ function createView(view,beforeId) {
 	'			onchange="setViewLanguage(\''+name+'\',\''+id+'ViewLang\')">' +
 	'		</select>' +
 	'		</scan>' +
-	'	  <button type="button" title="open view" onClick="openViewFile(\''+id+'View\')">' +
-	'	        <img src="images/open-workspace.png" alt="Open View">' +
+	'	  <button type="button" title="load view" onClick="openViewFile(\''+id+'View\')">' +
+	'	        <img src="images/open-workspace.png" alt="Load View">' +
 	'     </button>' +
 	'	  <button type="button" title="save view" onClick="saveViewFile(\''+id+'View\')">' +
 	'	        <img src="images/save-workspace.png" alt="Save View">' +
