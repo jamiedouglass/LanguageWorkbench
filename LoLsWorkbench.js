@@ -84,8 +84,13 @@ function openViewFile(id) {
 		}
 		reader.onloadend = function (evt) {
 			try {
+			    var se=view.getSelection();
 				info=evt.target.result;
-				view.setContents(info);
+				if (se===undefined || se=="") {
+					view.setContents(info);
+				} else {
+					view.insert(info);
+				}
 			} catch (e) {
 				alert("Error in file: "+e);
 				return;
@@ -111,7 +116,7 @@ function openViewFile(id) {
 	e.click();
 }
 function saveViewFile(id) {
-	var  e=document.getElementById(id),
+	var  d, s, e=document.getElementById(id),
 	view = LoLs.views[e.getAttribute("name")],
 	name=view.name;
 	if (view.isRefreshNeeded()) {
@@ -119,7 +124,11 @@ function saveViewFile(id) {
 			return;
 		}
 	}
-  	d=new Blob([view.getContents()],{type: 'text/plain'}); 
+	s=view.getSelection();
+	if (s===undefined || s=="") {
+		s=view.getContents();
+	}
+  	d=new Blob([s],{type: 'text/plain'}); 
   	e=document.createElement('a');
     e.setAttribute('href',window.URL.createObjectURL(d));
     e.setAttribute('download', name + '.txt');

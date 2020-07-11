@@ -76,7 +76,23 @@ ACEeditorClass={
   		return this.contents;
   	return e.editor.getValue();
   },
-	serialize:function(indent,all) {
+  getSelection: function () {
+  	var e;
+  	if (this.view!==undefined && this.view.id!==undefined)
+  		e=document.getElementById(this.view.id);
+  	if (e===undefined || e===null)
+  		return '';
+  	return e.editor.getSelectedText();
+  },
+  insert: function(s) {
+  	var e;
+  	if (this.view!==undefined && this.view.id!==undefined)
+  		e=document.getElementById(this.view.id);
+  	if (e===undefined || e===null)
+  		return undefined;
+	return e.editor.insert(s);
+  },
+    serialize:function(indent,all) {
 		var s="{";
 		s+='"name": "'+this.name+'"';
 		if (all===true || this.height!=="60px")
@@ -505,6 +521,12 @@ ViewClass={
 		if (this.inputView===this)
 			return this.contents;
 		return this.editor.getContents();
+	},
+	getSelection: function() {
+		return this.editor.getSelection();
+	},
+	insert: function(s) {
+		return this.editor.insert(s);
 	},
 	isRefreshNeeded:function() {
 		return this.needsRefresh;
