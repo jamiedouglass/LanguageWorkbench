@@ -257,7 +257,7 @@ function refreshAll() {
   	LoLs.refreshAll(event.altKey);
   } catch (e) {
   	if (e.errorPos!==undefined)
-  		insertMessage(e.view.id, e.errorPos, 'Unknown->');
+  		insertMessage(e.view.id, e.errorPos, '"Unknown"');
   	else
   		alert(e);
   }
@@ -280,7 +280,7 @@ function refreshView(viewName) {
   	LoLs.views[viewName].refresh(event.altKey);
   } catch (e) {
   	if (e.errorPos!==undefined)
-  		insertMessage(e.view.id, e.errorPos, 'Unknown->');
+  		insertMessage(e.view.id, e.errorPos, '"Unknown"');
   	else
   		alert(e);
   }
@@ -358,11 +358,10 @@ function insertMessage(id, index, message) {
     note = [
     	{row: pos.row, 
     	 col: pos.column,
-    	 text: message,
+    	 text: "Unable to recognize " + message + " at column " + pos.column,
     	 type: "error"}];
   editor.renderer.setShowGutter(true);
   editor.getSession().setAnnotations(note);
-  doc.insert(pos, message);
-  editor.find(message, {backwards:true}, false); 
+  editor.gotoLine(pos.row + 1, pos.column);
   editor.focus();
 }
