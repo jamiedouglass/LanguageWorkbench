@@ -354,8 +354,15 @@ function insertMessage(id, index, message) {
 	}
   var editor = document.getElementById(id).editor,
   	doc = editor.getSession().getDocument(),
-    pos = indexToPosition(doc, index);
+    pos = indexToPosition(doc, index),
+    note = [
+    	{row: pos.row, 
+    	 col: pos.column,
+    	 text: message,
+    	 type: "error"}];
+  editor.renderer.setShowGutter(true);
+  editor.getSession().setAnnotations(note);
   doc.insert(pos, message);
-  editor.find(message, {backwards:true}, false);
+  editor.find(message, {backwards:true}, false); 
   editor.focus();
 }

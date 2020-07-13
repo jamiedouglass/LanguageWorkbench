@@ -12,7 +12,7 @@ var EmptyWorkspace={name: "My Work",
 				makeList: true}]}], 
  views: [
 		{name: "My View",	
-		 editor: {name: "ACE", height: "300px", gutters: true, readOnly: false},   				 
+		 editor: {name: "ACE", height: "300px", gutters: false, readOnly: false},   				 
 		 language: "OMeta JS",
 		 contents: 	'ometa MyLanguage {\n  start=anything*\n}'}],
  currentView: "My View"};			

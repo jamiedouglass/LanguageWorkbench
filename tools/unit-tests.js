@@ -179,7 +179,7 @@ YUI({useBrowserconsole: true}).use('test', function (Y) {
 				views: [
 				 {name: "Raw Grammar",
 					language: "ometa",
-					editor: {name: "ACE", height: "100px", gutters: true},
+					editor: {name: "ACE", height: "100px", gutters: false},
 					contents: "ometa newRaw {\n  start = anything*\n}"}],
 				 currentView: "LET Grammar"});
 		},

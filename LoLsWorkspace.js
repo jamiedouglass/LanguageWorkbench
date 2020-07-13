@@ -539,9 +539,12 @@ ViewClass={
 		return ns.sort();
 	},
 	refresh:function(force) {
-		var source, result, view=this.workspace.currentView;
+		var source, result, view=this.workspace.currentView,
+		    aceEditor=document.getElementById(this.id).editor;
 		if (this.needsRefresh!==true && force!==true) return;
 		this.needsRefresh=undefined;
+		aceEditor.getSession().clearAnnotations();
+		aceEditor.renderer.setShowGutter(this.editor.gutters);
 		source=this.getInputContents();
 		if (this.language!==undefined) {
 			try {
