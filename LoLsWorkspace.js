@@ -24,7 +24,7 @@ ACEeditorClass={
 		e.style.position="relative"; 
 		e.style.height=this.height;
 		f=ace.edit(view.id);
-		f.getSession().setMode('ace/mode/textmate');
+		f.getSession().setMode('ace/mode/text');
 		f.renderer.setShowGutter(this.gutters);
 		if (this.contents!==undefined) {
 			f.setValue(this.contents);
