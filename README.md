@@ -61,7 +61,7 @@ License
 -------
 
 Language of languages (LoLs) is released under the MIT license. 
-All contributions made for inclusion are licensed to Research on Knowing, LLC.
+All contributions made for inclusion are licensed to Research on Knowing.
 
 
 More information 
