@@ -40,8 +40,7 @@ divided into workspace files. Each workspace consists of interrelated views and 
 Using Language of languages (LoLs) Workbench
 --------------------------------------------
 
-LoLs is accessible for the workbench link on the Language of Languages (LoLs) website
-[www.languageoflanguages.com/workbench/](http://www.languageoflanguages.com/workbench/).
+LoLs is accessible from the workbench link on the Research on Knowing website.
 Workspace files can be loaded and saved to your computer.
 
 Reporting issues
